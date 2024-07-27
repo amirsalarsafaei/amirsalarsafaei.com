@@ -17,30 +17,16 @@ export default function Playground() {
 		ambientLightIntensity: 1.8,
 	});
 
-	const camera = useControls('camera', {
-		position: [0, 0, 0],
-		near: 0.1,
-		far: 500,
-	});
-	
-	const screen = useControls('screen', {
-		position: [0, 9.65, -9.9 ],
-		rotation: [-0.36, 0, 0],
-		scale: 5,
-		height: 495,
-		width: 870,
-	})
 	return (
 		<>
 			<Canvas
 				className='playground'
-				camera={camera}
 			>
 				<ambientLight intensity={otherConfig.ambientLightIntensity} />
 				<pointLight intensity={lightConfig.intensity} position={lightConfig.position} />
-				<Model scale={screen.scale} />
-				<OrbitControls />
+				<Model scale={5}/>
 				<Screen />
+				<OrbitControls />
 			</Canvas>
 
 		</>

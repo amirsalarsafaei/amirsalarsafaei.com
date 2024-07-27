@@ -4,7 +4,6 @@ Command: npx gltfjsx@6.4.1 public/laptop-2.glb --output ./src/modules/playground
 */
 
 import * as THREE from 'three'
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 
@@ -565,7 +564,6 @@ type GLTFResult = GLTF & {
     monitor: THREE.MeshStandardMaterial
     ['Material.001']: THREE.MeshStandardMaterial
   }
-  animations: GLTFAction[]
 }
 
 export function Model(props: JSX.IntrinsicElements['group']) {

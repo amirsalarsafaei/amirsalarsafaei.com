@@ -1,0 +1,26 @@
+.tmux {
+  height: 100%;
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+
+  .pane {
+    height: 100%;
+    width: 100%;
+
+    .commands {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+    }
+
+    .cmd-input {
+      font-family: 'Courier New', Courier, monospace;
+      background: none;
+      outline: none;
+      border: none;
+      color: white;
+    }
+
+  }
+}

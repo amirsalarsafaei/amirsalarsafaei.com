@@ -1,5 +1,6 @@
 import { formatTime } from "../../../../utils/time";
 
+import './command.scss';
 export interface CommandProps {
 	command: string;
 	stdout?: string;
@@ -9,12 +10,12 @@ export interface CommandProps {
 	id: string;
 }
 
-export  function Command({ command, stdout, stderr, path, sentAt }: CommandProps) {
+export function Command({ command, stdout, stderr, path }: CommandProps) {
 	return <div>
-		<div>{formatTime(sentAt)} {path} {command}</div>
-		{stderr}
-		{stdout}
-	</div>
+		<div className="command"><div className="path">{path}</div>{formatTime(sentAt)}{command}</div>
+		{stderr && stderr !== "" && (<div className="stderr cmdout">{stderr}</div>)}
+		{stdout && stdout !== "" && (<div className="stdout cmdout">{stdout}</div>)}
+	</div >
 }
 
 

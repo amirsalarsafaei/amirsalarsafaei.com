@@ -1,4 +1,5 @@
 import { CommandProps } from "./Command";
+import { say } from "cowsay";
 
 
 interface PathHandler {
@@ -19,7 +20,8 @@ class File implements PathHandler {
 	createdAt: Date;
 	modifiedAt: Date;
 	accessedAt: Date;
-	constructor(name: string, type: FileType, parent?: File) {
+	content: string;
+	constructor(name: string, type: FileType, parent?: File, content: string = "") {
 		this.name = name;
 		this.type = type;
 		this.modes = [7, 7, 7];
@@ -33,6 +35,7 @@ class File implements PathHandler {
 			this.parent = parent;
 			this.parent.children!!.push(this);
 		}
+		this.content = content
 	}
 	children?: File[];
 	parent: File;
@@ -88,20 +91,12 @@ class File implements PathHandler {
 		return `${this.name}/`
 	}
 
-	getPathFromRoot(): string {
-		let cur: File = this;
-		let parents = [cur];
-		while (cur.parent !== cur) {
-			cur = cur.parent;
-			parents.push(cur);
+	getPath(): string {
+		if (this.parent === this) {
+			return "/"
 		}
-
-		const path = parents.reduce((prevPath, curPar) => {
-			return "/" + curPar.name + prevPath;
-		}, "/")
-		return path.substring(1)
+		return this.parent.getPath() + this.getLsName()
 	}
-
 }
 
 
@@ -122,6 +117,7 @@ class FileSystem implements PathHandler {
 
 		return this.root.getFile(path.substring(i))
 	}
+
 }
 
 type CommandResult = {
@@ -139,6 +135,10 @@ class CommandController implements CommandProps {
 	constructor(id: string, command: string, path: string, stderr?: string, stdout?: string) {
 		this.id = id;
 		this.path = path;
+	path: string;
+	constructor(id: string, command: string, folder: string, stderr?: string, stdout?: string) {
+		this.id = id;
+		this.path = folder;
 		this.command = command;
 		this.stdout = stdout;
 		this.stderr = stderr;
@@ -155,13 +155,49 @@ export class TerminalController {
 		this.history = []
 		this.fileSystem = new FileSystem();
 		this.folder = this.fileSystem.root;
+		new File("cv", FileType.File, this.fileSystem.root,
+			`Here goes my cv
+something in between
+the end of cv.
+`)
+		this.runCommand(`cowsay "Available commands are:\nls, cd, pwd, cowsay, mkdir, cat.\nCreated with creativity by:\n AmirSalar Safaei Ghaderi"`)
 	}
 
 
+
+	private splitCommandRespectingQuotes(command: string): string[] {
+		const args: string[] = [];
+		let currentArg = '';
+		let inQuotes = false;
+
+		for (let i = 0; i < command.length; i++) {
+			if (command[i] === '"' && (i === 0 || command[i - 1] !== '\\')) {
+				inQuotes = !inQuotes;
+			} else if (command[i] === ' ' && !inQuotes) {
+				if (currentArg) {
+					args.push(currentArg);
+					currentArg = '';
+				}
+			} else {
+				currentArg += command[i];
+			}
+		}
+
+		if (currentArg) {
+			args.push(currentArg);
+		}
+
+		return args;
+	}
+
+	getCurrentPath(): string {
+		return this.folder.getPath()
+	}
+
 	runCommand(command: string) {
 		command = command.trim();
-		let args = command.split(" ");
-		let path = this.folder.getPathFromRoot();
+		let args = this.splitCommandRespectingQuotes(command);
+		const path = this.folder.getPath();
 		let result: CommandResult = {};
 		if (args[0] === "cd") {
 			result = this.cd(args[1] ?? "");
@@ -174,6 +210,14 @@ export class TerminalController {
 		}
 		else if (args[0] === "ls") {
 			result = this.ls(args[1] ?? "");
+		} else if (args[0] === "cowsay") {
+			result = this.cowsay(args[1] ?? "");
+		} else if (args[0] === "cat") {
+			result = this.cat(args[1] ?? "");
+		} else {
+			result = {
+				stderr: "command `" + args[0] + "` not found",
+			}
 		}
 		else {
 			result = {
@@ -189,7 +233,6 @@ export class TerminalController {
 		)]
 
 	}
-
 
 
 	cd(path: string): CommandResult {
@@ -222,6 +265,7 @@ export class TerminalController {
 			return this.folder.getFile(path);
 		}
 	}
+
 
 	pwd(): CommandResult {
 		let cur = this.folder;
@@ -286,17 +330,48 @@ export class TerminalController {
 		}
 		return {
 			stdout: files.reduce((prevOut, curFile) => {
-				return `${prevOut}\n${curFile.getLsName()}`
+				if (prevOut !== "") {
+					return `${prevOut}\n${curFile.getLsName()}`
+				}
+				return curFile.getLsName()
 			}, "")
 		}
 	}
 
-	getCommands(): CommandController[] {
-		return this.history;
+	cat(path: string): CommandResult {
+		if (path === "") {
+			return {
+				stderr: `path cannot be empty`
+			}
+		}
+
+		const file = this.getFile(path);
+		if (file == null) {
+			return {
+				stderr: `cannot access '${path}': No such file or directory`
+			}
+		}
+
+		if (file.type == FileType.Dir) {
+			return {
+				stderr: `${file.name}: is a directory`
+			}
+		}
+
+		return {
+			stdout: file.content,
+		}
 	}
 
-	getPath(): string {
-		return this.folder.getPathFromRoot()
+	cowsay(text: string): CommandResult {
+		return {
+			stdout: say({ text: text })
+		}
+
+	}
+
+	getCommands(): CommandController[] {
+		return this.history;
 	}
 
 }

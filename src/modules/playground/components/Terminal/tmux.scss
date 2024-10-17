@@ -1,8 +1,7 @@
 .tmux {
   height: 100%;
   width: 100%;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 12px;
+
   .pane {
     height: 100%;
     width: 100%;
@@ -14,13 +13,6 @@
       max-height: 100%;
     }
 
-    .cmd-input {
-      font-family: 'Courier New', Courier, monospace;
-      background: none;
-      outline: none;
-      border: none;
-      color: white;
-    }
 
   }
 }

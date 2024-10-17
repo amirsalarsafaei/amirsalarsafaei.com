@@ -1,6 +1,7 @@
 import { KeyboardEvent,  useEffect, useRef, useState } from "react";
 import { TerminalController } from './TerminalController.ts';
 import { Command } from './Command.tsx';
+import './command.scss';
 type TerminalProps = {
 	focused: boolean;
 }
@@ -53,6 +54,14 @@ export function Terminal({ focused }: TerminalProps) {
 
 	return <div className="commands" ref={listRef}>
 		{termainalController.getCommands().map((c) => (<Command {...c} key={c.id} />))}
-		<div>{termainalController.getPath()} {"> "}<input ref={inputRef} className="cmd-input" value={cmdInput} onChange={(e) => setCmdInput(e.target.value)} onKeyDownCapture={handleKeyDown} /></div>
+		<div className="cmd-input-line">
+			<div className="path">{termainalController.getCurrentPath()}</div>
+			<input className="cmd-input"
+				spellCheck={false}
+				value={cmdInput}
+				ref={inputRef}
+				onChange={(e) => setCmdInput(e.target.value)}
+				onKeyDownCapture={handleKeyDown} />
+		</div>
 	</div>
 }

@@ -87,6 +87,21 @@ class File implements PathHandler {
 		}
 		return `${this.name}/`
 	}
+
+	getPathFromRoot(): string {
+		let cur: File = this;
+		let parents = [cur];
+		while (cur.parent !== cur) {
+			cur = cur.parent;
+			parents.push(cur);
+		}
+
+		const path = parents.reduce((prevPath, curPar) => {
+			return "/" + curPar.name + prevPath;
+		}, "/")
+		return path.substring(1)
+	}
+
 }
 
 
@@ -119,13 +134,15 @@ class CommandController implements CommandProps {
 	command: string;
 	stdout?: string;
 	stderr?: string;
-	folder: string;
-	constructor(id: string, command: string, folder: string, stderr?: string, stdout?: string) {
+	sentAt: Date;
+	path: string;
+	constructor(id: string, command: string, path: string, stderr?: string, stdout?: string) {
 		this.id = id;
-		this.folder = folder;
+		this.path = path;
 		this.command = command;
 		this.stdout = stdout;
 		this.stderr = stderr;
+		this.sentAt = new Date();
 	}
 }
 
@@ -144,7 +161,7 @@ export class TerminalController {
 	runCommand(command: string) {
 		command = command.trim();
 		let args = command.split(" ");
-		let folder = this.folder.name;
+		let path = this.folder.getPathFromRoot();
 		let result: CommandResult = {};
 		if (args[0] === "cd") {
 			result = this.cd(args[1] ?? "");
@@ -158,11 +175,16 @@ export class TerminalController {
 		else if (args[0] === "ls") {
 			result = this.ls(args[1] ?? "");
 		}
+		else {
+			result = {
+				stderr: `command not found: ${args[0] ?? ""}`
+			}
+		}
 
 
-		this.history = [ ...this.history, (
+		this.history = [...this.history, (
 			new CommandController(
-				String(this.history.length), command, folder, result.stderr, result.stdout,
+				String(this.history.length), command, path, result.stderr, result.stdout,
 			)
 		)]
 
@@ -211,9 +233,10 @@ export class TerminalController {
 
 		const path = parents.reduce((prevPath, curPar) => {
 			return "/" + curPar.name + prevPath;
-		}, "/")
+		}, "")
 
-		return { stdout: path.substring(1),
+		return {
+			stdout: path.substring(1),
 		}
 	}
 
@@ -272,5 +295,8 @@ export class TerminalController {
 		return this.history;
 	}
 
-	
+	getPath(): string {
+		return this.folder.getPathFromRoot()
+	}
+
 }

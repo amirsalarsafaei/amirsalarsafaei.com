@@ -19,7 +19,7 @@ export function Terminal({ focused }: TerminalProps) {
 
 	const focusInput = () => {
 		if (inputRef.current) {
-			inputRef.current.focus();
+			inputRef.current.focus({preventScroll: true});
 		}
 	};
 
@@ -30,15 +30,21 @@ export function Terminal({ focused }: TerminalProps) {
 	};
 
 	useEffect(() => {
-		console.log(focused);
+		if (focused) {
+			document.addEventListener('click', handleClickOutside, true);
+
+			const timer = setTimeout(focusInput, 10);
+
+			return () => {
+				document.removeEventListener('click', handleClickOutside, true);
+				clearTimeout(timer);
+			};
+		}
+
 	}, [focused])
 
 	useEffect(() => {
-		document.addEventListener('click', handleClickOutside, true);
 
-		return () => {
-			document.removeEventListener('click', handleClickOutside, true);
-		};
 	}, [])
 
 	useEffect(() => {

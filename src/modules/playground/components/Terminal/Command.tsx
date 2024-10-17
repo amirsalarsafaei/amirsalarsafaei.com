@@ -10,9 +10,9 @@ export interface CommandProps {
 	id: string;
 }
 
-export function Command({ command, stdout, stderr, path }: CommandProps) {
+export function Command({ command, stdout, stderr, path, sentAt }: CommandProps) {
 	return <div>
-		<div className="command"><div className="path">{path}</div>{formatTime(sentAt)}{command}</div>
+		<div className="command"><div className="path">{path}</div>{command}<div className="time">{formatTime(sentAt)}</div></div>
 		{stderr && stderr !== "" && (<div className="stderr cmdout">{stderr}</div>)}
 		{stdout && stdout !== "" && (<div className="stdout cmdout">{stdout}</div>)}
 	</div >

@@ -1,6 +1,6 @@
 .screen-block {
   width:  870px;
-  height: 95px;
+  height: 495px;
   display: block;
   overflow: hidden;
   background: black;
@@ -10,11 +10,5 @@
    margin: 5px;
     width: calc(100% - 10px);
     height: calc(100% - 10px);
-  }
-  * {
-    -webkit-font-smoothing: antialiased; /* For WebKit-based browsers */
-    -moz-osx-font-smoothing: grayscale;  /* For Firefox on macOS */
-    text-rendering: optimizeLegibility;
-
   }
 }

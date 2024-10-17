@@ -3,6 +3,7 @@
 ::selection {
   background-color: #b4befe;
 }
+
 .stderr {
   color: #f38ba8;
 }
@@ -41,6 +42,14 @@
   margin-right: 0.4rem;
   width: fit-content;
   @include unselectable
+}
+
+.time {
+  font-size: 0.8rem;
+  background-color: #9399b2;
+  border-radius: 1.2rem;
+  padding: 0.05rem 0.45rem;
+  margin: 0.025rem 0;
 }
 
 .command {

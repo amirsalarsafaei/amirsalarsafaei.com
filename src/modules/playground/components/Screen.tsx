@@ -7,8 +7,8 @@ export default function Screen() {
 
 
 	return <Html rotation={[-0.36, 0, 0]} position={[0, 9.3, -9.8]} transform occlude>
-		<div className="screen-block">
-			<div className="wrapper">
+		<div className="screen-block" draggable={false}>
+			<div className="wrapper" draggable={false}>
 				<Tmux />
 			</div>
 		</div>

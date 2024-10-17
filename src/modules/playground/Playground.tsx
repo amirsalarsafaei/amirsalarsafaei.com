@@ -1,6 +1,5 @@
 import { Model } from './models/LaptopModel.tsx'
 import { Canvas } from '@react-three/fiber'
-import { useControls } from 'leva';
 import { Suspense } from 'react';
 
 import './playground.scss';
@@ -16,7 +15,6 @@ export default function Playground() {
 				className='playground'
 				camera={{position:[0, 10, 10], rotation:[10, 5, 200]}}
 			>
-			</Canvas>
 				<Suspense fallback={<Loading />}	>
 					<ambientLight intensity={1.8} />
 					<pointLight intensity={300} position={[0, 30, -5]} />

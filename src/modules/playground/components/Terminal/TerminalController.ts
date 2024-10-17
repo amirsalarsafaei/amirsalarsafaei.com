@@ -135,10 +135,6 @@ class CommandController implements CommandProps {
 	constructor(id: string, command: string, path: string, stderr?: string, stdout?: string) {
 		this.id = id;
 		this.path = path;
-	path: string;
-	constructor(id: string, command: string, folder: string, stderr?: string, stdout?: string) {
-		this.id = id;
-		this.path = folder;
 		this.command = command;
 		this.stdout = stdout;
 		this.stderr = stderr;
@@ -148,7 +144,7 @@ class CommandController implements CommandProps {
 
 
 export class TerminalController {
-	private history: CommandController[];
+	history: CommandController[];
 	private fileSystem: FileSystem;
 	private folder: File;
 	constructor() {
@@ -217,11 +213,6 @@ the end of cv.
 		} else {
 			result = {
 				stderr: "command `" + args[0] + "` not found",
-			}
-		}
-		else {
-			result = {
-				stderr: `command not found: ${args[0] ?? ""}`
 			}
 		}
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 interface NavItem {
   label: string;
@@ -8,7 +9,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', path: '/' },
-  { label: 'CV', path: '/cv.pdf' },
+  { label: 'CV', path: '/cv' },
   { label: 'Blogs', path: '/blogs' },
   { label: 'Contact', path: '/contact' },
 ];
@@ -60,7 +61,7 @@ const NavItem = styled.li`
   }
 `;
 
-const NavLink = styled.a`
+const NavLink = styled(Link)`
   color: white;
   text-decoration: none;
   &:hover {
@@ -104,7 +105,7 @@ const Navbar: React.FC = () => {
       <NavLinks $isOpen={isOpen}>
         {navItems.map((item) => (
           <NavItem key={item.path}>
-            <NavLink href={item.path} onClick={() => setIsOpen(false)}>{`<${item.label}/>`}</NavLink>
+            <NavLink to={item.path} onClick={() => setIsOpen(false)}>{`<${item.label}/>`}</NavLink>
           </NavItem>
         ))}
       </NavLinks>

@@ -1,5 +1,6 @@
 import { CommandProps } from "./Command";
 import { say } from "cowsay";
+import cv from "./CV";
 
 
 interface PathHandler {
@@ -151,12 +152,8 @@ export class TerminalController {
 		this.history = []
 		this.fileSystem = new FileSystem();
 		this.folder = this.fileSystem.root;
-		new File("cv", FileType.File, this.fileSystem.root,
-			`Here goes my cv
-something in between
-the end of cv.
-`)
-		this.runCommand(`cowsay "Available commands are:\nls, cd, pwd, cowsay, mkdir, cat.\nCreated with creativity by:\n AmirSalar Safaei Ghaderi"`)
+		new File("cv", FileType.File, this.fileSystem.root, cv)
+		this.runCommand(`cowsay "Available commands are:\nls, cd, pwd, cowsay, mkdir, cat.\nCreated using creativity by:\n AmirSalar Safaei Ghaderi\ne.g.: 'cat cv'\nUse shift/ctrl and drag to move around"`)
 	}
 
 

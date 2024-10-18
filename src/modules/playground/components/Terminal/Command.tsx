@@ -12,7 +12,7 @@ export interface CommandProps {
 
 export function Command({ command, stdout, stderr, path, sentAt }: CommandProps) {
 	return <div>
-		<div className="command"><div className="path">{path}</div>{command}<div className="time">{formatTime(sentAt)}</div></div>
+		<div className="command"><div className="path">{path}</div><div className="text">{command}</div><div className="time">{formatTime(sentAt)}</div></div>
 		{stderr && stderr !== "" && (<div className="stderr cmdout">{stderr}</div>)}
 		{stdout && stdout !== "" && (<div className="stdout cmdout">{stdout}</div>)}
 	</div >

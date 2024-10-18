@@ -5,7 +5,7 @@ import Navbar from "./shared/Navbar/Navbar.tsx"
 function App() {
 
   return (
-		<div style={{"height":"100vh"}}>
+		<div style={{"height":"100dvh"}}>
 			<Navbar />
 			<Playground />
 		</div>

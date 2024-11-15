@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^9.116.1",
+    "@react-three/fiber": "^8.17.10",
     "cowsay": "^1.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
+    "react-three": "^0.9.7",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {

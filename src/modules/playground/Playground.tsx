@@ -1,4 +1,5 @@
-import  Model  from './models/LaptopModel.tsx';
+import  LaptopModel  from './models/LaptopModel.tsx';
+import GopherModel from './models/Gopher.tsx'
 import { Canvas, useThree } from '@react-three/fiber';
 import { Suspense, useRef, useEffect, useState } from 'react';
 
@@ -22,9 +23,7 @@ const useIsMobile = () => {
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener('resize', checkMobile); return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return isMobile;
@@ -69,7 +68,8 @@ export default function Playground() {
 				<Suspense fallback={<Loading />}	>
 					<ambientLight intensity={1.8} />
 					<pointLight intensity={300} position={[0, 30, -5]} />
-					<Model scale={5}/>
+					<LaptopModel scale={5}/>
+          <GopherModel scale={5} rotation={[0, 0.4, 0]} position={[-18, 11, -18]} />
 					<Screen />
 					<Controls />
 				</Suspense>

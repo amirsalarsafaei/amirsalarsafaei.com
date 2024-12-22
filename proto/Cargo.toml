@@ -1,0 +1,28 @@
+[package]
+name = "salar-interface"
+version = "0.1.0"
+edition = "2021"
+description = "Generated protobuf interfaces for amirsalarsafaei.com backend"
+publish = false
+
+[dependencies]
+tonic = { version = "0.12.3", features = ["transport", "codegen"] }
+prost = "0.13"
+prost-types = "0.13"
+serde = { version = "1.0", features = ["derive"] }
+pbjson = "0.6"
+pbjson-types = "0.6"
+time = { version = "0.3", features = ["formatting", "parsing"] }
+chrono = { version = "0.4", features = ["serde"] }
+protobuf = "3.7.1"
+protobuf-json-mapping = "3.3"
+
+
+[lib]
+name = "salar_interface"
+path = "src/lib.rs"
+
+[features]
+default = ["proto_full"]
+## @@protoc_insertion_point(features)
+

@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package blogs;
+
+import "google/protobuf/timestamp.proto";
+
+service Blogs {
+  rpc ListBlogs(ListBlogsRequest) returns (ListBlogsResponse);
+  rpc ListPublishedBlogs(ListPublishedBlogsRequest) returns (ListPublishedBlogsResponse);
+  rpc CreateBlog(CreateBlogRequest) returns (CreateBlogResponse);
+  rpc GetBlog(GetBlogRequest) returns (GetBlogReponse);
+  rpc UpdateBlog(UpdateBlogRequest) returns (UpdateBlogResponse);
+  rpc PublishBlog(PublishBlogRequest) returns (PublishBlogResponse);
+}
+
+message Blog {
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    DRAFT = 1;
+    PUBLISHED = 2;
+  }
+
+  string id = 1;
+  string content = 2;
+  string title = 3;
+  repeated string tags = 4;
+  State state = 7;
+
+  google.protobuf.Timestamp published_at = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message ListBlogsRequest {
+  string page_token = 1;
+  int32 page_size = 2;
+}
+
+message ListBlogsResponse {
+  repeated Blog blogs = 1;
+  string next_page_token = 2;
+}
+
+message ListPublishedBlogsRequest {
+  string page_token = 1;
+  int32 page_size = 2;
+}
+
+message ListPublishedBlogsResponse {
+  repeated Blog blogs = 1;
+  string next_page_token = 2;
+}
+
+message CreateBlogRequest {
+  string title = 1;
+  string content = 2;
+}
+
+message CreateBlogResponse {
+  Blog blog = 1;
+}
+
+message GetBlogRequest {
+  string id = 1;
+}
+
+message GetBlogReponse {
+  Blog blog = 1;
+}
+
+message UpdateBlogRequest {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+}
+
+message UpdateBlogResponse {
+  Blog blog = 1;
+}
+
+message PublishBlogRequest {
+  string id = 1;
+}
+
+message PublishBlogResponse {
+  Blog blog = 1;
+}
+
+message ListPublishedBlogsPaginationToken {
+  google.protobuf.Timestamp last_published_at = 1;
+}
+
+message ListBlogsPaginationToken {
+  google.protobuf.Timestamp last_created_at = 1;
+}

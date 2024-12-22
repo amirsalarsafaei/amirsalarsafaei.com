@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package playground;
+
+service Spotify {
+  rpc GetRecentlyPlayedSong(GetRecentlyPlayedSongRequest) returns (GetRecentlyPlayedSongResponse);
+}
+
+message GetRecentlyPlayedSongRequest {}
+
+message GetRecentlyPlayedSongResponse {
+  string track = 1;
+  string artist = 2;
+  bool playing = 3;
+  string album_art_url = 4;
+}

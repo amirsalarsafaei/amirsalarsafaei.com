@@ -1,0 +1,137 @@
+// Variables
+@import '/src/styles/variables';
+
+.blogs-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.blogs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem 0;
+  * {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.blog-card {
+  background: $card-bg;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba($secondary-color, 0.1);
+  position: relative;
+  overflow: hidden;
+
+
+  &::before {
+    content: '{';
+    position: absolute;
+    top: -20px;
+    left: -10px;
+    font-size: 100px;
+    color: rgba($secondary-color, 0.03);
+    font-family: $code-font;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-color: rgba($secondary-color, 0.3);
+  }
+}
+
+.blog-title {
+  color: $accent-color;
+  font-family: $code-font;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  
+  &::before {
+    content: "// ";
+    color: rgba($secondary-color, 0.5);
+  }
+}
+
+.blog-excerpt {
+  color: $text-color;
+  font-family: $content-font;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.blog-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba($secondary-color, 0.1);
+  font-family: $code-font;
+  font-size: 0.85rem;
+}
+
+.blog-date {
+  color: rgba($text-color, 0.6);
+  font-size: 0.8rem;
+}
+
+.blogs-loading {
+  text-align: center;
+  padding: 2rem;
+  color: $text-color;
+  
+  .loading-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba($secondary-color, 0.3);
+    border-radius: 50%;
+    border-top-color: $secondary-color;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+}
+
+.blogs-error {
+  text-align: center;
+  padding: 3rem;
+  color: $text-color;
+  background: rgba($card-bg, 0.5);
+  border-radius: 8px;
+  margin: 2rem 0;
+  
+  h2 {
+    color: #ff6b6b;
+    margin-bottom: 1rem;
+    font-family: $code-font;
+  }
+  
+  p {
+    opacity: 0.8;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .blogs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .blog-card {
+    padding: 1.25rem;
+  }
+}
+

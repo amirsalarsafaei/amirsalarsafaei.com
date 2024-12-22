@@ -1,0 +1,41 @@
+.tmux {
+  height: 100%;
+  width: 100%;
+
+  .pane {
+    height: 100%;
+    width: 100%;
+
+    .commands {
+      overflow-y: scroll;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+
+      // Webkit scrollbar styling (Chrome, Safari, newer versions of Edge)
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+      }
+
+      // Firefox scrollbar styling
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+  }
+}

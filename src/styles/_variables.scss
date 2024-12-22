@@ -1,0 +1,40 @@
+// Colors
+$primary-bg: #0a0c0b;          // Nearly black with hint of green
+$card-bg: #0f1412;             // Very dark green-black
+$primary-color: #141917;       // Dark green-tinted black
+$secondary-color: #2bbc8a;     // Muted matrix green
+$text-color: #98a3a0;         // Muted green-gray for main text
+$highlight-color: #4ae168;     // Softer green for highlights
+$hover-color: #1c2721;        // Dark hover state
+$accent-color: #36b37e;       // Professional green accent
+$content-font: 'Inter', sans-serif;
+$primary-bg: #0a0c0b;          // Nearly black with hint of green
+// Blog specific colors
+$blog-heading-color: $secondary-color;
+$blog-text-color: #dfe4ea;
+$blog-code-bg: $hover-color;
+$blog-code-color: #ff7675;
+$blog-border-color: $primary-color;
+$blog-tag-bg: $card-bg;
+$blog-meta-color: #a4b0be;
+$blog-blockquote-border: $secondary-color;
+$blog-link-color: $secondary-color;
+$card-bg: #0f1412;             // Very dark green-black
+// Blog layout
+$blog-max-width: 900px;
+$blog-container-padding: 2rem;
+$blog-border-radius: 5px;
+$content-font: 'Inter', sans-serif;
+// Layout
+$navbar-height: 4rem;
+$mobile-breakpoint: 768px;
+
+// Typography
+$code-font: 'Fira Code', monospace;
+
+// Animation
+$transition-speed: 0.3s;
+
+:root {
+  --navbar-height: #{$navbar-height};
+}

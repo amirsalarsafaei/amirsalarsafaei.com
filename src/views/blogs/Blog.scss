@@ -1,0 +1,135 @@
+@import "src/styles/global.scss";
+
+
+.blogContainer {
+  max-width: $blog-max-width;
+  margin: 0 auto;
+  padding: $blog-container-padding;
+  font-family: $code-font;
+}
+
+.blogHeader {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid $blog-border-color;
+  padding-bottom: 1rem;
+}
+
+.blogTitle {
+  font-size: 2.5rem;
+  color: $blog-heading-color;
+  margin-bottom: 1rem;
+}
+
+.blogMeta {
+  display: flex;
+  gap: 1rem;
+  color: $blog-meta-color;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.tagContainer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: $blog-tag-bg;
+  color: $secondary-color;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+transition: background-color $transition-speed;
+
+&:hover {
+  background: $hover-color;
+}
+}
+
+.markdown {
+  line-height: 1.6;
+  color: $blog-text-color;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: $blog-heading-color;
+    margin: 2rem 0 1rem;
+    border-bottom: 1px solid $blog-border-color;
+    padding-bottom: 0.3rem;
+  }
+
+  code {
+    background: $blog-code-bg;
+    color: $blog-code-color;
+    padding: 0.2em 0.4em;
+    border-radius: $blog-border-radius;
+    font-family: $code-font;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: $blog-code-bg;
+    padding: 1rem;
+    border-radius: $blog-border-radius;
+    overflow-x: auto;
+    margin: 1rem 0;
+
+    code {
+      background: none;
+      padding: 0;
+      color: $blog-text-color;
+    }
+  }
+
+  blockquote {
+    border-left: 4px solid $blog-blockquote-border;
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    background: $blog-code-bg;
+  }
+
+  a {
+    color: $blog-link-color;
+    text-decoration: none;
+transition: color $transition-speed;
+
+    &:hover {
+      text-decoration: underline;
+    color: $highlight-color;
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  th, td {
+    border: 1px solid $blog-border-color;
+    padding: 0.5rem;
+  }
+
+  th {
+    background: $blog-code-bg;
+  }
+
+  ul, ol {
+    padding-left: 2rem;
+  }
+
+  li {
+    margin: 0.5rem 0;
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: $blog-border-radius;
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid $blog-border-color;
+    margin: 2rem 0;
+  }
+}

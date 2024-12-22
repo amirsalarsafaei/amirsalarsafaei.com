@@ -1,14 +1,9 @@
-import Playground from "./modules/playground/Playground.tsx"
-import Navbar from "./shared/Navbar/Navbar.tsx"
+import Playground from "./views/playground/Playground.tsx";
 
 
 function App() {
-
   return (
-		<div style={{"height":"100dvh"}}>
-			<Navbar />
-			<Playground />
-		</div>
+    <Playground />
   )
 }
 

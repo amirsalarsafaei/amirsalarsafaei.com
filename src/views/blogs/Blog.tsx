@@ -12,42 +12,44 @@ import mermaid from 'mermaid';
 
 import './Blog.scss';
 import { Helmet } from "react-helmet-async";
+import Loading from "@/shared/Loading/Loading";
 
 function BlogMetadata({ data, isLoading }: { data?: any, isLoading: boolean }) {
-	const defaultTitle = "Blog | Amir Salar Safaei";
-	const defaultDescription = "Read interesting articles about technology, programming, and more.";
-	const defaultImage = "https://amirsalarsafaei.com/blog-1.png";
 
-	// Get the first paragraph of content for description (limited to 160 characters)
+	if (isLoading || !data?.blog) {
+		return <></>;
+	}
+
 	const getDescription = () => {
-		if (!data?.blog?.content) return defaultDescription;
+
 		const firstParagraph = data.blog.content.split('\n')[0] || '';
 		return firstParagraph.slice(0, 160) + (firstParagraph.length > 160 ? '...' : '');
 	};
 
+
 	return (
 		<Helmet>
-			<title>{isLoading ? defaultTitle : (data?.blog?.title || defaultTitle)}</title>
+			<title>{data.blog.title}</title>
 			<meta name="description" content={getDescription()} />
 
 			{/* Open Graph meta tags */}
-			<meta property="og:title" content={isLoading ? defaultTitle : (data?.blog?.title || defaultTitle)} />
+			<meta property="og:title" content={data.blog.title} />
 			<meta property="og:description" content={getDescription()} />
 			<meta property="og:type" content="article" />
-			<meta property="og:url" content={window.location.href} />
-			<meta property="og:image" content={defaultImage} />
+			<meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+
 
 			{/* Twitter Card meta tags */}
 			<meta name="twitter:card" content="summary_large_image" />
-			<meta name="twitter:title" content={isLoading ? defaultTitle : (data?.blog?.title || defaultTitle)} />
+			<meta name="twitter:title" content={data.blog.title} />
 			<meta name="twitter:description" content={getDescription()} />
-			<meta name="twitter:image" content={defaultImage} />
+
 
 			{/* Article specific meta tags */}
-			{data?.blog?.createdAt && (
+			{data.blog.createdAt && (
 				<meta property="article:published_time" content={data.blog.createdAt.toISOString()} />
 			)}
-			{data?.blog?.tags?.map((tag: string, index: number) => (
+			{data.blog.tags?.map((tag: string, index: number) => (
 				<meta key={index} property="article:tag" content={tag} />
 			))}
 		</Helmet>
@@ -148,11 +150,7 @@ export default function SingleBlog() {
 	const renderContent = () => {
 		if (isFetching) {
 			return (
-				<div className="messageContainer">
-					<div className="loadingSpinner" />
-					<div className="message">Loading blog post...</div>
-					<div className="subMessage">Please wait while we fetch the content</div>
-				</div>
+				<Loading message="Loading the blog" />
 			);
 		}
 

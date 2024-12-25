@@ -1,19 +1,21 @@
+use chrono::Utc;
 use log::{error, info};
 use rspotify::clients::OAuthClient;
 use rspotify::model::PlayableItem::Track;
 use rspotify::model::TimeLimits;
-use chrono::Utc;
 use rspotify::prelude::*;
 use rspotify::AuthCodeSpotify;
-use salar_interface::playground::{GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse, spotify_server};
+use salar_interface::playground::{
+    spotify_server, GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse,
+};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
+use time;
+use time::OffsetDateTime;
 use tokio::sync::RwLock;
 use tokio::time::{interval, Duration};
 use toml_edit::DocumentMut;
-
-
 
 #[derive(Clone)]
 pub struct PrivateCreds {
@@ -45,15 +47,26 @@ impl PrivateCreds {
 
         fs::write(&self.spotify_cred_path, doc.to_string())?;
         Ok(())
-    } }
+    }
+}
+
+#[derive(Clone)]
+struct CachedResponse {
+    response: GetRecentlyPlayedSongResponse,
+    cached_at: time::OffsetDateTime,
+}
 
 pub struct SpotifyServicer {
     spotify_client: PrivateCreds,
+    cached_response: Arc<RwLock<Option<CachedResponse>>>,
 }
 
 impl SpotifyServicer {
     pub fn new(spotify_client: PrivateCreds) -> Self {
-        let servicer = Self { spotify_client };
+        let servicer = Self {
+            spotify_client,
+            cached_response: Arc::new(RwLock::new(None)),
+        };
         servicer.start_token_refresh();
         servicer
     }
@@ -71,7 +84,7 @@ impl SpotifyServicer {
                 let guard = client.auth_code.write().await;
                 match (*guard).refresh_token().await {
                     Ok(_) => {
-                        drop(guard); 
+                        drop(guard);
                         match client.write_tokens_to_file().await {
                             Ok(_) => info!("Successfully refreshed and saved Spotify token"),
                             Err(e) => error!("Failed to save refreshed token to file: {}", e),
@@ -99,10 +112,32 @@ impl SpotifyServicer {
 
         let album_art_url = match track.album.images.first() {
             Some(img) => img.url.clone(),
-            None => "".to_string()
+            None => "".to_string(),
         };
-        
+
         (track_name, artist_name, album_art_url)
+    }
+
+    async fn set_cache_response(&self, resp: GetRecentlyPlayedSongResponse) {
+        let mut guard = self.cached_response.write().await;
+        *guard = Some(CachedResponse {
+            response: resp,
+            cached_at: time::OffsetDateTime::now_utc(),
+        });
+    }
+
+    async fn get_cache_response(&self) -> Option<GetRecentlyPlayedSongResponse> {
+        let gaurd = self.cached_response.read().await;
+        match *gaurd {
+            Some(cached_value) => {
+                if cached_value.cached_at < OffsetDateTime::now_utc() - time::Duration::seconds(30) {
+                    None
+                } else {
+                    Some(cached_value.response)
+                }
+            }
+            None => None,
+        }
     }
 }
 
@@ -111,18 +146,19 @@ impl spotify_server::Spotify for SpotifyServicer {
     async fn get_recently_played_song(
         &self,
         _request: tonic::Request<GetRecentlyPlayedSongRequest>,
-    ) -> std::result::Result<
-        tonic::Response<GetRecentlyPlayedSongResponse>,
-        tonic::Status,
-    > {
+    ) -> std::result::Result<tonic::Response<GetRecentlyPlayedSongResponse>, tonic::Status> {
         let client = self.spotify_client.clone();
         let spotify = client.auth_code.read().await;
 
-        match spotify.current_playing(None, Some(vec![&rspotify::model::AdditionalType::Track])).await {
+        match spotify
+            .current_playing(None, Some(vec![&rspotify::model::AdditionalType::Track]))
+            .await
+        {
             Ok(Some(playing_ctx)) => {
                 if let Some(item) = playing_ctx.item {
                     if let Track(track) = item {
-                        let (track_name, artist_name, album_art_url) = Self::extract_track_info(&track);
+                        let (track_name, artist_name, album_art_url) =
+                            Self::extract_track_info(&track);
                         let response = GetRecentlyPlayedSongResponse {
                             track: track_name,
                             artist: artist_name,
@@ -141,10 +177,14 @@ impl spotify_server::Spotify for SpotifyServicer {
             }
         }
 
-        match spotify.current_user_recently_played(Some(1), Some(TimeLimits::Before(Utc::now()))).await {
+        match spotify
+            .current_user_recently_played(Some(1), Some(TimeLimits::Before(Utc::now())))
+            .await
+        {
             Ok(played_tracks) => {
                 if let Some(last_played) = played_tracks.items.last() {
-                    let (track_name, artist_name, album_art_url) = Self::extract_track_info(&last_played.track);
+                    let (track_name, artist_name, album_art_url) =
+                        Self::extract_track_info(&last_played.track);
                     let response = GetRecentlyPlayedSongResponse {
                         track: track_name,
                         artist: artist_name,

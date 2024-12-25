@@ -1,0 +1,79 @@
+@import '@/styles/_variables.scss';
+
+.tech-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+
+  .terminal {
+    background: $terminal-bg;
+    border-radius: $border-radius;
+    width: 100%;
+    max-width: 800px;
+    font-family: $code-font;
+
+    .terminal-body {
+      padding: 1rem;
+      color: $terminal-text;
+
+      .spinner-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+
+        .binary-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid transparent;
+          border-top-color: $terminal-primary;
+          border-right-color: $terminal-primary;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          position: relative;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            border: 3px solid transparent;
+            border-top-color: $terminal-secondary;
+            border-radius: 50%;
+            animation: spin 0.5s linear infinite reverse;
+          }
+        }
+      }
+
+      .main-message {
+        text-align: center;
+        color: $terminal-white;
+        font-size: $font-size-xl;
+        margin-bottom: 1rem;
+        font-family: $content-font;
+      }
+
+      .state-message {
+        text-align: center;
+        color: $terminal-primary;
+        font-size: $font-size-lg;
+        min-height: 1.5em;
+        opacity: 0.8;
+      transition: color $transition-speed ease;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

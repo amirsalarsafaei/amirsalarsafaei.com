@@ -1,14 +1,16 @@
 // Colors
-$primary-bg: #0a0c0b;          // Nearly black with hint of green
-$card-bg: #0f1412;             // Very dark green-black
-$primary-color: #141917;       // Dark green-tinted black
-$secondary-color: #2bbc8a;     // Muted matrix green
-$text-color: #98a3a0;         // Muted green-gray for main text
-$highlight-color: #4ae168;     // Softer green for highlights
-$hover-color: #1c2721;        // Dark hover state
-$accent-color: #36b37e;       // Professional green accent
+$primary-bg: #0a0c0b; // Nearly black with hint of green
+$card-bg: #0f1412; // Very dark green-black
+$primary-color: #141917; // Dark green-tinted black
+$secondary-color: #2bbc8a; // Muted matrix green
+$text-color: #98a3a0; // Muted green-gray for main text
+$highlight-color: #4ae168; // Softer green for highlights
+$hover-color: #1c2721; // Dark hover state
+$border-radius: 5px;
+$accent-color: #36b37e; // Professional green accent
 $content-font: 'Inter', sans-serif;
-$primary-bg: #0a0c0b;          // Nearly black with hint of green
+$primary-bg: #0a0c0b; // Nearly black with hint of green
+
 // Blog specific colors
 $blog-heading-color: $secondary-color;
 $blog-text-color: #dfe4ea;
@@ -19,11 +21,18 @@ $blog-tag-bg: $card-bg;
 $blog-meta-color: #a4b0be;
 $blog-blockquote-border: $secondary-color;
 $blog-link-color: $secondary-color;
-$card-bg: #0f1412;             // Very dark green-black
+$card-bg: #0f1412; // Very dark green-black
 // Blog layout
 $blog-max-width: 900px;
 $blog-container-padding: 2rem;
 $blog-border-radius: 5px;
+
+$terminal-bg: $primary-bg;
+$terminal-text: $secondary-color;
+$terminal-primary: $highlight-color;
+$terminal-secondary: $accent-color;
+$terminal-white: $blog-text-color;
+
 $content-font: 'Inter', sans-serif;
 // Layout
 $navbar-height: 4rem;
@@ -38,3 +47,74 @@ $transition-speed: 0.3s;
 :root {
   --navbar-height: #{$navbar-height};
 }
+
+// Font Sizes
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-md: 1.125rem;   // 18px
+$font-size-lg: 1.25rem;    // 20px
+$font-size-xl: 1.5rem;     // 24px
+$font-size-2xl: 1.875rem;  // 30px
+$font-size-3xl: 2.25rem;   // 36px
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-base: 1.5;
+$line-height-loose: 1.75;
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Spacing
+$spacing-xs: 0.25rem;    // 4px
+$spacing-sm: 0.5rem;     // 8px
+$spacing-base: 1rem;     // 16px
+$spacing-md: 1.5rem;     // 24px
+$spacing-lg: 2rem;       // 32px
+$spacing-xl: 3rem;       // 48px
+
+// Z-index
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+$transition-speed: 0.3s;
+$transition-timing: ease;
+
+// Shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+// Container
+$container-padding-mobile: 1rem;
+$container-padding-tablet: 2rem;
+$container-padding-desktop: 4rem;
+$container-max-width: 1200px;
+
+// Grid
+$grid-columns: 12;
+$grid-gutter: 2rem;
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+);
+
+// Media Queries
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;

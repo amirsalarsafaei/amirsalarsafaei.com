@@ -7,6 +7,7 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Group, Mesh } from 'three';
 import { Suspense, useRef, useEffect, useState } from 'react';
 import { Vector3 } from 'three';
+import { Helmet } from 'react-helmet-async';
 
 import './playground.scss';
 import Screen from './components/Screen.tsx';
@@ -176,6 +177,19 @@ export default function Playground() {
 
 	return (
 		<>
+			<Helmet>
+				<title>Amirsalar Safaei - Passionate Software Engineer</title>
+				<meta name="description" content="Welcome to my creative portfolio! I'm an enthusiastic software engineer who loves to share my passion for technology through this unique interactive 3D experience." />
+				<meta name="keywords" content="Software Engineering, Programming, Software Architecture, Web Development, 3D Interactive, Software Development, Tech Innovation" />
+				<meta property="og:title" content="Amirsalar Safaei - Passionate Software Engineer" />
+				<meta property="og:description" content="Discover software engineering through the eyes of an enthusiast. Experience my creative approach to technology in this interactive 3D environment." />
+				<meta property="og:type" content="website" />
+				<meta name="twitter:card" content="summary_large_image" />
+				<meta name="twitter:title" content="Amirsalar Safaei - Passionate Software Engineer" />
+				<meta name="twitter:description" content="Step into my world of software engineering, where passion meets innovation in an engaging 3D experience." />
+				<meta name="author" content="Amirsalar Safaei" />
+				<meta name="robots" content="index, follow" />
+			</Helmet>
 			<Canvas
 				className='playground'
 				camera={{

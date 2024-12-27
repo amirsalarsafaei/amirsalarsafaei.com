@@ -1,3 +1,4 @@
+'use client';
 import { Blog } from '@generated/blogs/blogs';
 
 import './BlogsList.scss';

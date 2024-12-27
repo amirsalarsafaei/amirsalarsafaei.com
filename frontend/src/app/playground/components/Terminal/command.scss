@@ -1,69 +1,117 @@
 @import 'src/styles/global.scss';
 
+// Terminal Theme Colors
+$terminal-bg: #282c34;
+$terminal-text: #abb2bf;
+$terminal-error: #e06c75;
+$terminal-success: #98c379;
+$terminal-path-bg: #61afef;
+$terminal-path-text: #ffffff;
+$terminal-time-bg: #c678dd;
+$terminal-time-text: #ffffff;
+$terminal-input-text: #d7dae0;
 
-.stderr {
-  color: #f38ba8;
-}
+// Terminal Dimensions
+$terminal-padding: 0.2rem;
+$terminal-border-radius: 10rem;
+$terminal-element-spacing: 0.4rem;
 
-* {
-  font-size: 16px;
-}
+// Terminal Font Sizes
+$terminal-text-size: 1rem;
+$terminal-time-size: 0.8rem;
 
 .tmux {
+  background-color: $terminal-bg;
+  color: $terminal-text;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+
   .pane {
+    padding: $terminal-padding;
+
     .cmd-input-line {
       width: 100%;
       display: flex;
       flex-direction: row;
       align-items: baseline;
-      padding: 0.2rem;
+      padding: $terminal-padding;
 
       .cmd-input {
         background: none;
         outline: none;
         border: none;
-        color: white;
+        color: $terminal-input-text;
         width: 100%;
         font-family: inherit;
+
+        &:focus {
+          outline: none;
+        }
       }
     }
   }
 }
 
+.stderr {
+  color: $terminal-error;
+  font-weight: 500;
+}
 
 .cmdout {
   white-space: pre;
+  line-height: 1.4;
+  padding: $terminal-padding 0;
 }
 
 .path {
-  color: white;
-  background: #74c7ec;
-  border-radius: 1.2rem;
-  padding: 0.1rem 0.45rem;
-  margin-right: 0.4rem;
-  width: fit-content;
-  @include unselectable
+  color: $terminal-path-text;
+  background: $terminal-path-bg;
+  border-radius: 80px;
+  padding: 0.03rem 0.5rem;
+  min-width: 1rem;
+  text-align: center;
+  margin-right: $terminal-element-spacing;
+
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  flex-shrink: 0;
+  @include unselectable;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
 }
 
 .time {
-  font-size: 0.8rem;
-  background-color: #9399b2;
-  border-radius: 1.2rem;
+  font-size: $terminal-time-size;
+  background-color: $terminal-time-bg;
+  color: $terminal-time-text;
+  border-radius: $terminal-border-radius;
   padding: 0.05rem 0.45rem;
-  margin: 0.025rem 0.2rem;
+  margin: 0.025rem $terminal-element-spacing;
   flex: none;
+  font-weight: 500;
 }
 
 .text {
   flex-grow: 1;
   overflow-wrap: break-word;
   word-break: break-word;
+  line-height: 1.4;
 }
 
 .command {
   display: flex;
   flex-direction: row;
   align-items: baseline;
-  padding: 0.2rem;
+  padding: $terminal-padding;
   width: 100%;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
 }

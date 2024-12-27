@@ -4,12 +4,13 @@ import './BlogsList.scss';
 import Link from 'next/link';
 
 interface BlogsProps {
-	blogs: Blog[];
+	blogs: Blog[],
+	isAdmin: boolean,
 	isLoadingError: boolean,
 	isFetching: boolean,
 }
 
-export default function({ blogs, isFetching, isLoadingError }: BlogsProps) {
+export default function({ blogs, isFetching, isLoadingError, isAdmin }: BlogsProps) {
 
 	return (
 		<div className="blogs-container">
@@ -22,7 +23,7 @@ export default function({ blogs, isFetching, isLoadingError }: BlogsProps) {
 				<>
 					<div className="blogs-grid">
 						{blogs.map((blog) => (
-							<Link href={`/blogs/${blog.id}`} key={blog.id}>
+							<Link href={`${isAdmin ? "/admin" : ""}/blogs/${blog.id}`} key={blog.id}>
 								<div className="blog-card">
 									<h3 className="blog-title">{blog.title}</h3>
 									<div className="blog-meta">

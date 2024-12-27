@@ -1,14 +1,14 @@
 use blogs::BlogServicer;
 use clap::Parser;
 use env_logger;
+use http::HeaderName;
 use rspotify::{AuthCodeSpotify, Credentials, OAuth};
 use salar_interface;
 use spotify::{PrivateCreds, SpotifyServicer};
-use tonic_web::{CorsGrpcWeb, GrpcWebLayer, GrpcWebService};
 use std::{process, time::Duration};
 use tonic::transport::Server;
-use tower_http::cors::{CorsLayer, AllowOrigin};
-use http::HeaderName;
+use tonic_web::{CorsGrpcWeb, GrpcWebLayer, GrpcWebService};
+use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_layer::{self, Layer};
 
 const DEFAULT_EXPOSED_HEADERS: [HeaderName; 4] = [
@@ -32,6 +32,7 @@ mod blogs;
 mod config;
 mod cornucopia;
 mod db;
+mod imageserver;
 mod spotify;
 
 #[tokio::main]
@@ -108,15 +109,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .collect::<Vec<HeaderName>>(),
         );
 
-    Server::builder()
+    let grpc_server = Server::builder()
         .accept_http1(true)
         .layer(cors_layer)
         .layer(GrpcWebLayer::new())
         .add_service(spotify_servier)
         .add_service(blogs_servicer)
         .add_service(reflection_service)
-        .serve(addr)
-        .await?;
+        .serve(addr);
+
+    let image_server =
+        imageserver::ImageServer::new(&config.image_server.upload_dir, &config.auth_token);
+    let image_app = image_server.create_router();
+
+    let image_addr = format!("{}:{}", config.server.host, config.image_server.port);
+    println!("Starting image server on {}", image_addr);
+
+    let image_server = axum::serve(
+        tokio::net::TcpListener::bind(image_addr).await?,
+        image_app.into_make_service(),
+    );
+
+    println!("Servers started, waiting for requests...");
+
+    tokio::join!(grpc_server, image_server).0?;
 
     Ok(())
 }

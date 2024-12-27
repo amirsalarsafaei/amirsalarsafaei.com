@@ -3,6 +3,7 @@
 import * as THREE from 'three'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
+import { useEffect } from 'react';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -23,8 +24,9 @@ type GLTFResult = GLTF & {
   }
 }
 
-export default function Model(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/laptop-2-transformed.glb') as GLTFResult
+export default function Model(props:any) {
+  const { nodes, materials } = useGLTF('/laptop-2-transformed.glb', true) as GLTFResult
+
   return (
     <group {...props} dispose={null}>
       <mesh name="body_laptop_body_laptop_0" geometry={nodes.body_laptop_body_laptop_0.geometry} material={materials.body_laptop} position={[0, 0.154, 0]} scale={0.01} />
@@ -36,3 +38,5 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
     </group>
   )
 }
+
+useGLTF.preload('/laptop-2-transformed.glb')

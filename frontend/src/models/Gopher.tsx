@@ -30,8 +30,8 @@ export type GLTFResult = GLTF & {
   }
 }
 
-export default function Model(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/gopher.glb') as GLTFResult
+export default function Model(props: any) {
+  const { nodes, materials } = useGLTF('/gopher.glb', true) as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh name="Object_4" geometry={nodes.Object_4.geometry} material={materials['Material.009']} />
@@ -52,3 +52,5 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
     </group>
   )
 }
+
+useGLTF.preload('/gopher.glb')

@@ -1,20 +1,21 @@
 'use client'
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { blogs_client } from "@/clients/grpc";
-import { Blog, GrpcWebError, ListBlogsRequest } from "@generated/blogs/blogs";
+import { Blog, GrpcWebError, ListPublishedBlogsRequest, ListPublishedBlogsResponse } from "@generated/blogs/blogs";
 import { useSearchParams } from "next/navigation";
 import BlogsList from "@/components/BlogsList/BlogsList";
+import { useGrpc } from "@/providers/GrpcProvider";
 
 export default function BlogsListClient({ 
   initialData 
 }: { 
-  initialData: Awaited<ReturnType<typeof blogs_client.ListPublishedBlogs>> 
+  initialData: Awaited<ListPublishedBlogsResponse> 
 }) {
   const searchParams = useSearchParams();
+  const {blogs_client} = useGrpc();
   
   const getPublishedBlogs = async ({ pageParam = "" }) => {
-    const req = ListBlogsRequest.create({
+    const req = ListPublishedBlogsRequest.create({
       pageSize: Number(searchParams.get("page-size")) || 10,
       pageToken: pageParam,
     });
@@ -50,6 +51,7 @@ export default function BlogsListClient({
   return BlogsList({
     blogs: data?.pages?.reduce((collected, page) => [...collected, ...page.blogs], [] as Blog[]) ?? [],
     isLoadingError,
-    isFetching
+    isFetching,
+    isAdmin: false,
   });
 }

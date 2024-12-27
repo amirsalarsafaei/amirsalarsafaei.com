@@ -1,6 +1,7 @@
+@import '@/styles/global.scss';
 .screen-block {
-  width: 870px;
-  height: 495px;
+  width: 1230px;
+  height: 700px;
   display: block;
   overflow: hidden;
   background: black;
@@ -15,7 +16,7 @@
   * {
 
     ::selection {
-      background-color: #b4befe;
+      background-color: $terminal-bg;
     }
   }
 }

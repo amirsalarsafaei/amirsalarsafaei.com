@@ -1,23 +1,9 @@
-import '@/styles/global.scss';
 import type { Metadata } from 'next';
 
 import '@/styles/global.scss';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      retry: 1,
-      staleTime: 5 * 60 * 1000,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+import QueryProvider from '@/providers/QueryProvider';
+import { GrpcProvider } from '@/providers/GrpcProvider';
+import Navbar from '@/components/Navbar/Navbar';
 
 export const metadata: Metadata = {
   title: {
@@ -44,7 +30,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://amirsalarsafaei.com',
-    title: 'Amirsalar Safaei | Full-Stack Engineer',
+    title: 'Amirsalar Safaei | Software Engineer',
     description: 'Building high-performance systems and software with Rust, Go, and modern web technologies',
     siteName: 'Amirsalar Safaei Portfolio',
     images: [{
@@ -56,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Amirsalar Safaei | Full-Stack Engineer',
+    title: 'Amirsalar Safaei | Software Engineer',
     description: 'Building high-performance systems and software with Rust, Go, and modern web technologies',
     images: ['/og-image.png']
   },
@@ -77,11 +63,6 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
 };
 
 export default function RootLayout({
@@ -92,11 +73,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <main>
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        </main>
+        <div id="root">
+          <QueryProvider>
+            <GrpcProvider>
+              <div>
+                <Navbar />
+                <div className="page-content">
+                  {children}
+                </div>
+              </div>
+            </GrpcProvider>
+          </QueryProvider>
+        </div>
       </body>
     </html>
   );

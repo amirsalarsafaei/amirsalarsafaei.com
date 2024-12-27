@@ -44,13 +44,13 @@ const Navbar = () => {
                 className="nav-link"
                 target="_blank"
                 rel="noopener noreferrer"
-              >{`<${item.label}/>`}</a>
+              >{item.label}</a>
             ) : (
               <Link 
                 href={item.path} 
                 className="nav-link"
                 onClick={() => setIsOpen(false)}
-              >{`<${item.label}/>`}</Link>
+              >{item.label}</Link>
             )}
           </li>
         ))}

@@ -1,0 +1,104 @@
+@import "src/styles/global.scss";
+
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px); // Adjust based on your layout
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.editorHeader {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: $blog-code-bg;
+  border-radius: 8px;
+  align-items: center;
+
+  input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  .titleInput {
+    flex: 2;
+  }
+
+  .tagsInput {
+    flex: 1;
+  }
+
+  .saveButton {
+    padding: 0.5rem 1rem;
+    background: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+
+    &:hover {
+      background: #0051a2;
+    }
+  }
+}
+
+.editorContent {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0; // Important for proper scrolling
+}
+
+.editorPane,
+.previewPane {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid $blog-border-color;
+  border-radius: 8px;
+  background: $blog-code-bg;
+}
+
+.markdownInput {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border: none;
+  resize: none;
+  font-family: $code-font;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  outline: none;
+  background: $blog-code-bg;
+  color: $blog-text-color;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.previewPane {
+  padding: 1rem;
+
+  // Import existing blog styles
+  @import '@/app/blogs/[id]/Blog.scss';
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .editorContent {
+    flex-direction: column;
+  }
+
+  .editorHeader {
+    flex-direction: column;
+
+    input,
+    button {
+      width: 100%;
+    }
+  }
+}

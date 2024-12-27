@@ -156,7 +156,10 @@ pub mod blogs_client {
         pub async fn get_blog(
             &mut self,
             request: impl tonic::IntoRequest<super::GetBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetBlogReponse>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<super::GetBlogResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -249,7 +252,7 @@ pub mod blogs_server {
         async fn get_blog(
             &self,
             request: tonic::Request<super::GetBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetBlogReponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::GetBlogResponse>, tonic::Status>;
         async fn update_blog(
             &self,
             request: tonic::Request<super::UpdateBlogRequest>,
@@ -477,7 +480,7 @@ pub mod blogs_server {
                     struct GetBlogSvc<T: Blogs>(pub Arc<T>);
                     impl<T: Blogs> tonic::server::UnaryService<super::GetBlogRequest>
                     for GetBlogSvc<T> {
-                        type Response = super::GetBlogReponse;
+                        type Response = super::GetBlogResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,

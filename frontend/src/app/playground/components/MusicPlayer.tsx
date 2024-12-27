@@ -21,8 +21,8 @@ function AlbumArt({ url }: { url: string }) {
 	const texture = useLoader(THREE.TextureLoader, url);
 
 	return (
-		<mesh position={[0, 0.6, 1.05]}>
-			<planeGeometry args={[3, 3]} />
+		<mesh position={[0, 0.6, 0.85 ]}>
+			<planeGeometry args={[2.7, 2.7]} />
 			<meshBasicMaterial
 				map={texture}
 				transparent
@@ -57,14 +57,22 @@ export default function MusicPlayer() {
 
 
 	return (
-		<group rotation={[0, -Math.PI / 6, 0]} position={[17, 3.7, 10]} >
-			<GadgetMusic rotation={[0, Math.PI, 0]} scale={50} />
+		<group rotation={[0, -Math.PI / 6, 0]} position={[11.1, 2.9, -0.2]} scale={1}>
 
+			<GadgetMusic 
+				rotation={[0, Math.PI, 0]} 
+				scale={40} 
+				renderOrder={1}
+				customDepth={{
+					depthWrite: false,
+					depthTest: true
+				}}
+			/>
 			<Suspense fallback={null}>
 				{isPending || isLoadingError ? (
 					<Text
 						color="#FF2E2E"
-						scale={0.5}
+						scale={0.3}
 						position={[0, 2, 1.05]}
 						maxWidth={13}
 						textAlign="center"
@@ -77,8 +85,8 @@ export default function MusicPlayer() {
 					<group>
 						<Text
 							color="#00FFFF"
-							scale={0.5}
-							position={[0, 2.8, 1.05]}
+							scale={0.3}
+							position={[0, 2.6, 0.85]}
 							maxWidth={13}
 							textAlign="center"
 							anchorX="center"
@@ -95,7 +103,7 @@ export default function MusicPlayer() {
 						<Text
 							color="#00FFFF"
 							scale={0.3}
-							position={[0, -1.1, 1.07]}
+							position={[0, -1.1, 0.87]}
 							maxWidth={13}
 							textAlign="center"
 							anchorX="center"

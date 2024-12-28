@@ -16,6 +16,7 @@ export interface Blog {
   id: string;
   content: string;
   title: string;
+  imageUrl?: string | undefined;
   tags: string[];
   state: Blog_State;
   publishedAt?: Date | undefined;
@@ -98,6 +99,7 @@ export interface ListPublishedBlogsResponse {
 export interface CreateBlogRequest {
   title: string;
   content: string;
+  imageUrl?: string | undefined;
 }
 
 export interface CreateBlogResponse {
@@ -108,7 +110,7 @@ export interface GetBlogRequest {
   id: string;
 }
 
-export interface GetBlogReponse {
+export interface GetBlogResponse {
   blog?: Blog | undefined;
 }
 
@@ -116,6 +118,7 @@ export interface UpdateBlogRequest {
   id: string;
   title: string;
   content: string;
+  imageUrl?: string | undefined;
 }
 
 export interface UpdateBlogResponse {
@@ -143,6 +146,7 @@ function createBaseBlog(): Blog {
     id: "",
     content: "",
     title: "",
+    imageUrl: undefined,
     tags: [],
     state: Blog_State.STATE_UNSPECIFIED,
     publishedAt: undefined,
@@ -160,6 +164,9 @@ export const Blog: MessageFns<Blog> = {
     }
     if (message.title !== "") {
       writer.uint32(26).string(message.title);
+    }
+    if (message.imageUrl !== undefined) {
+      writer.uint32(66).string(message.imageUrl);
     }
     for (const v of message.tags) {
       writer.uint32(34).string(v!);
@@ -205,6 +212,14 @@ export const Blog: MessageFns<Blog> = {
           }
 
           message.title = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.imageUrl = reader.string();
           continue;
         }
         case 4: {
@@ -253,6 +268,7 @@ export const Blog: MessageFns<Blog> = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       content: isSet(object.content) ? globalThis.String(object.content) : "",
       title: isSet(object.title) ? globalThis.String(object.title) : "",
+      imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : undefined,
       tags: globalThis.Array.isArray(object?.tags) ? object.tags.map((e: any) => globalThis.String(e)) : [],
       state: isSet(object.state) ? blog_StateFromJSON(object.state) : Blog_State.STATE_UNSPECIFIED,
       publishedAt: isSet(object.publishedAt) ? fromJsonTimestamp(object.publishedAt) : undefined,
@@ -270,6 +286,9 @@ export const Blog: MessageFns<Blog> = {
     }
     if (message.title !== "") {
       obj.title = message.title;
+    }
+    if (message.imageUrl !== undefined) {
+      obj.imageUrl = message.imageUrl;
     }
     if (message.tags?.length) {
       obj.tags = message.tags;
@@ -294,6 +313,7 @@ export const Blog: MessageFns<Blog> = {
     message.id = object.id ?? "";
     message.content = object.content ?? "";
     message.title = object.title ?? "";
+    message.imageUrl = object.imageUrl ?? undefined;
     message.tags = object.tags?.map((e) => e) || [];
     message.state = object.state ?? Blog_State.STATE_UNSPECIFIED;
     message.publishedAt = object.publishedAt ?? undefined;
@@ -607,7 +627,7 @@ export const ListPublishedBlogsResponse: MessageFns<ListPublishedBlogsResponse> 
 };
 
 function createBaseCreateBlogRequest(): CreateBlogRequest {
-  return { title: "", content: "" };
+  return { title: "", content: "", imageUrl: undefined };
 }
 
 export const CreateBlogRequest: MessageFns<CreateBlogRequest> = {
@@ -617,6 +637,9 @@ export const CreateBlogRequest: MessageFns<CreateBlogRequest> = {
     }
     if (message.content !== "") {
       writer.uint32(18).string(message.content);
+    }
+    if (message.imageUrl !== undefined) {
+      writer.uint32(26).string(message.imageUrl);
     }
     return writer;
   },
@@ -644,6 +667,14 @@ export const CreateBlogRequest: MessageFns<CreateBlogRequest> = {
           message.content = reader.string();
           continue;
         }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.imageUrl = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -657,6 +688,7 @@ export const CreateBlogRequest: MessageFns<CreateBlogRequest> = {
     return {
       title: isSet(object.title) ? globalThis.String(object.title) : "",
       content: isSet(object.content) ? globalThis.String(object.content) : "",
+      imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : undefined,
     };
   },
 
@@ -668,6 +700,9 @@ export const CreateBlogRequest: MessageFns<CreateBlogRequest> = {
     if (message.content !== "") {
       obj.content = message.content;
     }
+    if (message.imageUrl !== undefined) {
+      obj.imageUrl = message.imageUrl;
+    }
     return obj;
   },
 
@@ -678,6 +713,7 @@ export const CreateBlogRequest: MessageFns<CreateBlogRequest> = {
     const message = createBaseCreateBlogRequest();
     message.title = object.title ?? "";
     message.content = object.content ?? "";
+    message.imageUrl = object.imageUrl ?? undefined;
     return message;
   },
 };
@@ -798,22 +834,22 @@ export const GetBlogRequest: MessageFns<GetBlogRequest> = {
   },
 };
 
-function createBaseGetBlogReponse(): GetBlogReponse {
+function createBaseGetBlogResponse(): GetBlogResponse {
   return { blog: undefined };
 }
 
-export const GetBlogReponse: MessageFns<GetBlogReponse> = {
-  encode(message: GetBlogReponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const GetBlogResponse: MessageFns<GetBlogResponse> = {
+  encode(message: GetBlogResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.blog !== undefined) {
       Blog.encode(message.blog, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetBlogReponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetBlogResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetBlogReponse();
+    const message = createBaseGetBlogResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -834,11 +870,11 @@ export const GetBlogReponse: MessageFns<GetBlogReponse> = {
     return message;
   },
 
-  fromJSON(object: any): GetBlogReponse {
+  fromJSON(object: any): GetBlogResponse {
     return { blog: isSet(object.blog) ? Blog.fromJSON(object.blog) : undefined };
   },
 
-  toJSON(message: GetBlogReponse): unknown {
+  toJSON(message: GetBlogResponse): unknown {
     const obj: any = {};
     if (message.blog !== undefined) {
       obj.blog = Blog.toJSON(message.blog);
@@ -846,18 +882,18 @@ export const GetBlogReponse: MessageFns<GetBlogReponse> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetBlogReponse>, I>>(base?: I): GetBlogReponse {
-    return GetBlogReponse.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<GetBlogResponse>, I>>(base?: I): GetBlogResponse {
+    return GetBlogResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetBlogReponse>, I>>(object: I): GetBlogReponse {
-    const message = createBaseGetBlogReponse();
+  fromPartial<I extends Exact<DeepPartial<GetBlogResponse>, I>>(object: I): GetBlogResponse {
+    const message = createBaseGetBlogResponse();
     message.blog = (object.blog !== undefined && object.blog !== null) ? Blog.fromPartial(object.blog) : undefined;
     return message;
   },
 };
 
 function createBaseUpdateBlogRequest(): UpdateBlogRequest {
-  return { id: "", title: "", content: "" };
+  return { id: "", title: "", content: "", imageUrl: undefined };
 }
 
 export const UpdateBlogRequest: MessageFns<UpdateBlogRequest> = {
@@ -870,6 +906,9 @@ export const UpdateBlogRequest: MessageFns<UpdateBlogRequest> = {
     }
     if (message.content !== "") {
       writer.uint32(26).string(message.content);
+    }
+    if (message.imageUrl !== undefined) {
+      writer.uint32(34).string(message.imageUrl);
     }
     return writer;
   },
@@ -905,6 +944,14 @@ export const UpdateBlogRequest: MessageFns<UpdateBlogRequest> = {
           message.content = reader.string();
           continue;
         }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.imageUrl = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -919,6 +966,7 @@ export const UpdateBlogRequest: MessageFns<UpdateBlogRequest> = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       title: isSet(object.title) ? globalThis.String(object.title) : "",
       content: isSet(object.content) ? globalThis.String(object.content) : "",
+      imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : undefined,
     };
   },
 
@@ -933,6 +981,9 @@ export const UpdateBlogRequest: MessageFns<UpdateBlogRequest> = {
     if (message.content !== "") {
       obj.content = message.content;
     }
+    if (message.imageUrl !== undefined) {
+      obj.imageUrl = message.imageUrl;
+    }
     return obj;
   },
 
@@ -944,6 +995,7 @@ export const UpdateBlogRequest: MessageFns<UpdateBlogRequest> = {
     message.id = object.id ?? "";
     message.title = object.title ?? "";
     message.content = object.content ?? "";
+    message.imageUrl = object.imageUrl ?? undefined;
     return message;
   },
 };
@@ -1249,7 +1301,7 @@ export interface Blogs {
     metadata?: grpc.Metadata,
   ): Promise<ListPublishedBlogsResponse>;
   CreateBlog(request: DeepPartial<CreateBlogRequest>, metadata?: grpc.Metadata): Promise<CreateBlogResponse>;
-  GetBlog(request: DeepPartial<GetBlogRequest>, metadata?: grpc.Metadata): Promise<GetBlogReponse>;
+  GetBlog(request: DeepPartial<GetBlogRequest>, metadata?: grpc.Metadata): Promise<GetBlogResponse>;
   UpdateBlog(request: DeepPartial<UpdateBlogRequest>, metadata?: grpc.Metadata): Promise<UpdateBlogResponse>;
   PublishBlog(request: DeepPartial<PublishBlogRequest>, metadata?: grpc.Metadata): Promise<PublishBlogResponse>;
 }
@@ -1282,7 +1334,7 @@ export class BlogsClientImpl implements Blogs {
     return this.rpc.unary(BlogsCreateBlogDesc, CreateBlogRequest.fromPartial(request), metadata);
   }
 
-  GetBlog(request: DeepPartial<GetBlogRequest>, metadata?: grpc.Metadata): Promise<GetBlogReponse> {
+  GetBlog(request: DeepPartial<GetBlogRequest>, metadata?: grpc.Metadata): Promise<GetBlogResponse> {
     return this.rpc.unary(BlogsGetBlogDesc, GetBlogRequest.fromPartial(request), metadata);
   }
 
@@ -1378,7 +1430,7 @@ export const BlogsGetBlogDesc: UnaryMethodDefinitionish = {
   } as any,
   responseType: {
     deserializeBinary(data: Uint8Array) {
-      const value = GetBlogReponse.decode(data);
+      const value = GetBlogResponse.decode(data);
       return {
         ...value,
         toObject() {

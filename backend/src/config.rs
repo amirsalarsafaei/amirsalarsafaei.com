@@ -16,6 +16,7 @@ pub struct Config {
     pub database: DatabaseConfig,
     pub server: ServerConfig,
     pub auth_token: String,
+    pub image_server: ImageServerConfig,
 }
 
 #[derive(Deserialize)]
@@ -27,6 +28,13 @@ pub struct DatabaseConfig {
 pub struct ServerConfig {
     pub host: String,
     pub port: u16,
+}
+
+#[derive(Deserialize)]
+pub struct ImageServerConfig {
+    pub host: String,
+    pub port: u16,
+    pub upload_dir: String,
 }
 
 #[derive(Deserialize)]

@@ -13,7 +13,7 @@ use uuid::Uuid;
 use prost_types::Timestamp;
 use salar_interface::blogs::blogs_server::Blogs;
 use salar_interface::blogs::{
-    blog::State, Blog, CreateBlogRequest, CreateBlogResponse, GetBlogReponse, GetBlogRequest,
+    blog::State, Blog, CreateBlogRequest, CreateBlogResponse, GetBlogRequest, GetBlogResponse,
     ListBlogsPaginationToken, ListBlogsRequest, ListBlogsResponse,
     ListPublishedBlogsPaginationToken, ListPublishedBlogsRequest, ListPublishedBlogsResponse,
     PublishBlogRequest, PublishBlogResponse, UpdateBlogRequest, UpdateBlogResponse,
@@ -108,9 +108,7 @@ impl BlogServicer {
     }
 
     fn get_next_list_page_token(&self, blogs: &[Blog]) -> String {
-        let last_timestamp = blogs
-            .last()
-            .and_then(|b| b.created_at.clone());
+        let last_timestamp = blogs.last().and_then(|b| b.created_at.clone());
 
         match last_timestamp {
             Some(ts) => self.create_list_blogs_pagination_token(ts),
@@ -167,6 +165,7 @@ impl Blogs for BlogServicer {
                     .iter()
                     .map(|blog| Blog {
                         id: blog.id.to_string(),
+                        image_url: blog.image_url.clone(),
                         content: blog.content.clone(),
                         title: blog.title.clone(),
                         state: State::Published as i32,
@@ -193,7 +192,7 @@ impl Blogs for BlogServicer {
     async fn get_blog(
         &self,
         request: tonic::Request<GetBlogRequest>,
-    ) -> Result<tonic::Response<GetBlogReponse>, tonic::Status> {
+    ) -> Result<tonic::Response<GetBlogResponse>, tonic::Status> {
         let connection = self
             .pool
             .get()
@@ -204,11 +203,12 @@ impl Blogs for BlogServicer {
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
         match get_blog_by_id().bind(&connection, &uuid_str).opt().await {
-            Ok(Some(blog)) => Ok(tonic::Response::new(GetBlogReponse {
+            Ok(Some(blog)) => Ok(tonic::Response::new(GetBlogResponse {
                 blog: Some(Blog {
                     id: blog.id.to_string(),
                     content: blog.content.clone(),
                     title: blog.title.clone(),
+                    image_url: blog.image_url.clone(),
                     state: if blog.published {
                         State::Published
                     } else {
@@ -247,6 +247,7 @@ impl Blogs for BlogServicer {
                 &connection,
                 &request.get_ref().title,
                 &request.get_ref().content,
+                &request.get_ref().image_url,
             )
             .one()
             .await
@@ -256,6 +257,7 @@ impl Blogs for BlogServicer {
                     id: blog.id.to_string(),
                     content: blog.content.clone(),
                     title: blog.title.clone(),
+                    image_url: blog.image_url.clone(),
                     state: if blog.published {
                         State::Published
                     } else {
@@ -296,6 +298,7 @@ impl Blogs for BlogServicer {
                 &connection,
                 &request.get_ref().title,
                 &request.get_ref().content,
+                &request.get_ref().image_url.clone(),
                 &uuid_str,
             )
             .opt()
@@ -306,6 +309,7 @@ impl Blogs for BlogServicer {
                     id: blog.id.to_string(),
                     content: blog.content.clone(),
                     title: blog.title.clone(),
+                    image_url: blog.image_url.clone(),
                     state: if blog.published {
                         State::Published
                     } else {
@@ -348,6 +352,7 @@ impl Blogs for BlogServicer {
                     id: blog.id.to_string(),
                     content: blog.content.clone(),
                     title: blog.title.clone(),
+                    image_url: blog.image_url.clone(),
                     state: if blog.published {
                         State::Published
                     } else {
@@ -375,16 +380,13 @@ impl Blogs for BlogServicer {
         let last_created_at = if request.get_ref().page_token.is_empty() {
             OffsetDateTime::now_utc()
         } else {
-            self.parse_list_blogs_pagination_token(
-                &request.get_ref().page_token.as_str(),
-            )?
+            self.parse_list_blogs_pagination_token(&request.get_ref().page_token.as_str())?
         };
 
         let page_size = match request.get_ref().page_size {
             0 => 20,
             x => x,
         } as i64;
-
 
         let connection = self
             .pool
@@ -404,6 +406,7 @@ impl Blogs for BlogServicer {
                         id: blog.id.to_string(),
                         content: blog.content.clone(),
                         title: blog.title.clone(),
+                        image_url: blog.image_url.clone(),
                         state: if blog.published {
                             State::Published
                         } else {

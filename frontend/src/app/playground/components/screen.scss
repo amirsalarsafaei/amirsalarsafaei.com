@@ -1,0 +1,22 @@
+@import '@/styles/global.scss';
+.screen-block {
+  width: 1230px;
+  height: 700px;
+  display: block;
+  overflow: hidden;
+  background: black;
+
+
+  .wrapper {
+    margin: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+  }
+
+  * {
+
+    ::selection {
+      background-color: $terminal-bg;
+    }
+  }
+}

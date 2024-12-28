@@ -1,0 +1,50 @@
+// Variables
+$font-size: 20px;
+$font-weight: 700;
+$scrollbar-width: 20px;
+$scrollbar-track-color: rgba(0, 0, 0, 0.1);
+$scrollbar-thumb-color: rgba(255, 255, 255, 0.3);
+$scrollbar-thumb-radius: 4px;
+
+.tmux {
+  height: 100%;
+  width: 100%;
+
+  .pane {
+    height: 100%;
+    width: 100%;
+
+    .commands {
+      overflow-y: scroll;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+
+      // Webkit scrollbar styling (Chrome, Safari, newer versions of Edge)
+      &::-webkit-scrollbar {
+        width: $scrollbar-width;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: $scrollbar-track-color;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: $scrollbar-thumb-color;
+        border-radius: $scrollbar-thumb-radius;
+      }
+
+      scrollbar-width: thin;
+      scrollbar-color: $scrollbar-thumb-color $scrollbar-track-color;
+    }
+
+    * {
+      font-size: $font-size;
+      font-weight: $font-weight;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+  }
+}

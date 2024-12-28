@@ -1,0 +1,15 @@
+.codeBlock {
+  background-color: var(--code-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  line-height: 1.5;
+  margin: 1rem 0;
+
+  code {
+    display: block;
+    white-space: pre-wrap;
+  }
+}

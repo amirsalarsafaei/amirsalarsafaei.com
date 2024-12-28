@@ -1,0 +1,83 @@
+.terminal {
+  background-color: #011627;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin: 2rem auto;
+  max-width: 900px;
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+}
+
+.terminalHeader {
+  background-color: #01111d;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #033042;
+  flex-shrink: 0;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-right: 1rem;
+
+  span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+}
+
+.close {
+  background-color: #ff5f57;
+}
+
+.minimize {
+  background-color: #febc2e;
+}
+
+.maximize {
+  background-color: #28c841;
+}
+
+.termTitle {
+  color: #607B96;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.terminalBody {
+  padding: 1.5rem;
+  color: #607B96;
+  font-family: monospace;
+  line-height: 1.6;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.line {
+  margin-bottom: 1rem;
+}
+
+.prompt {
+  color: #43D9AD;
+  margin-right: 0.5rem;
+}
+
+.content {
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+
+    a {
+      color: #43D9AD;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

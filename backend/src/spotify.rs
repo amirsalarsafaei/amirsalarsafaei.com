@@ -118,26 +118,23 @@ impl SpotifyServicer {
         (track_name, artist_name, album_art_url)
     }
 
-    async fn set_cache_response(&self, resp: GetRecentlyPlayedSongResponse) {
+    async fn set_cache_response(&self, resp: &GetRecentlyPlayedSongResponse) {
         let mut guard = self.cached_response.write().await;
         *guard = Some(CachedResponse {
-            response: resp,
+            response: resp.clone(),
             cached_at: time::OffsetDateTime::now_utc(),
         });
     }
 
     async fn get_cache_response(&self) -> Option<GetRecentlyPlayedSongResponse> {
-        let gaurd = self.cached_response.read().await;
-        match *gaurd {
-            Some(cached_value) => {
-                if cached_value.cached_at < OffsetDateTime::now_utc() - time::Duration::seconds(30) {
-                    None
-                } else {
-                    Some(cached_value.response)
-                }
+        let guard = self.cached_response.read().await;
+        guard.as_ref().and_then(|cached_value| {
+            if cached_value.cached_at < OffsetDateTime::now_utc() - time::Duration::seconds(30) {
+                None
+            } else {
+                Some(cached_value.response.clone())
             }
-            None => None,
-        }
+            })
     }
 }
 
@@ -147,6 +144,11 @@ impl spotify_server::Spotify for SpotifyServicer {
         &self,
         _request: tonic::Request<GetRecentlyPlayedSongRequest>,
     ) -> std::result::Result<tonic::Response<GetRecentlyPlayedSongResponse>, tonic::Status> {
+
+        if let Some(cached_value) = self.get_cache_response().await {
+            return Ok(tonic::Response::new(cached_value))
+        }
+
         let client = self.spotify_client.clone();
         let spotify = client.auth_code.read().await;
 
@@ -165,6 +167,7 @@ impl spotify_server::Spotify for SpotifyServicer {
                             playing: true,
                             album_art_url,
                         };
+                        self.set_cache_response(&response).await;
                         return Ok(tonic::Response::new(response));
                     }
                 }
@@ -191,6 +194,7 @@ impl spotify_server::Spotify for SpotifyServicer {
                         playing: false,
                         album_art_url,
                     };
+                    self.set_cache_response(&response).await;
                     Ok(tonic::Response::new(response))
                 } else {
                     Err(tonic::Status::not_found("No recently played tracks found"))

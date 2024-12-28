@@ -1,0 +1,51 @@
+.newBlogContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  padding: 1rem;
+}
+
+.newBlogHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: var(--blog-code-bg);
+  border-radius: 8px;
+}
+
+.titleInput {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid var(--blog-border-color);
+  border-radius: 4px;
+  background: var(--blog-bg);
+  color: var(--blog-text-color);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+}
+
+.createButton {
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: var(--primary-color-dark);
+  }
+
+  &:disabled {
+    background: var(--blog-border-color);
+    cursor: not-allowed;
+  }
+}

@@ -8,7 +8,7 @@ service Blogs {
   rpc ListBlogs(ListBlogsRequest) returns (ListBlogsResponse);
   rpc ListPublishedBlogs(ListPublishedBlogsRequest) returns (ListPublishedBlogsResponse);
   rpc CreateBlog(CreateBlogRequest) returns (CreateBlogResponse);
-  rpc GetBlog(GetBlogRequest) returns (GetBlogReponse);
+  rpc GetBlog(GetBlogRequest) returns (GetBlogResponse);
   rpc UpdateBlog(UpdateBlogRequest) returns (UpdateBlogResponse);
   rpc PublishBlog(PublishBlogRequest) returns (PublishBlogResponse);
 }
@@ -23,6 +23,7 @@ message Blog {
   string id = 1;
   string content = 2;
   string title = 3;
+  optional string image_url = 8;
   repeated string tags = 4;
   State state = 7;
 
@@ -53,6 +54,7 @@ message ListPublishedBlogsResponse {
 message CreateBlogRequest {
   string title = 1;
   string content = 2;
+  optional string image_url = 3;
 }
 
 message CreateBlogResponse {
@@ -63,7 +65,7 @@ message GetBlogRequest {
   string id = 1;
 }
 
-message GetBlogReponse {
+message GetBlogResponse {
   Blog blog = 1;
 }
 
@@ -71,6 +73,7 @@ message UpdateBlogRequest {
   string id = 1;
   string title = 2;
   string content = 3;
+  optional string image_url = 4;
 }
 
 message UpdateBlogResponse {

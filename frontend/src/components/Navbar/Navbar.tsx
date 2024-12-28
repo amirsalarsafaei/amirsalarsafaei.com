@@ -12,7 +12,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', path: '/' },
-  { label: 'CV', path: 'https://amirsalarsafaei.com/cv.pdf' },
+  { label: 'CV', path: '/cv' },
   { label: 'Blogs', path: '/blogs' },
   { label: 'Contact', path: '/contact' },
   { label: 'Github', path: 'https://github.com/amirsalarsafaei'}

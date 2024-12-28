@@ -73,6 +73,16 @@ export default function BlogContent({ initialData }: { initialData: GetBlogRespo
 							const match = /language-(\w+)/.exec(className || '');
 							const [copied, setCopied] = useState(false);
 
+							if (!match) {
+								return (
+									<code
+										className="inline-code"
+										{...props}
+									>
+										{children}
+									</code>
+								);
+							}
 
 							// Handle Mermaid diagrams
 							if (match?.[1] === 'mermaid') {
@@ -106,6 +116,7 @@ export default function BlogContent({ initialData }: { initialData: GetBlogRespo
 										</button>
 									</div>
 									<SyntaxHighlighter
+										{...props}
 										style={vscDarkPlus}
 										language={match?.[1] || 'text'}
 										PreTag="div"

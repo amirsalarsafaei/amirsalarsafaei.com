@@ -8,6 +8,23 @@
   gap: 1rem;
 }
 
+.inline-code {
+  background: rgba($highlight-color, 0.1);
+  color: $highlight-color;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: $code-font;
+  font-size: 0.9em;
+  border: 1px solid rgba($highlight-color, 0.2);
+  transition: background 0.2s ease;
+  word-break: normal;
+  word-wrap: normal;
+
+  &:hover {
+    background: rgba($highlight-color, 0.15);
+  }
+}
+
 .editorHeader {
   display: flex;
   gap: 1rem;

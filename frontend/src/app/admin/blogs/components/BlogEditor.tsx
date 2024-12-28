@@ -55,10 +55,20 @@ export default function BlogEditor({ onContentChange, initialContent = '' }: Blo
 					remarkPlugins={[remarkGfm]}
 					rehypePlugins={[rehypeRaw]}
 					components={{
-						code({ node, className, children, ...props }) {
+						code({ node,  className, children, ...props }) {
 							const match = /language-(\w+)/.exec(className || '');
 							const [copied, setCopied] = useState(false);
 
+							if (!match) {
+								return (
+									<code
+										className="inline-code"
+										{...props}
+									>
+										{children}
+									</code>
+								);
+							}
 							if (match?.[1] === 'mermaid') {
 								return (
 									<div className="mermaid">
@@ -90,6 +100,7 @@ export default function BlogEditor({ onContentChange, initialContent = '' }: Blo
 										</button>
 									</div>
 									<SyntaxHighlighter
+										{...props}
 										style={vscDarkPlus}
 										language={match?.[1] || 'text'}
 										PreTag="div"

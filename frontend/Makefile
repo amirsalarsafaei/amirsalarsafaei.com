@@ -1,11 +1,8 @@
 
 
 deploy-files:
-	@echo "Copying files to VPS..."
+	@echo "Copying Next.js build to VPS..."
 	@rsync -av --progress \
-		--exclude 'target' \
-		--exclude '.git' \
-		--exclude '.gitignore' \
-		--exclude '.env' \
-		./dist/ vps:/var/www/amirsalarsafaei/
-	@echo "Files copied successfully!"
+		--exclude 'cache' \
+		./.next/ vps:/root/amirsalarsafaei.com/frontend/.next/
+	@echo "Next.js build deployed successfully!"

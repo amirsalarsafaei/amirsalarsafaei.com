@@ -1,66 +1,14 @@
 @import "src/styles/global.scss";
 
-
-.blogContainer {
-  max-width: $blog-max-width;
-  margin: 0 auto;
-  padding: $blog-container-padding;
-  font-family: $code-font;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-}
-
-.blogHeader {
-  margin-bottom: 2rem;
-  border-bottom: 2px solid $blog-border-color;
-  padding-bottom: 1rem;
-}
-
-.blogTitle {
-  font-size: 2.5rem;
-  color: $blog-heading-color;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-}
-
-.blogMeta {
-  display: flex;
-  gap: 1rem;
-  color: $blog-meta-color;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
-.tagContainer {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tag {
-  background: $blog-tag-bg;
-  color: $secondary-color;
-  padding: 0.25rem 0.75rem;
-  border-radius: 15px;
-  font-size: 0.85rem;
-  transition: background-color $transition-speed;
-
-  &:hover {
-    background: $hover-color;
-  }
-}
-
 .markdown {
   line-height: 1.8;
 
   color: $blog-text-color;
   font-size: 1rem; // 18px
+
+  p {
+    margin: 0.75rem 0;
+  }
 
   @media (max-width: 768px) {
     font-size: 0.9rem; // 16px
@@ -134,7 +82,7 @@
     }
   }
 
-  .inline-code {
+  .inlineCode {
     background: rgba($highlight-color, 0.1);
     color: $highlight-color;
     padding: 0.2em 0.4em;
@@ -151,7 +99,7 @@
 
   pre {
     background: $blog-code-bg;
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: $blog-border-radius;
     overflow-x: auto;
     margin: 1rem 0;
@@ -166,11 +114,11 @@
   blockquote {
     border-left: 4px solid $blog-blockquote-border;
     margin: 1.5rem 0;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     font-size: 1.1rem;
 
     @media (max-width: 768px) {
-      padding: 1rem 1.25rem;
+      padding: 0.75rem 1rem;
       font-size: 1rem;
       margin: 1.25rem 0;
     }
@@ -178,6 +126,10 @@
     background: $blog-code-bg;
     border-radius: 0 $blog-border-radius $blog-border-radius 0;
     font-style: italic;
+
+    p {
+      margin: 0.5rem 0;
+    }
 
     >p:first-child {
       margin-top: 0;
@@ -239,14 +191,14 @@
     margin: 2rem 0;
   }
 
-  .code-block-container {
+  .codeBlockContainer {
     margin: 1.5rem 0;
     border-radius: $blog-border-radius;
     overflow: hidden;
     background: #1e1e1e;
   }
 
-  .code-block-header {
+  .codeBlockHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -255,7 +207,7 @@
     border-bottom: 1px solid #3d3d3d;
   }
 
-  .code-language {
+  .codeLanguage {
     color: #9cdcfe;
     font-size: 0.85rem;
     font-family: $code-font;
@@ -266,7 +218,7 @@
     }
   }
 
-  .copy-button {
+  .copyButton {
     background: transparent;
     border: 1px solid #4d4d4d;
     color: #9cdcfe;
@@ -298,151 +250,5 @@
     svg {
       max-width: 100%;
     }
-  }
-}
-
-// Override default Prism styles
-:global {
-  .prism-code {
-    background: #1e1e1e !important;
-    padding: 1rem !important;
-  }
-
-  .linenumber {
-    color: #6d6d6d !important;
-    min-width: 2.5em !important;
-  }
-
-  .token.comment {
-    color: #6a9955 !important;
-  }
-
-  .token.string {
-    color: #ce9178 !important;
-  }
-
-  .token.keyword {
-    color: #569cd6 !important;
-  }
-
-  .token.function {
-    color: #dcdcaa !important;
-  }
-
-  .token.number {
-    color: #b5cea8 !important;
-  }
-
-  .token.operator {
-    color: #d4d4d4 !important;
-  }
-
-  .token.class-name {
-    color: #4ec9b0 !important;
-  }
-
-  .token.property {
-    color: #9cdcfe !important;
-    background: #1a1b26 !important;
-    padding: 1.25rem !important;
-    font-size: 0.95em !important;
-    line-height: 1.5 !important;
-    tab-size: 2 !important;
-  }
-
-  .linenumber {
-    color: #363b54 !important;
-    min-width: 3em !important;
-    padding-right: 1em !important;
-    text-align: right !important;
-    user-select: none !important;
-  }
-
-  .token {
-    background: none !important;
-  }
-
-  .token.comment,
-  .token.prolog,
-  .token.doctype,
-  .token.cdata {
-    color: #565f89 !important;
-    font-style: italic !important;
-  }
-
-  .token.string,
-  .token.char,
-  .token.attr-value {
-    color: #9ece6a !important;
-  }
-
-  .token.punctuation {
-    color: #89ddff !important;
-  }
-
-  .token.property,
-  .token.tag,
-  .token.constant,
-  .token.symbol,
-  .token.deleted {
-    color: #7dcfff !important;
-  }
-
-  .token.boolean,
-  .token.number {
-    color: #ff9e64 !important;
-  }
-
-  .token.selector,
-  .token.attr-name,
-  .token.builtin {
-    color: #bb9af7 !important;
-  }
-
-  .token.keyword,
-  .token.atrule {
-    color: #f7768e !important;
-    font-style: italic !important;
-  }
-
-  .token.function,
-  .token.class-name {
-    color: #2ac3de !important;
-  }
-
-  .token.regex,
-  .token.important,
-  .token.variable {
-    color: #e0af68 !important;
-  }
-
-  .token.operator,
-  .token.entity {
-    color: #89ddff !important;
-  }
-
-  .token.url {
-    color: #73daca !important;
-  }
-
-  .token.important,
-  .token.bold {
-    font-weight: bold !important;
-  }
-
-  .token.italic {
-    font-style: italic !important;
-  }
-
-  .token.entity {
-    cursor: help !important;
-  }
-
-  .token.inserted {
-    color: #9ece6a !important;
-  }
-
-  .token.deleted {
-    color: #f7768e !important;
   }
 }

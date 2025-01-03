@@ -2,7 +2,10 @@ use crate::cornucopia::queries::blogs::{
     blogs_paginated_by_earlier, create_blog, get_blog_by_id, publish_blog,
     published_blogs_paginated_by_earlier, update_blog_details,
 };
+use crate::toproto::{list_to_proto, ToProto};
+
 use base64::{engine::general_purpose::URL_SAFE, Engine};
+use cornucopia_async::GenericClient;
 use deadpool_postgres::Pool;
 use log;
 use prost::Message;
@@ -13,7 +16,7 @@ use uuid::Uuid;
 use prost_types::Timestamp;
 use salar_interface::blogs::blogs_server::Blogs;
 use salar_interface::blogs::{
-    blog::State, Blog, CreateBlogRequest, CreateBlogResponse, GetBlogRequest, GetBlogResponse,
+    Blog, CreateBlogRequest, CreateBlogResponse, GetBlogRequest, GetBlogResponse,
     ListBlogsPaginationToken, ListBlogsRequest, ListBlogsResponse,
     ListPublishedBlogsPaginationToken, ListPublishedBlogsRequest, ListPublishedBlogsResponse,
     PublishBlogRequest, PublishBlogResponse, UpdateBlogRequest, UpdateBlogResponse,
@@ -47,13 +50,6 @@ impl BlogServicer {
             }
             .encode_to_vec(),
         )
-    }
-
-    fn datetime_to_timestamp(&self, datetime: OffsetDateTime) -> Timestamp {
-        Timestamp {
-            nanos: datetime.nanosecond() as i32,
-            seconds: datetime.unix_timestamp(),
-        }
     }
 
     fn parse_list_published_blogs_pagination_token(
@@ -128,6 +124,21 @@ impl BlogServicer {
             None => Err(tonic::Status::unauthenticated("authorizatoin not provided")),
         }
     }
+
+    async fn get_blog_by_id<C: GenericClient>(
+        &self,
+        client: &C,
+        uuid: &Uuid,
+    ) -> Result<Blog, tonic::Status> {
+        match get_blog_by_id().bind(client, &uuid).opt().await {
+            Ok(Some(blog)) => Ok(blog.to_proto()),
+            Ok(None) => Err(tonic::Status::not_found("The blog not found")),
+            Err(err) => {
+                log::error!("could not get blog from database: {}", err);
+                Err(tonic::Status::internal("Could not get blog from storage"))
+            }
+        }
+    }
 }
 
 #[tonic::async_trait]
@@ -161,19 +172,7 @@ impl Blogs for BlogServicer {
             .await
         {
             Ok(blogs) => {
-                let blogs_pb: Vec<Blog> = blogs
-                    .iter()
-                    .map(|blog| Blog {
-                        id: blog.id.to_string(),
-                        image_url: blog.image_url.clone(),
-                        content: blog.content.clone(),
-                        title: blog.title.clone(),
-                        state: State::Published as i32,
-                        tags: vec![],
-                        published_at: Some(self.datetime_to_timestamp(blog.published_at)),
-                        created_at: Some(self.datetime_to_timestamp(blog.created_at)),
-                    })
-                    .collect();
+                let blogs_pb: Vec<Blog> = blogs.iter().map(|blog| blog.to_proto()).collect();
 
                 Ok(tonic::Response::new(ListPublishedBlogsResponse {
                     next_page_token: self.get_next_list_published_page_token(&blogs_pb),
@@ -199,35 +198,12 @@ impl Blogs for BlogServicer {
             .await
             .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
 
-        let uuid_str = Uuid::try_parse(&request.get_ref().id)
+        let uuid = Uuid::try_parse(&request.get_ref().id)
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
-        match get_blog_by_id().bind(&connection, &uuid_str).opt().await {
-            Ok(Some(blog)) => Ok(tonic::Response::new(GetBlogResponse {
-                blog: Some(Blog {
-                    id: blog.id.to_string(),
-                    content: blog.content.clone(),
-                    title: blog.title.clone(),
-                    image_url: blog.image_url.clone(),
-                    state: if blog.published {
-                        State::Published
-                    } else {
-                        State::Draft
-                    } as i32,
-                    tags: vec![],
-                    published_at: match blog.published_at {
-                        Some(p_at) => Some(self.datetime_to_timestamp(p_at)),
-                        None => None,
-                    },
-                    created_at: Some(self.datetime_to_timestamp(blog.created_at)),
-                }),
-            })),
-            Ok(None) => Err(tonic::Status::not_found("The blog not found")),
-            Err(err) => {
-                log::error!("could not get blog from database: {}", err);
-                Err(tonic::Status::internal("Could not get blog from storage"))
-            }
-        }
+        Ok(tonic::Response::new(GetBlogResponse {
+            blog: Some(self.get_blog_by_id(&connection, &uuid).await?),
+        }))
     }
 
     async fn create_blog(
@@ -236,46 +212,40 @@ impl Blogs for BlogServicer {
     ) -> Result<tonic::Response<CreateBlogResponse>, tonic::Status> {
         self.check_auth_token(request.metadata())?;
 
-        let connection = self
+        let mut connection = self
             .pool
             .get()
             .await
             .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
 
-        match create_blog()
+        let tx = connection
+            .transaction()
+            .await
+            .map_err(|_| tonic::Status::internal("Could start process to storage"))?;
+
+        let blog_id = create_blog()
             .bind(
-                &connection,
+                &tx,
                 &request.get_ref().title,
                 &request.get_ref().content,
                 &request.get_ref().image_url,
             )
             .one()
             .await
-        {
-            Ok(blog) => Ok(tonic::Response::new(CreateBlogResponse {
-                blog: Some(Blog {
-                    id: blog.id.to_string(),
-                    content: blog.content.clone(),
-                    title: blog.title.clone(),
-                    image_url: blog.image_url.clone(),
-                    state: if blog.published {
-                        State::Published
-                    } else {
-                        State::Draft
-                    } as i32,
-                    tags: vec![],
-                    published_at: match blog.published_at {
-                        Some(p_at) => Some(self.datetime_to_timestamp(p_at)),
-                        None => None,
-                    },
-                    created_at: Some(self.datetime_to_timestamp(blog.created_at)),
-                }),
-            })),
-            Err(err) => {
-                log::error!("could not create blog in database: {}", err);
-                Err(tonic::Status::internal("Could not add blog to storage"))
-            }
-        }
+            .map_err(|e| {
+                log::error!("could not create blog in database: {}", e);
+                tonic::Status::internal("Could not add blog to storage")
+            })?;
+
+        let blog = self.get_blog_by_id(&tx, &blog_id).await?;
+
+        tx.commit()
+            .await
+            .map_err(|_| tonic::Status::internal("could not finalize changes"))?;
+
+        Ok(tonic::Response::new(CreateBlogResponse {
+            blog: Some(blog),
+        }))
     }
 
     async fn update_blog(
@@ -284,18 +254,23 @@ impl Blogs for BlogServicer {
     ) -> Result<tonic::Response<UpdateBlogResponse>, tonic::Status> {
         self.check_auth_token(request.metadata())?;
 
-        let connection = self
+        let mut connection = self
             .pool
             .get()
             .await
             .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
+
+        let tx = connection
+            .transaction()
+            .await
+            .map_err(|_| tonic::Status::internal("Could start process to storage"))?;
 
         let uuid_str = Uuid::try_parse(&request.get_ref().id)
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
         match update_blog_details()
             .bind(
-                &connection,
+                &tx,
                 &request.get_ref().title,
                 &request.get_ref().content,
                 &request.get_ref().image_url.clone(),
@@ -304,26 +279,18 @@ impl Blogs for BlogServicer {
             .opt()
             .await
         {
-            Ok(Some(blog)) => Ok(tonic::Response::new(UpdateBlogResponse {
-                blog: Some(Blog {
-                    id: blog.id.to_string(),
-                    content: blog.content.clone(),
-                    title: blog.title.clone(),
-                    image_url: blog.image_url.clone(),
-                    state: if blog.published {
-                        State::Published
-                    } else {
-                        State::Draft
-                    } as i32,
-                    tags: vec![],
-                    published_at: match blog.published_at {
-                        Some(p_at) => Some(self.datetime_to_timestamp(p_at)),
-                        None => None,
-                    },
-                    created_at: Some(self.datetime_to_timestamp(blog.created_at)),
-                }),
-            })),
             Ok(None) => Err(tonic::Status::not_found("Blog not found")),
+            Ok(_) => {
+                let blog = self.get_blog_by_id(&tx, &uuid_str).await?;
+
+                tx.commit()
+                    .await
+                    .map_err(|_| tonic::Status::internal("could not finalize changes"))?;
+
+                Ok(tonic::Response::new(UpdateBlogResponse {
+                    blog: Some(blog),
+                }))
+            }
             Err(err) => {
                 log::error!("could not update blog in database: {}", err);
                 Err(tonic::Status::internal("Could not update blog in storage"))
@@ -337,33 +304,33 @@ impl Blogs for BlogServicer {
     ) -> Result<tonic::Response<PublishBlogResponse>, tonic::Status> {
         self.check_auth_token(request.metadata())?;
 
-        let connection = self
+        let mut connection = self
             .pool
             .get()
             .await
             .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
 
+        let tx = connection
+            .transaction()
+            .await
+            .map_err(|_| tonic::Status::internal("Could start process to storage"))?;
+
         let uuid_str = Uuid::try_parse(&request.get_ref().id)
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
-        match publish_blog().bind(&connection, &uuid_str).opt().await {
-            Ok(Some(blog)) => Ok(tonic::Response::new(PublishBlogResponse {
-                blog: Some(Blog {
-                    id: blog.id.to_string(),
-                    content: blog.content.clone(),
-                    title: blog.title.clone(),
-                    image_url: blog.image_url.clone(),
-                    state: if blog.published {
-                        State::Published
-                    } else {
-                        State::Draft
-                    } as i32,
-                    tags: vec![],
-                    published_at: Some(self.datetime_to_timestamp(blog.published_at)),
-                    created_at: Some(self.datetime_to_timestamp(blog.created_at)),
-                }),
-            })),
+        match publish_blog().bind(&tx, &uuid_str).opt().await {
             Ok(None) => Err(tonic::Status::not_found("Blog not found")),
+            Ok(_) => {
+                let blog = self.get_blog_by_id(&tx, &uuid_str).await?;
+
+                tx.commit()
+                    .await
+                    .map_err(|_| tonic::Status::internal("could not finalize changes"))?;
+
+                Ok(tonic::Response::new(PublishBlogResponse {
+                    blog: Some(blog),
+                }))
+            }
             Err(err) => {
                 log::error!("could not publish blog in database: {}", err);
                 Err(tonic::Status::internal("Could not publish blog in storage"))
@@ -400,27 +367,7 @@ impl Blogs for BlogServicer {
             .await
         {
             Ok(blogs) => {
-                let blogs_pb: Vec<Blog> = blogs
-                    .iter()
-                    .map(|blog| Blog {
-                        id: blog.id.to_string(),
-                        content: blog.content.clone(),
-                        title: blog.title.clone(),
-                        image_url: blog.image_url.clone(),
-                        state: if blog.published {
-                            State::Published
-                        } else {
-                            State::Draft
-                        } as i32,
-                        tags: vec![],
-                        published_at: match blog.published_at {
-                            Some(p_at) => Some(self.datetime_to_timestamp(p_at)),
-                            None => None,
-                        },
-                        created_at: Some(self.datetime_to_timestamp(blog.created_at)),
-                    })
-                    .collect();
-
+                let blogs_pb: Vec<Blog> = list_to_proto(&blogs);
                 Ok(tonic::Response::new(ListBlogsResponse {
                     next_page_token: self.get_next_list_page_token(&blogs_pb),
                     blogs: blogs_pb,

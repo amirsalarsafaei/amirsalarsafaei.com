@@ -1,0 +1,255 @@
+@import "src/styles/global.scss";
+
+.editorContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.toolbar {
+  background: $blog-code-bg;
+  border: 1px solid $blog-border-color;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.editorPane,
+.previewPane {
+  position: absolute;
+  top: calc(42px + 0.5rem); // toolbar height + gap
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  border: 1px solid $blog-border-color;
+  background: $blog-code-bg;
+  transition: opacity 0.3s ease;
+  box-sizing: border-box;
+
+  padding: 1rem;
+}
+
+.toolbarButton {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid $blog-border-color;
+  color: $blog-text-color;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 4px;
+  font-family: $code-font;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: rgba($highlight-color, 0.1);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+  }
+}
+
+.editorHeader {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: $blog-code-bg;
+  border-radius: 8px;
+  align-items: center;
+
+  input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  .titleInput {
+    flex: 2;
+  }
+
+  .tagsInput {
+    flex: 1;
+  }
+
+  .saveButton {
+    padding: 0.5rem 1rem;
+    background: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+
+    &:hover {
+      background: #0051a2;
+    }
+  }
+}
+
+.editorPane {
+  border-radius: 0 0 8px 8px;
+  opacity: 1;
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.previewPane {
+  border-radius: 0 0 8px 8px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+
+.markdownInput {
+  width: 100%;
+  height: 100%;
+  border: none;
+  resize: none;
+  font-family: $code-font;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  outline: none;
+  background: $blog-code-bg;
+  color: $blog-text-color;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem;
+
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.upsertContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.upsertHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: var(--blog-code-bg);
+  border-radius: 8px;
+}
+
+
+.headerButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.blogImageContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.blogImagePreview {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid $blog-border-color;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .removeImage {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    line-height: 1;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+  }
+}
+
+.titleInput {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid var(--blog-border-color);
+  border-radius: 4px;
+  background: var(--blog-bg);
+  color: var(--blog-text-color);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .editorContent {
+    flex-direction: column;
+  }
+
+  .editorHeader {
+    flex-direction: column;
+
+    input,
+    button {
+      width: 100%;
+    }
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbarButton {
+    flex: 1;
+    justify-content: center;
+  }
+}
+

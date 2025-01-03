@@ -21,7 +21,23 @@ const nextConfig = {
 
     ignoreBuildErrors: true,
   },
-  pageExtensions: ['tsx', 'ts', 'jsx', 'js']
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3001',
+        pathname: '/images/**',
+      },
+
+      {
+        protocol: 'https',
+        hostname: 'upload.amirsalarsafaei.com',
+        pathname: '/images/**',
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

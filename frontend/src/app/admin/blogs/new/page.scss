@@ -4,6 +4,7 @@
   gap: 1rem;
   height: 100%;
   padding: 1rem;
+  box-sizing: border-box;
 }
 
 .newBlogHeader {
@@ -30,22 +31,3 @@
   }
 }
 
-.createButton {
-  padding: 0.5rem 1rem;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background: var(--primary-color-dark);
-  }
-
-  &:disabled {
-    background: var(--blog-border-color);
-    cursor: not-allowed;
-  }
-}

@@ -1,0 +1,29 @@
+@import "prism-theme";
+@import "variables";
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "JetBrains Mono", monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  background: $primary-bg;
+  color: $text-color;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100dvh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}

@@ -1,0 +1,114 @@
+.prism-code {
+  background: #1e1e1e !important;
+  padding: 1rem !important;
+}
+
+.linenumber {
+  color: #6d6d6d !important;
+  min-width: 2.5em !important;
+}
+
+.token {
+  background: none !important;
+
+  &.comment,
+  &.prolog,
+  &.doctype,
+  &.cdata {
+    color: #565f89 !important;
+    font-style: italic !important;
+  }
+
+  &.string,
+  &.char,
+  &.attr-value {
+    color: #9ece6a !important;
+  }
+
+  &.punctuation {
+    color: #89ddff !important;
+  }
+
+  &.property,
+  &.tag,
+  &.constant,
+  &.symbol,
+  &.deleted {
+    color: #7dcfff !important;
+  }
+
+  &.boolean,
+  &.number {
+    color: #ff9e64 !important;
+  }
+
+  &.selector,
+  &.attr-name,
+  &.builtin {
+    color: #bb9af7 !important;
+  }
+
+  &.keyword,
+  &.atrule {
+    color: #f7768e !important;
+    font-style: italic !important;
+  }
+
+  &.function,
+  &.class-name {
+    color: #2ac3de !important;
+  }
+
+  &.regex,
+  &.important,
+  &.variable {
+    color: #e0af68 !important;
+  }
+
+  &.operator,
+  &.entity {
+    color: #89ddff !important;
+  }
+
+  &.url {
+    color: #73daca !important;
+  }
+
+  &.important,
+  &.bold {
+    font-weight: bold !important;
+  }
+
+  &.italic {
+    font-style: italic !important;
+  }
+
+  &.entity {
+    cursor: help !important;
+  }
+
+  &.inserted {
+    color: #9ece6a !important;
+  }
+
+  &.deleted {
+    color: #f7768e !important;
+  }
+
+  &.property {
+    color: #9cdcfe !important;
+    background: #1a1b26 !important;
+    padding: 1.25rem !important;
+    font-size: 0.95em !important;
+    line-height: 1.5 !important;
+    tab-size: 2 !important;
+  }
+}
+
+.linenumber {
+  color: #363b54 !important;
+  min-width: 1.5em !important;
+  padding-right: 1em !important;
+  text-align: right !important;
+  user-select: none !important;
+}

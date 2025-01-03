@@ -2,16 +2,7 @@ version: v2
 modules:
   - path: proto
     name: buf.build/salar/interface
-breaking:
-  use:
-    - FILE
-lint:
-  use:
-    - DEFAULT
-  except:
-    - PACKAGE_VERSION_SUFFIX
-    - SERVICE_SUFFIX
 deps:
-  - buf.build/googleapis/googleapis
+  - buf.build/googleapis/googleapis:8d7204855ec14631a499bd7393ce1970
   - buf.build/protocolbuffers/wellknowntypes
   - buf.build/grpc-ecosystem/grpc-gateway

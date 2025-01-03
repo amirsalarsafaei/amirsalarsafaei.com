@@ -8,16 +8,22 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { grpc } from "@improbable-eng/grpc-web";
 import { BrowserHeaders } from "browser-headers";
+import { Empty } from "../google/protobuf/empty";
 import { Timestamp } from "../google/protobuf/timestamp";
 
 export const protobufPackage = "blogs";
+
+export interface Tag {
+  id: string;
+  name: string;
+}
 
 export interface Blog {
   id: string;
   content: string;
   title: string;
   imageUrl?: string | undefined;
-  tags: string[];
+  tags: Tag[];
   state: Blog_State;
   publishedAt?: Date | undefined;
   createdAt?: Date | undefined;
@@ -141,6 +147,110 @@ export interface ListBlogsPaginationToken {
   lastCreatedAt?: Date | undefined;
 }
 
+export interface GetTagRequest {
+  id: string;
+}
+
+export interface ListTagsRequest {
+}
+
+export interface ListTagsResponse {
+  tags: Tag[];
+}
+
+export interface DeleteTagRequest {
+  id: string;
+}
+
+export interface SetBlogTagsRequest {
+  blogId: string;
+  tagNames: string[];
+}
+
+export interface SetBlogTagsResponse {
+  tags: Tag[];
+}
+
+export interface CreateTagRequest {
+  name: string;
+}
+
+function createBaseTag(): Tag {
+  return { id: "", name: "" };
+}
+
+export const Tag: MessageFns<Tag> = {
+  encode(message: Tag, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Tag {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTag();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Tag {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+    };
+  },
+
+  toJSON(message: Tag): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Tag>, I>>(base?: I): Tag {
+    return Tag.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Tag>, I>>(object: I): Tag {
+    const message = createBaseTag();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
 function createBaseBlog(): Blog {
   return {
     id: "",
@@ -169,7 +279,7 @@ export const Blog: MessageFns<Blog> = {
       writer.uint32(66).string(message.imageUrl);
     }
     for (const v of message.tags) {
-      writer.uint32(34).string(v!);
+      Tag.encode(v!, writer.uint32(34).fork()).join();
     }
     if (message.state !== Blog_State.STATE_UNSPECIFIED) {
       writer.uint32(56).int32(blog_StateToNumber(message.state));
@@ -227,7 +337,7 @@ export const Blog: MessageFns<Blog> = {
             break;
           }
 
-          message.tags.push(reader.string());
+          message.tags.push(Tag.decode(reader, reader.uint32()));
           continue;
         }
         case 7: {
@@ -269,7 +379,7 @@ export const Blog: MessageFns<Blog> = {
       content: isSet(object.content) ? globalThis.String(object.content) : "",
       title: isSet(object.title) ? globalThis.String(object.title) : "",
       imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : undefined,
-      tags: globalThis.Array.isArray(object?.tags) ? object.tags.map((e: any) => globalThis.String(e)) : [],
+      tags: globalThis.Array.isArray(object?.tags) ? object.tags.map((e: any) => Tag.fromJSON(e)) : [],
       state: isSet(object.state) ? blog_StateFromJSON(object.state) : Blog_State.STATE_UNSPECIFIED,
       publishedAt: isSet(object.publishedAt) ? fromJsonTimestamp(object.publishedAt) : undefined,
       createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
@@ -291,7 +401,7 @@ export const Blog: MessageFns<Blog> = {
       obj.imageUrl = message.imageUrl;
     }
     if (message.tags?.length) {
-      obj.tags = message.tags;
+      obj.tags = message.tags.map((e) => Tag.toJSON(e));
     }
     if (message.state !== Blog_State.STATE_UNSPECIFIED) {
       obj.state = blog_StateToJSON(message.state);
@@ -314,7 +424,7 @@ export const Blog: MessageFns<Blog> = {
     message.content = object.content ?? "";
     message.title = object.title ?? "";
     message.imageUrl = object.imageUrl ?? undefined;
-    message.tags = object.tags?.map((e) => e) || [];
+    message.tags = object.tags?.map((e) => Tag.fromPartial(e)) || [];
     message.state = object.state ?? Blog_State.STATE_UNSPECIFIED;
     message.publishedAt = object.publishedAt ?? undefined;
     message.createdAt = object.createdAt ?? undefined;
@@ -1294,6 +1404,415 @@ export const ListBlogsPaginationToken: MessageFns<ListBlogsPaginationToken> = {
   },
 };
 
+function createBaseGetTagRequest(): GetTagRequest {
+  return { id: "" };
+}
+
+export const GetTagRequest: MessageFns<GetTagRequest> = {
+  encode(message: GetTagRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetTagRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: GetTagRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetTagRequest>, I>>(base?: I): GetTagRequest {
+    return GetTagRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetTagRequest>, I>>(object: I): GetTagRequest {
+    const message = createBaseGetTagRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseListTagsRequest(): ListTagsRequest {
+  return {};
+}
+
+export const ListTagsRequest: MessageFns<ListTagsRequest> = {
+  encode(_: ListTagsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListTagsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListTagsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): ListTagsRequest {
+    return {};
+  },
+
+  toJSON(_: ListTagsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListTagsRequest>, I>>(base?: I): ListTagsRequest {
+    return ListTagsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListTagsRequest>, I>>(_: I): ListTagsRequest {
+    const message = createBaseListTagsRequest();
+    return message;
+  },
+};
+
+function createBaseListTagsResponse(): ListTagsResponse {
+  return { tags: [] };
+}
+
+export const ListTagsResponse: MessageFns<ListTagsResponse> = {
+  encode(message: ListTagsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.tags) {
+      Tag.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListTagsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListTagsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.tags.push(Tag.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListTagsResponse {
+    return { tags: globalThis.Array.isArray(object?.tags) ? object.tags.map((e: any) => Tag.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: ListTagsResponse): unknown {
+    const obj: any = {};
+    if (message.tags?.length) {
+      obj.tags = message.tags.map((e) => Tag.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListTagsResponse>, I>>(base?: I): ListTagsResponse {
+    return ListTagsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListTagsResponse>, I>>(object: I): ListTagsResponse {
+    const message = createBaseListTagsResponse();
+    message.tags = object.tags?.map((e) => Tag.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseDeleteTagRequest(): DeleteTagRequest {
+  return { id: "" };
+}
+
+export const DeleteTagRequest: MessageFns<DeleteTagRequest> = {
+  encode(message: DeleteTagRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteTagRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeleteTagRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteTagRequest>, I>>(base?: I): DeleteTagRequest {
+    return DeleteTagRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteTagRequest>, I>>(object: I): DeleteTagRequest {
+    const message = createBaseDeleteTagRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseSetBlogTagsRequest(): SetBlogTagsRequest {
+  return { blogId: "", tagNames: [] };
+}
+
+export const SetBlogTagsRequest: MessageFns<SetBlogTagsRequest> = {
+  encode(message: SetBlogTagsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.blogId !== "") {
+      writer.uint32(10).string(message.blogId);
+    }
+    for (const v of message.tagNames) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SetBlogTagsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSetBlogTagsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.blogId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.tagNames.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SetBlogTagsRequest {
+    return {
+      blogId: isSet(object.blogId) ? globalThis.String(object.blogId) : "",
+      tagNames: globalThis.Array.isArray(object?.tagNames) ? object.tagNames.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: SetBlogTagsRequest): unknown {
+    const obj: any = {};
+    if (message.blogId !== "") {
+      obj.blogId = message.blogId;
+    }
+    if (message.tagNames?.length) {
+      obj.tagNames = message.tagNames;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SetBlogTagsRequest>, I>>(base?: I): SetBlogTagsRequest {
+    return SetBlogTagsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SetBlogTagsRequest>, I>>(object: I): SetBlogTagsRequest {
+    const message = createBaseSetBlogTagsRequest();
+    message.blogId = object.blogId ?? "";
+    message.tagNames = object.tagNames?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseSetBlogTagsResponse(): SetBlogTagsResponse {
+  return { tags: [] };
+}
+
+export const SetBlogTagsResponse: MessageFns<SetBlogTagsResponse> = {
+  encode(message: SetBlogTagsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.tags) {
+      Tag.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SetBlogTagsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSetBlogTagsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.tags.push(Tag.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SetBlogTagsResponse {
+    return { tags: globalThis.Array.isArray(object?.tags) ? object.tags.map((e: any) => Tag.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: SetBlogTagsResponse): unknown {
+    const obj: any = {};
+    if (message.tags?.length) {
+      obj.tags = message.tags.map((e) => Tag.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SetBlogTagsResponse>, I>>(base?: I): SetBlogTagsResponse {
+    return SetBlogTagsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SetBlogTagsResponse>, I>>(object: I): SetBlogTagsResponse {
+    const message = createBaseSetBlogTagsResponse();
+    message.tags = object.tags?.map((e) => Tag.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseCreateTagRequest(): CreateTagRequest {
+  return { name: "" };
+}
+
+export const CreateTagRequest: MessageFns<CreateTagRequest> = {
+  encode(message: CreateTagRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateTagRequest {
+    return { name: isSet(object.name) ? globalThis.String(object.name) : "" };
+  },
+
+  toJSON(message: CreateTagRequest): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateTagRequest>, I>>(base?: I): CreateTagRequest {
+    return CreateTagRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateTagRequest>, I>>(object: I): CreateTagRequest {
+    const message = createBaseCreateTagRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
 export interface Blogs {
   ListBlogs(request: DeepPartial<ListBlogsRequest>, metadata?: grpc.Metadata): Promise<ListBlogsResponse>;
   ListPublishedBlogs(
@@ -1477,6 +1996,135 @@ export const BlogsPublishBlogDesc: UnaryMethodDefinitionish = {
   responseType: {
     deserializeBinary(data: Uint8Array) {
       const value = PublishBlogResponse.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export interface Tags {
+  SetBlogTags(request: DeepPartial<SetBlogTagsRequest>, metadata?: grpc.Metadata): Promise<SetBlogTagsResponse>;
+  CreateTag(request: DeepPartial<CreateTagRequest>, metadata?: grpc.Metadata): Promise<Tag>;
+  ListTags(request: DeepPartial<ListTagsRequest>, metadata?: grpc.Metadata): Promise<ListTagsResponse>;
+  DeleteTag(request: DeepPartial<DeleteTagRequest>, metadata?: grpc.Metadata): Promise<Empty>;
+}
+
+export class TagsClientImpl implements Tags {
+  private readonly rpc: Rpc;
+
+  constructor(rpc: Rpc) {
+    this.rpc = rpc;
+    this.SetBlogTags = this.SetBlogTags.bind(this);
+    this.CreateTag = this.CreateTag.bind(this);
+    this.ListTags = this.ListTags.bind(this);
+    this.DeleteTag = this.DeleteTag.bind(this);
+  }
+
+  SetBlogTags(request: DeepPartial<SetBlogTagsRequest>, metadata?: grpc.Metadata): Promise<SetBlogTagsResponse> {
+    return this.rpc.unary(TagsSetBlogTagsDesc, SetBlogTagsRequest.fromPartial(request), metadata);
+  }
+
+  CreateTag(request: DeepPartial<CreateTagRequest>, metadata?: grpc.Metadata): Promise<Tag> {
+    return this.rpc.unary(TagsCreateTagDesc, CreateTagRequest.fromPartial(request), metadata);
+  }
+
+  ListTags(request: DeepPartial<ListTagsRequest>, metadata?: grpc.Metadata): Promise<ListTagsResponse> {
+    return this.rpc.unary(TagsListTagsDesc, ListTagsRequest.fromPartial(request), metadata);
+  }
+
+  DeleteTag(request: DeepPartial<DeleteTagRequest>, metadata?: grpc.Metadata): Promise<Empty> {
+    return this.rpc.unary(TagsDeleteTagDesc, DeleteTagRequest.fromPartial(request), metadata);
+  }
+}
+
+export const TagsDesc = { serviceName: "blogs.Tags" };
+
+export const TagsSetBlogTagsDesc: UnaryMethodDefinitionish = {
+  methodName: "SetBlogTags",
+  service: TagsDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return SetBlogTagsRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = SetBlogTagsResponse.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export const TagsCreateTagDesc: UnaryMethodDefinitionish = {
+  methodName: "CreateTag",
+  service: TagsDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return CreateTagRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = Tag.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export const TagsListTagsDesc: UnaryMethodDefinitionish = {
+  methodName: "ListTags",
+  service: TagsDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return ListTagsRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = ListTagsResponse.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export const TagsDeleteTagDesc: UnaryMethodDefinitionish = {
+  methodName: "DeleteTag",
+  service: TagsDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return DeleteTagRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = Empty.decode(data);
       return {
         ...value,
         toObject() {

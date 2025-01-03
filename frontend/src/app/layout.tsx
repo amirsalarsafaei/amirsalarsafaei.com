@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
-import '@/styles/global.scss';
+import '@/styles/global.scss';  // Global styles first
+import '@/styles/_base.scss';  // Global styles first
+import styles from './page.module.scss';
 import QueryProvider from '@/providers/QueryProvider';
 import { GrpcProvider } from '@/providers/GrpcProvider';
 import Navbar from '@/components/Navbar/Navbar';
@@ -76,9 +78,9 @@ export default function RootLayout({
         <div id="root">
           <QueryProvider>
             <GrpcProvider>
-              <div>
+              <div className={styles.contentNavbarWrapper}>
                 <Navbar />
-                <div className="page-content">
+                <div className={styles.pageContent}>
                   {children}
                 </div>
               </div>

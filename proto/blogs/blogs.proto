@@ -2,7 +2,11 @@ syntax = "proto3";
 
 package blogs;
 
+import "google/api/resource.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 
 service Blogs {
   rpc ListBlogs(ListBlogsRequest) returns (ListBlogsResponse);
@@ -13,7 +17,25 @@ service Blogs {
   rpc PublishBlog(PublishBlogRequest) returns (PublishBlogResponse);
 }
 
+service Tags {
+  rpc SetBlogTags(SetBlogTagsRequest) returns (SetBlogTagsResponse);
+  rpc CreateTag(CreateTagRequest) returns (Tag);
+  rpc ListTags(ListTagsRequest) returns (ListTagsResponse);
+  rpc DeleteTag(DeleteTagRequest) returns (google.protobuf.Empty);
+}
+
+message Tag {
+  string id = 1;
+  string name = 2;
+}
+
 message Blog {
+  option (google.api.resource) = {
+    type: "grpcapi.amirsalarsafaei.com/Blog"
+    pattern: "blogs/{blog}"
+    singular: "blog"
+    plural: "blogs"
+  };
   enum State {
     STATE_UNSPECIFIED = 0;
     DRAFT = 1;
@@ -24,11 +46,17 @@ message Blog {
   string content = 2;
   string title = 3;
   optional string image_url = 8;
-  repeated string tags = 4;
-  State state = 7;
+  repeated Tag tags = 4;
+  State state = 7 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
 
-  google.protobuf.Timestamp published_at = 5;
-  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp published_at = 5 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
+  google.protobuf.Timestamp created_at = 6 [
+    (google.api.field_behavior) = OUTPUT_ONLY
+  ];
 }
 
 message ListBlogsRequest {
@@ -94,4 +122,31 @@ message ListPublishedBlogsPaginationToken {
 
 message ListBlogsPaginationToken {
   google.protobuf.Timestamp last_created_at = 1;
+}
+
+message GetTagRequest {
+  string id = 1;
+}
+
+message ListTagsRequest {}
+
+message ListTagsResponse {
+  repeated Tag tags = 1;
+}
+
+message DeleteTagRequest {
+  string id = 1;
+}
+
+message SetBlogTagsRequest {
+  string blog_id = 1;
+  repeated string tag_names = 2;
+}
+
+message SetBlogTagsResponse {
+  repeated Tag tags = 1;
+}
+
+message CreateTagRequest {
+  string name = 1;
 }

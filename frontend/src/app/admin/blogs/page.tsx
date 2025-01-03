@@ -7,6 +7,8 @@ import BlogsList from "@/components/BlogsList/BlogsList";
 import { useGrpc } from "@/providers/GrpcProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { grpc } from '@improbable-eng/grpc-web';
+import { Button } from "@/components/Button/Button";
+import styles from './page.module.scss';
 
 export default function BlogsListClient() {
 	const searchParams = useSearchParams();
@@ -43,10 +45,19 @@ export default function BlogsListClient() {
 		initialPageParam: "",
 	});
 
-	return BlogsList({
-		blogs: data?.pages?.reduce((collected, page) => [...collected, ...page.blogs], [] as Blog[]) ?? [],
-		isLoadingError,
-		isFetching,
-		isAdmin: true,
-	});
+	return (
+		<>
+			<div className={styles.toolbar}>
+				<Button variant="primary" href={'/admin/blogs/new'} >
+					New
+				</Button>
+			</div>
+			<BlogsList
+				blogs={data?.pages?.reduce((collected, page) => [...collected, ...page.blogs], [] as Blog[]) ?? []}
+				isLoadingError={isLoadingError}
+				isFetching={isFetching}
+				isAdmin
+			/>
+		</>
+	);
 }

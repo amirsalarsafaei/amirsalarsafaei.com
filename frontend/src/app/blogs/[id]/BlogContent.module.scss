@@ -1,0 +1,123 @@
+@import '@/styles/variables';
+
+.messageContainer {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.message {
+  font-size: 2rem;
+  color: $accent-color;
+  margin-bottom: 1rem;
+  font-family: $code-font;
+}
+
+.subMessage {
+  color: rgba($secondary-color, 0.8);
+  line-height: 1.6;
+}
+
+.blogContainer {
+  max-width: $blog-max-width;
+  margin: 0 auto;
+  padding: $blog-container-padding;
+  font-family: $code-font;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.blogHeader {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid $blog-border-color;
+  padding-bottom: 1rem;
+  text-align: center;
+}
+
+.blogTitle {
+  font-size: 2.5rem;
+  color: $blog-heading-color;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.blogMeta {
+  display: flex;
+  gap: 1rem;
+  color: $blog-meta-color;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.tagContainer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tag {
+  background: $blog-tag-bg;
+  color: $secondary-color;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  transition: background-color $transition-speed;
+
+  &:hover {
+    background: $hover-color;
+  }
+}
+
+.blogImage {
+  width: 100%;
+  margin-top: 2rem;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba($blog-heading-color, 0.05) 0%, transparent 100%);
+    pointer-events: none;
+  }
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform $transition-speed;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+@media (max-width: 768px) {
+  .blogContainer {
+    padding: 1rem;
+  }
+
+  .blogTitle {
+    font-size: 2rem;
+  }
+
+  .blogImage {
+    height: 300px;
+  }
+}

@@ -6,19 +6,21 @@ import Linux from '@/models/Linux';
 import AnimatedGopherModel from '@/models/AnimatedGopher';
 
 import { Canvas, useThree } from '@react-three/fiber';
-import { Suspense, useRef, useEffect, useState } from 'react';
+import { Suspense, useRef, useEffect, useState, useCallback } from 'react';
 import Loading from './Loading';
 
 import './PlaygroundScene.scss';
 import Screen from './Screen';
 import MusicPlayer from './MusicPlayer';
 import RoomEnvironment from './RoomEnvironment';
+import GithubWall from './GithubWall';
 
 import {
 	OrbitControls,
 	Grid,
 	ContactShadows,
 } from '@react-three/drei';
+import CameraControlsUI from './CameraControlsUI';
 
 
 const mobilePosition = [0, 15, 50];
@@ -42,35 +44,94 @@ const useIsMobile = () => {
 };
 
 
-const Controls = () => {
+const Controls = ({ currentView }: { currentView: string }) => {
 	const controlsRef = useRef<any>(null);
 	const { camera } = useThree();
 	const isMobile = useIsMobile();
 
-	useEffect(() => {
-		if (isMobile) {
-			controlsRef.current?.target.set(...mobileTarget);
-			camera.position.set(mobilePosition[0], mobilePosition[1], mobilePosition[2]);
-		} else {
-			controlsRef.current?.target.set(...desktopTarget);
-			camera.position.set(desktopPosition[0], desktopPosition[1], desktopPosition[2]);
+	// Debug function to print camera info
+	const printCameraInfo = useCallback(() => {
+		if (controlsRef.current) {
+			console.log('Camera Position:', [
+				Math.round(camera.position.x * 100) / 100,
+				Math.round(camera.position.y * 100) / 100,
+				Math.round(camera.position.z * 100) / 100
+			]);
+			console.log('Camera Target:', [
+				Math.round(controlsRef.current.target.x * 100) / 100,
+				Math.round(controlsRef.current.target.y * 100) / 100,
+				Math.round(controlsRef.current.target.z * 100) / 100
+			]);
 		}
-		controlsRef.current?.update();
-	}, [camera, isMobile]);
+	}, [camera]);
+
+	const updateCameraPosition = useCallback((position: [number, number, number], target: [number, number, number]) => {
+		if (controlsRef.current) {
+			// Animate to new position
+			camera.position.set(position[0], position[1], position[2]);
+			controlsRef.current.target.set(target[0], target[1], target[2]);
+			controlsRef.current.update();
+		}
+	}, [camera]);
+
+	// Handle initial mobile/desktop position
+	useEffect(() => {
+		const position = isMobile ? mobilePosition : desktopPosition;
+		const target = isMobile ? mobileTarget : desktopTarget;
+		updateCameraPosition([position[0], position[1], position[2]], [target[0], target[1], target[2]]);
+	}, [isMobile, updateCameraPosition]);
+
+	// Handle view changes
+	useEffect(() => {
+		switch (currentView) {
+			case 'gopher':
+				updateCameraPosition([2, 10.81, 14.24], [-2.84, 9.44, 5.96]);
+				break;
+			case 'music':
+				updateCameraPosition([1.85, 4.86, 17.7], [9.98, 4.3, 2.01]);
+				break;
+			case 'wall':
+				updateCameraPosition([-39.61, 22.23, 5.33], [-10.3, 22.15, -13.67]);
+				break;
+			case 'tux':
+				updateCameraPosition([2.26, 9.68, 8.74], [5.67, 8.97, 1.66]);
+				break;
+			case 'screen':
+				updateCameraPosition([0, 12, 10], [0, 10, 0]);
+				break;
+			default:
+				// Reset to default view based on mobile/desktop
+				const position = isMobile ? mobilePosition : desktopPosition;
+				const target = isMobile ? mobileTarget : desktopTarget;
+
+				updateCameraPosition([position[0], position[1], position[2]], [target[0], target[1], target[2]]);
+		}
+	}, [currentView, isMobile, updateCameraPosition]);
 
 	return (
-		<>
-			<OrbitControls ref={controlsRef} />
-		</>
+		<OrbitControls
+			ref={controlsRef}
+			minPolarAngle={Math.PI / 4}
+			maxPolarAngle={Math.PI / 1.5}
+			minDistance={5}
+			maxDistance={50}
+			enablePan={true}
+			enableZoom={true}
+			enableRotate={true}
+			dampingFactor={0.05}
+			rotateSpeed={0.5}
+		/>
 	);
 }
 
 
 export default function Playground() {
 	const isMobile = useIsMobile();
+	const [currentView, setCurrentView] = useState('default');
 
 	return (
-		<>
+		<div className="playground-container">
+			<CameraControlsUI onViewChange={setCurrentView} />
 			<Canvas
 				className='playground'
 				camera={{
@@ -122,10 +183,21 @@ export default function Playground() {
 					<RoomEnvironment />
 
 
-					{/* Enhanced Floor and Shadows */}
+					{/* Floor, Grid and Shadows */}
 					<group position={[0, 0, 0]}>
+						<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.15, 0]} receiveShadow>
+							<planeGeometry args={[100, 100]} />
+							<meshStandardMaterial 
+								color="#202020" 
+								roughness={0.8}
+								metalness={0.2}
+								opacity={1}
+								transparent={false}
+								depthWrite={true}
+							/>
+						</mesh>
 						<Grid
-							position={[0, 0.01, 0]}
+							position={[0, 0.1, 0]}
 							args={[75, 75]}
 							cellSize={0.5}
 							cellThickness={0.5}
@@ -139,7 +211,7 @@ export default function Playground() {
 							infiniteGrid={true}
 						/>
 						<ContactShadows
-							position={[0, -0.01, 0]}
+							position={[0, 0.2, 0]}
 							opacity={0.5}
 							scale={50}
 							blur={2.5}
@@ -160,12 +232,12 @@ export default function Playground() {
 						position={[12, 0, -10]}
 						rotation={[0, -0.5, 0]}
 					/>
+					<GithubWall />
 					<MusicPlayer />
 					<Screen />
-					<Controls />
+					<Controls currentView={currentView} />
 				</Suspense>
 			</Canvas >
-
-		</>
+		</div>
 	);
 }

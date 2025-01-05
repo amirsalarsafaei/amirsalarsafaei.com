@@ -29,8 +29,8 @@ export default function BlogContent({ initialData }: { initialData: GetBlogRespo
 					
 					<h1 className={styles.blogTitle}>{initialData.blog.title}</h1>
 					<div className={styles.blogMeta}>
-						<time dateTime={initialData.blog.createdAt?.toString()}>
-							{initialData.blog.createdAt?.toLocaleDateString()}
+						<time dateTime={initialData.blog.publishedAt?.toString()}>
+							{initialData.blog.publishedAt?.toLocaleDateString()}
 						</time>
 					</div>
 					{initialData.blog.tags && (

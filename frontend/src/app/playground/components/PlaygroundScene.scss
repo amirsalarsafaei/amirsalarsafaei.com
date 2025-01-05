@@ -16,3 +16,117 @@
 
 
 }
+
+.playground-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.controls-container {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100000000;
+
+  .controls-panel {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #404040;
+
+    &.minimized {
+
+      .controls-instructions,
+      .camera-controls {
+        display: none;
+      }
+
+      padding: 0;
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .toggle-button {
+      position: absolute;
+      top: -24px;
+      right: 0;
+      background-color: #1e1e1e;
+      border: 1px solid #404040;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      padding: 4px 8px;
+      cursor: pointer;
+      color: #d4d4d4;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #2d2d2d;
+      }
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .controls-instructions {
+      margin-bottom: 12px;
+      font-size: 14px;
+      opacity: 0.75;
+      max-width: 300px;
+      text-align: center;
+
+      .mobile-note {
+        font-size: 12px;
+      }
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 8px;
+
+      button {
+        padding: 8px 12px;
+        background-color: #2d2d2d;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #3d3d3d;
+        }
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .screen-icon {
+          color: #569cd6;
+        }
+
+        .gopher-icon {
+          color: #00ADD8;
+        }
+
+        .music-icon {
+          color: #ce9178;
+        }
+
+        .github-icon {
+          color: #c586c0;
+        }
+
+        .tux-icon {
+          color: white;
+        }
+      }
+    }
+  }
+}

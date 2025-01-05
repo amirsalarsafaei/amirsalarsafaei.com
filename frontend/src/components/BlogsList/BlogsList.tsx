@@ -53,7 +53,7 @@ export default function({ blogs, isFetching, isLoadingError, isAdmin }: BlogsPro
 									<div className={styles.blogContent}>
 										<h3 className={styles.blogTitle}>{blog.title}</h3>
 										<div className={styles.blogMeta}>
-											<span className={styles.blogDate}>{blog.createdAt?.toLocaleDateString()}</span>
+											<span className={styles.blogDate}>{!isAdmin ? blog.publishedAt?.toLocaleDateString() : blog.createdAt?.toLocaleDateString()}</span>
 										</div>
 									</div>
 								</div>

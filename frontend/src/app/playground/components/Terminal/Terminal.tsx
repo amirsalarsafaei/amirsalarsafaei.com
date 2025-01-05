@@ -1,4 +1,4 @@
-import { KeyboardEvent,  useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { TerminalController } from './TerminalController';
 import { Command } from './Command';
 import './command.scss';
@@ -19,32 +19,15 @@ export function Terminal({ focused }: TerminalProps) {
 
 	const focusInput = () => {
 		if (inputRef.current) {
-			inputRef.current.focus({preventScroll: true});
+			inputRef.current.focus({ preventScroll: true });
 		}
 	};
 
-	const handleClickOutside = (event: MouseEvent) => {
-		if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-			focusInput();
-		}
-	};
 
-	useEffect(() => {
-		if (focused) {
-			document.addEventListener('click', handleClickOutside, true);
-
-			const timer = setTimeout(focusInput, 10);
-
-			return () => {
-				document.removeEventListener('click', handleClickOutside, true);
-				clearTimeout(timer);
-			};
-		}
-
-	}, [focused])
 
 	useEffect(() => {
 
+		focusInput();
 	}, [])
 
 	useEffect(() => {

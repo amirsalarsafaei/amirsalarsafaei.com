@@ -22,13 +22,14 @@
   h6 {
     color: $blog-heading-color;
     margin: 2.5rem 0 1.25rem;
-    border-bottom: 1px solid $blog-border-color;
-    padding-bottom: 0.5rem;
+
     line-height: 1.3;
   }
 
   h1 {
     font-size: 2.25rem;
+    border-bottom: 2px solid $highlight-color;
+    padding-bottom: 0.5rem;
 
     @media (max-width: 768px) {
       font-size: 1.875rem;
@@ -37,6 +38,17 @@
 
   h2 {
     font-size: 1.875rem;
+    border-bottom: 2px solid $highlight-color;
+    padding-bottom: 0.5rem;
+    position: relative;
+
+    &::before {
+      content: '##';
+      position: absolute;
+      left: -1.5em;
+      color: rgba($highlight-color, 0.4);
+      font-family: $code-font;
+    }
 
     @media (max-width: 768px) {
       font-size: 1.625rem;
@@ -45,6 +57,10 @@
 
   h3 {
     font-size: 1.5rem;
+    color: $highlight-color;
+    background: rgba($highlight-color, 0.1);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
 
     @media (max-width: 768px) {
       font-size: 1.375rem;
@@ -53,6 +69,17 @@
 
   h4 {
     font-size: 1.25rem;
+    color: $highlight-color;
+    position: relative;
+    padding-left: 1rem;
+
+    &::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: rgba($highlight-color, 0.6);
+      font-family: $code-font;
+    }
 
     @media (max-width: 768px) {
       font-size: 1.125rem;
@@ -62,6 +89,8 @@
   h5,
   h6 {
     font-size: 1.125rem;
+    color: $highlight-color;
+    font-style: italic;
 
     @media (max-width: 768px) {
       font-size: 1rem;
@@ -183,6 +212,9 @@
   img {
     max-width: 100%;
     border-radius: $blog-border-radius;
+    display: block;
+    margin: 2rem auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   hr {

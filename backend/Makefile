@@ -7,6 +7,7 @@ deploy-files:
 		--exclude '.git' \
 		--exclude '.gitignore' \
 		--exclude '.env' \
+		--exclude 'uploads' \
 		./ vps:/var/www/amirsalarsafaeibackend/
 	@rsync -av --progress \
 		--exclude 'target' \

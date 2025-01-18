@@ -7,9 +7,9 @@ import BlogsList from "@/components/BlogsList/BlogsList";
 import { useGrpc } from "@/providers/GrpcProvider";
 
 export default function BlogsListClient({ 
-  initialData 
+  initialData, initialDataUpdatedAt
 }: { 
-  initialData: Awaited<ListPublishedBlogsResponse> 
+  initialData: Awaited<ListPublishedBlogsResponse>, initialDataUpdatedAt: number
 }) {
   const searchParams = useSearchParams();
   const {blogs_client} = useGrpc();
@@ -41,6 +41,7 @@ export default function BlogsListClient({
       }
       return lastPage.nextPageToken
     },
+    initialDataUpdatedAt: initialDataUpdatedAt,
     initialPageParam: "",
     initialData: {
       pages: [initialData],

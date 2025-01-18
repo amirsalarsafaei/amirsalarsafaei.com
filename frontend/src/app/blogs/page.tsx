@@ -28,6 +28,6 @@ async function getInitialBlogs() {
 export default async function PublishedBlogs() {
   const initialData = await getInitialBlogs();
   
-  return <BlogsListClient initialData={initialData} />;
+  return <BlogsListClient initialData={initialData} initialDataUpdatedAt={Date.now()} />;
 }
 

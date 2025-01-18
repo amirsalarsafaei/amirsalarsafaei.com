@@ -16,7 +16,6 @@ const transport = new GrpcWebImpl(GRPC_WEB_URL, {
 });
 
 
-// Function to create gRPC clients
 function createGrpcClients() {
   return {
     spotify: new SpotifyClientImpl(transport),

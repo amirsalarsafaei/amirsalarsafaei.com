@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     default: 'Amirsalar Safaei | Software Engineer',
     template: '%s | Amirsalar Safaei'
   },
+  viewport: { width: "device-width", initialScale: 1, userScalable: false },
   description: 'Software engineer passionate about high-performance systems and programming languages. Crafting innovative solutions with Rust, Go, TS and Python. Sharing insights through technical blogs and interactive experiences.',
   keywords: [
     'Software Engineer',

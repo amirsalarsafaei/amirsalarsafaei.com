@@ -1,6 +1,6 @@
 
 import { Text, RoundedBox } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber'
+import { ThreeEvent, useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -50,7 +50,8 @@ const RepoCard = ({ repo, position }: { repo: Repository; position: [number, num
         }
     });
 
-    const handleClick = () => {
+    const handleClick = (e: ThreeEvent<MouseEvent>) => {
+        e.stopPropagation();
         window.open(`https://github.com/${repo.author}/${repo.name}`, '_blank');
     };
 

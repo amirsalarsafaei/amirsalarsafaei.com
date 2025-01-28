@@ -46,7 +46,8 @@ export default function BlogsListClient({
     initialData: {
       pages: [initialData],
       pageParams: [""]
-    }
+    },
+    refetchOnMount: true,
   });
 
   return BlogsList({

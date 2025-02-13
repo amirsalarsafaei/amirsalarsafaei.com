@@ -1,0 +1,33 @@
+@import "src/styles/global.scss";
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba($highlight-color, 0.3);
+    background: rgba($highlight-color, 0.05);
+    color: $blog-text-color;
+    font-family: $code-font;
+    
+    &:hover {
+        background: rgba($highlight-color, 0.1);
+        border-color: rgba($highlight-color, 0.4);
+    }
+
+    &.selected {
+        background: rgba($highlight-color, 0.2);
+        border-color: rgba($highlight-color, 0.5);
+        color: $highlight-color;
+
+        &:hover {
+            background: rgba($highlight-color, 0.25);
+            border-color: rgba($highlight-color, 0.6);
+        }
+    }
+}
+

@@ -9,7 +9,7 @@ use std::{process, time::Duration};
 use tags::TagServicer;
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
-use tower_http::cors::{AllowOrigin, CorsLayer};
+use tower_http::cors::{AllowOrigin, CorsLayer, Any};
 
 const DEFAULT_EXPOSED_HEADERS: [HeaderName; 4] = [
     HeaderName::from_static("grpc-status"),
@@ -103,8 +103,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         config.auth_token.clone(),
     ));
 
+    let allowed_origins = [
+        "http://localhost:3000".parse().unwrap(),
+        "http://localhost:5173".parse().unwrap(),
+        "https://amirsalarsafaei.com".parse().unwrap(),
+        "http://amirsalarsafaei.com".parse().unwrap(),
+    ];
     let cors_layer = CorsLayer::new()
-        .allow_origin(AllowOrigin::mirror_request())
+        .allow_origin(allowed_origins)
         .allow_credentials(true)
         .max_age(DEFAULT_MAX_AGE)
         .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())

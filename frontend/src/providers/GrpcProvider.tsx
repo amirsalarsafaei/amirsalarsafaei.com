@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { getGrpcClients } from '@/clients/grpc';
+import { createGrpcClients } from '@/clients/grpc';
 import type { Spotify } from '@generated/playground/spotify';
 import type { Blogs } from '@generated/blogs/blogs';
 
@@ -18,7 +18,7 @@ export function GrpcProvider({ children }: { children: ReactNode }) {
   const [clients, setClients] = useState<Omit<GrpcContextType, 'isReady'> | null>(null);
 
   useEffect(() => {
-    const { spotify_client, blogs_client } = getGrpcClients();
+    const { spotify_client, blogs_client } = createGrpcClients();
     setClients({ spotify_client, blogs_client });
     setIsReady(true);
   }, []);

@@ -43,9 +43,37 @@ $terminal-time-size: 0.8rem;
         width: 100%;
         font-family: inherit;
 
+        caret-color: transparent;
+
         &:focus {
           outline: none;
         }
+      }
+
+      .cmd-input-wrapper {
+        position: relative;
+        flex-grow: 1;
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: 2px;
+          height: 1.2em;
+          width: 0.6em;
+          background-color: $terminal-input-text;
+          animation: blink 1s step-end infinite;
+          left: calc(var(--cursor-position) * 0.6em);
+        }
+      }
+
+      @keyframes blink {
+        0%, 100% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+
       }
     }
   }

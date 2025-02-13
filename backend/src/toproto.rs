@@ -10,7 +10,7 @@ use crate::cornucopia::types::public::BlogsTags;
 use prost::Message;
 
 pub trait ToProto<T> {
-    fn to_proto(&self) -> T;
+    fn as_proto(&self) -> T;
 }
 
 pub fn list_to_proto<T, P>(items: &Vec<T>) -> Vec<P>
@@ -18,7 +18,7 @@ where
     T: ToProto<P>,
     P: Message,
 {
-    items.iter().map(|a| a.to_proto()).collect()
+    items.iter().map(|a| a.as_proto()).collect()
 }
 
 fn datetime_to_timestamp(datetime: &OffsetDateTime) -> Timestamp {
@@ -29,7 +29,7 @@ fn datetime_to_timestamp(datetime: &OffsetDateTime) -> Timestamp {
 }
 
 impl ToProto<BlogPb> for Blog {
-    fn to_proto(&self) -> BlogPb {
+    fn as_proto(&self) -> BlogPb {
         BlogPb {
             id: self.id.to_string(),
             content: self.content.clone(),
@@ -51,7 +51,7 @@ impl ToProto<BlogPb> for Blog {
 }
 
 impl ToProto<BlogPb> for PublishedBlog {
-    fn to_proto(&self) -> BlogPb {
+    fn as_proto(&self) -> BlogPb {
         BlogPb {
             id: self.id.to_string(),
             image_url: self.image_url.clone(),
@@ -66,7 +66,7 @@ impl ToProto<BlogPb> for PublishedBlog {
 }
 
 impl ToProto<TagPb> for BlogsTags {
-    fn to_proto(&self) -> TagPb {
+    fn as_proto(&self) -> TagPb {
         TagPb {
             id: self.id.to_string(),
             name: self.name.clone(),
@@ -75,7 +75,7 @@ impl ToProto<TagPb> for BlogsTags {
 }
 
 impl ToProto<TagPb> for Tag {
-    fn to_proto(&self) -> TagPb {
+    fn as_proto(&self) -> TagPb {
         TagPb {
             id: self.id.to_string(),
             name: self.name.clone(),

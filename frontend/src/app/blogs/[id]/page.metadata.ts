@@ -1,9 +1,11 @@
 
 import { Metadata } from 'next';
-import { blogs_client } from "@/clients/grpc";
 import { GetBlogRequest } from "@generated/blogs/blogs";
+import { createGrpcClients } from '@/clients/grpc';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const {blogs_client} = createGrpcClients();
+
   try {
     const req = GetBlogRequest.create({ id: params.id });
     const data = await blogs_client.GetBlog(req);

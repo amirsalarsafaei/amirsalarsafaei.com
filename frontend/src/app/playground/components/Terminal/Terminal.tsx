@@ -51,12 +51,14 @@ export function Terminal({ focused }: TerminalProps) {
 		{termainalController.getCommands().map((c) => (<Command {...c} key={c.id} />))}
 		<div className="cmd-input-line">
 			<div className="path">{termainalController.getCurrentPath()}</div>
-			<input className="cmd-input"
-				spellCheck={false}
-				value={cmdInput}
-				ref={inputRef}
-				onChange={(e) => setCmdInput(e.target.value)}
-				onKeyDownCapture={handleKeyDown} />
+			<div className="cmd-input-wrapper" style={{ '--cursor-position': `${cmdInput.length}` } as React.CSSProperties}>
+				<input className="cmd-input"
+					spellCheck={false}
+					value={cmdInput}
+					ref={inputRef}
+					onChange={(e) => setCmdInput(e.target.value)}
+					onKeyDownCapture={handleKeyDown} />
+			</div>
 		</div>
 	</div>
 }

@@ -6,6 +6,8 @@ import Markdown from '@/components/Markdown/Markdown';
 import image_client from '@/clients/image';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/Button/Button';
+import { Tag } from '@generated/blogs/blogs';
+import { useGrpc } from '@/providers/GrpcProvider';
 
 export interface SubmitBlogProps {
 	title: string;
@@ -26,6 +28,7 @@ interface BlogEditorProps {
 	initialContent: string;
 	initialTitle: string;
 	initialImageUrl: string | undefined;
+	initialTags: Tag[];
 	headerButtons?: CustomButton[];
 }
 
@@ -36,16 +39,20 @@ export default function BlogEditor({
 	initialTitle = '',
 	initialContent = '',
 	initialImageUrl = undefined,
-	headerButtons = []
+	initialTags = [],
+	headerButtons = [],
 }: BlogEditorProps) {
 	const [markdown, setMarkdown] = useState(initialContent);
 	const [title, setTitle] = useState(initialTitle);
 	const [imageUrl, setImageUrl] = useState(initialImageUrl);
+	const [tags, setTags] = useState(initialTags);
 	const [isPreviewMode, setIsPreviewMode] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const blogImageInputRef = useRef<HTMLInputElement>(null);
 	const { token } = useAuth();
+
+	const {tags_client} = useGrpc();
 
 	const handleSubmit = () => {
 		onSubmit({

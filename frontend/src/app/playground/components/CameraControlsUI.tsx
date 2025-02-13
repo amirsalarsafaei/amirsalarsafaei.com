@@ -25,6 +25,8 @@ const CameraControlsUI: React.FC<CameraControlsUIProps> = ({ onViewChange }) => 
                 <div className="controls-instructions">
                     <code>CTRL/SHIFT + Mouse</code> to move around
                     <br />
+                    <span>Type on the laptop screen to interact</span>
+                    <br />
                     <span className="mobile-note">Touch controls on mobile</span>
                 </div>
                 <div className="camera-controls">

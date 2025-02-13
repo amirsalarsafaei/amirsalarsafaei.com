@@ -131,7 +131,7 @@ impl BlogServicer {
         uuid: &Uuid,
     ) -> Result<Blog, tonic::Status> {
         match get_blog_by_id().bind(client, &uuid).opt().await {
-            Ok(Some(blog)) => Ok(blog.to_proto()),
+            Ok(Some(blog)) => Ok(blog.as_proto()),
             Ok(None) => Err(tonic::Status::not_found("The blog not found")),
             Err(err) => {
                 log::error!("could not get blog from database: {}", err);
@@ -172,7 +172,7 @@ impl Blogs for BlogServicer {
             .await
         {
             Ok(blogs) => {
-                let blogs_pb: Vec<Blog> = blogs.iter().map(|blog| blog.to_proto()).collect();
+                let blogs_pb: Vec<Blog> = blogs.iter().map(|blog| blog.as_proto()).collect();
 
                 Ok(tonic::Response::new(ListPublishedBlogsResponse {
                     next_page_token: self.get_next_list_published_page_token(&blogs_pb),

@@ -141,7 +141,7 @@ impl Tags for TagServicer {
             .one()
             .await
         {
-            Ok(tag) => Ok(tonic::Response::new(tag.to_proto())),
+            Ok(tag) => Ok(tonic::Response::new(tag.as_proto())),
             Err(err) => {
                 log::error!("could not create tag in database: {}", err);
                 Err(tonic::Status::internal("could not create tag in storage"))

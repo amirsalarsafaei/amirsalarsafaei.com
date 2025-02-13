@@ -5,7 +5,6 @@ const GadgetMusic = dynamic(() => import('@/models/GadgetMusic'), { ssr: false }
 import {
 	Text,
 } from '@react-three/drei';
-import { spotify_client } from '@/clients/grpc';
 import { GetRecentlyPlayedSongRequest } from '@generated/playground/spotify';
 import { useQuery }
 	from '@tanstack/react-query';
@@ -13,6 +12,7 @@ import { RpcError } from 'grpc-web';
 import * as THREE from 'three';
 import { useLoader } from '@react-three/fiber';
 import { Suspense } from 'react';
+import { useGrpc } from '@/providers/GrpcProvider';
 
 const REFETCH_INTERVAL = 1 * 60_000; // 1 minutes in milliseconds
 const STALE_TIME = 10 * 60_000; // 10 minutes in milliseconds
@@ -32,6 +32,8 @@ function AlbumArt({ url }: { url: string }) {
 }
 
 export default function MusicPlayer() {
+
+	const {spotify_client} = useGrpc();
 
 	const fetchLastSong = async () => {
 		const request = GetRecentlyPlayedSongRequest.create();

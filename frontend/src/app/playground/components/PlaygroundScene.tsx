@@ -4,6 +4,7 @@
 import LaptopModel from '@/models/LaptopModel';
 import Linux from '@/models/Linux';
 import AnimatedGopherModel from '@/models/AnimatedGopher';
+import FerrisCrab from '@/models/FerrisCrab';
 
 import { Canvas, useThree } from '@react-three/fiber';
 import { Suspense, useRef, useEffect, useState, useCallback } from 'react';
@@ -234,6 +235,11 @@ export default function Playground() {
 					/>
 					<GithubWall />
 					<MusicPlayer />
+					<FerrisCrab 
+						scale={11}
+						position={[-11, 0, 0]}
+						rotation={[0, 0.7, 0]}
+					/>
 					<Screen />
 					<Controls currentView={currentView} />
 				</Suspense>

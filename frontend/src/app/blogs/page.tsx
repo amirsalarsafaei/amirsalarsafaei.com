@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { ListPublishedBlogsRequest } from "@generated/blogs/blogs";
 import BlogsListClient from './components/PublishedBlogs'
-import { getGrpcClients } from '@/clients/grpc';
+import { createGrpcClients } from '@/clients/grpc';
 
 export const metadata: Metadata = {
   title: 'Blogs | AmirSalar Safaei',
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 async function getInitialBlogs() {
-  const {blogs_client} = getGrpcClients();
+  const {blogs_client} = createGrpcClients();
 
   const req = ListPublishedBlogsRequest.create({
     pageSize: 10,

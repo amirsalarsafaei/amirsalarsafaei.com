@@ -4,6 +4,7 @@ import { Blog } from '@generated/blogs/blogs';
 import styles from './BlogsList.module.scss';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Chip } from '@/components/Chip/Chip';
 
 interface BlogsProps {
 	blogs: Blog[],
@@ -53,7 +54,19 @@ export default function({ blogs, isFetching, isLoadingError, isAdmin }: BlogsPro
 									<div className={styles.blogContent}>
 										<h3 className={styles.blogTitle}>{blog.title}</h3>
 										<div className={styles.blogMeta}>
-											<span className={styles.blogDate}>{!isAdmin ? blog.publishedAt?.toLocaleDateString() : blog.createdAt?.toLocaleDateString()}</span>
+											<span className={styles.blogDate}>
+												{!isAdmin ? blog.publishedAt?.toLocaleDateString() : blog.createdAt?.toLocaleDateString()}
+											</span>
+											{blog.tags && blog.tags.length > 0 && (
+												<div className={styles.blogTags}>
+													{blog.tags.map((tag) => (
+														<Chip
+															key={tag.id}
+															label={tag.name}
+														/>
+													))}
+												</div>
+											)}
 										</div>
 									</div>
 								</div>

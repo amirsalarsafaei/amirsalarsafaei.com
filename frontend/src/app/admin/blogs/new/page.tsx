@@ -3,14 +3,14 @@ import { useState } from 'react';
 import { useGrpc } from '@/providers/GrpcProvider';
 import BlogEditor, { SubmitBlogProps } from '../components/BlogEditor';
 import { useAuth } from '@/hooks/useAuth';
-import { CreateBlogRequest } from '@generated/blogs/blogs';
+import { CreateBlogRequest, SetBlogTagsRequest } from '@generated/blogs/blogs';
 import { useRouter } from 'next/navigation';
 import { grpc } from '@improbable-eng/grpc-web';
 import './page.scss';
 
 
 export default function NewBlog() {
-	const { blogs_client } = useGrpc();
+	const { blogs_client, tags_client } = useGrpc();
 	const { token } = useAuth();
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,13 @@ export default function NewBlog() {
 
 		const req = CreateBlogRequest.create({ title: submitBlog.title, content: submitBlog.content, imageUrl: submitBlog.imageUrl })
 		try {
-			const resp = await blogs_client.CreateBlog(req, (token ? new grpc.Metadata({ authorization: token }) : undefined));
+			const metadata = (token ? new grpc.Metadata({ authorization: token }) : undefined);
+			const resp = await blogs_client.CreateBlog(req, metadata);
+			try {
+				await tags_client.SetBlogTags(SetBlogTagsRequest.create({blogId: resp.blog?.id, tagNames: submitBlog.tags }))
+			} catch(err) {
+				console.error("could not set blog tags:", err);
+			}
 			router.push(`/admin/blogs/${resp.blog?.id}`);
 			setIsLoading(false);
 		} catch (err) {
@@ -33,5 +39,5 @@ export default function NewBlog() {
 		}
 	};
 
-	return (<BlogEditor onSubmit={handleCreate} isSubmiting={isLoading} initialImageUrl={undefined} initialTitle="" initialContent="" buttonLabel="Create New Blog" />);
+	return (<BlogEditor onSubmit={handleCreate} isSubmiting={isLoading} initialImageUrl={undefined} initialTags={[]} initialTitle="" initialContent="" buttonLabel="Create New Blog" />);
 }

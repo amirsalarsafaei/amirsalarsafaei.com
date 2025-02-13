@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { useGrpc } from '@/providers/GrpcProvider';
 import BlogEditor, { SubmitBlogProps } from '../components/BlogEditor';
 import { useAuth } from '@/hooks/useAuth';
-import { Blog, UpdateBlogRequest, GetBlogRequest, PublishBlogRequest } from '@generated/blogs/blogs';
+import { Blog, UpdateBlogRequest, GetBlogRequest, PublishBlogRequest, SetBlogTagsRequest } from '@generated/blogs/blogs';
 import { grpc } from '@improbable-eng/grpc-web';
 import styles from './page.module.scss';
 
 
 export default function EditBlog({ params }: { params: { id: string } }) {
-	const { blogs_client } = useGrpc();
+	const { blogs_client, tags_client } = useGrpc();
 	const { token } = useAuth();
 	const [blog, setBlog] = useState<Blog | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
@@ -61,8 +61,14 @@ export default function EditBlog({ params }: { params: { id: string } }) {
 			content: submitBlog.content,
 			imageUrl: submitBlog.imageUrl
 		});
+		const metadata = (token ? new grpc.Metadata({ authorization: token }) : undefined);
 		try {
-			await blogs_client.UpdateBlog(req, (token ? new grpc.Metadata({ authorization: token }) : undefined));
+			await blogs_client.UpdateBlog(req, metadata);
+			try {
+				await tags_client.SetBlogTags(SetBlogTagsRequest.create({blogId: params.id, tagNames: submitBlog.tags }), metadata);
+			} catch(err) {
+				console.error("could not set blog tags:", err);
+			}
 			setIsLoading(false);
 		} catch (err) {
 			console.error('Failed to update blog:', err);
@@ -111,6 +117,7 @@ export default function EditBlog({ params }: { params: { id: string } }) {
 			buttonLabel="Update Blog"
 			initialImageUrl={blog?.imageUrl} initialTitle={blog?.title ?? ""} initialContent={blog?.content ?? ""}
 			isSubmiting={isLoading}
+			initialTags={blog?.tags ?? []}
 			headerButtons={[
 				{ label: "Publish", disabled: isPublishing, onClick: handlePublish },
 			]}

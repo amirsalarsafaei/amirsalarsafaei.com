@@ -75,7 +75,70 @@
     font-size: 1rem;
   }
 
-  .titleInput {
+.tagsSection {
+    margin: 1rem 0;
+    background: $blog-code-bg;
+    padding: 1rem;
+    border-radius: $blog-border-radius;
+}
+
+.tagsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: $highlight-color;
+        font-family: $code-font;
+    }
+}
+
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tagWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.deleteTagButton {
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba($blog-text-color, 0.9);
+    color: $blog-code-bg;
+    border: 2px solid $blog-code-bg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    opacity: 0;
+    transition: all 0.2s ease;
+    font-family: $code-font;
+
+    &:hover {
+        background: $blog-text-color;
+        transform: scale(1.1);
+    }
+}
+
+.tagWrapper:hover .deleteTagButton {
+    opacity: 1;
+}
+
+.titleInput {
     flex: 2;
   }
 

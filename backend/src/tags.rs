@@ -88,7 +88,12 @@ impl Tags for TagServicer {
                 tonic::Status::internal("could not insert new tags")
             })?;
 
-        match get_blog_tags().bind(&tx, &blog_id_uuid).all().await {
+        tx.commit().await.map_err(|e| {
+                log::error!("could not commit transaction: {}", e);
+                tonic::Status::internal("could not finalize changes")
+        })?;
+
+        match get_blog_tags().bind(&connection, &blog_id_uuid).all().await {
             Ok(tags) => Ok(tonic::Response::new(SetBlogTagsResponse {
                 tags: toproto::list_to_proto(&tags),
             })),

@@ -3,16 +3,21 @@
 import { useState, useRef } from 'react';
 import styles from './BlogEditor.module.scss';
 import Markdown from '@/components/Markdown/Markdown';
+import { CreateTagRequest, DeleteTagRequest } from '@generated/blogs/blogs';
 import image_client from '@/clients/image';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/Button/Button';
-import { Tag } from '@generated/blogs/blogs';
+import { ListTagsRequest, Tag } from '@generated/blogs/blogs';
 import { useGrpc } from '@/providers/GrpcProvider';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Chip } from '@/components/Chip/Chip';
+import { grpc } from '@improbable-eng/grpc-web';
 
 export interface SubmitBlogProps {
 	title: string;
 	content: string;
 	imageUrl: string | undefined;
+	tags: string[];
 }
 
 interface CustomButton {
@@ -52,13 +57,80 @@ export default function BlogEditor({
 	const blogImageInputRef = useRef<HTMLInputElement>(null);
 	const { token } = useAuth();
 
-	const {tags_client} = useGrpc();
+
+	const { tags_client } = useGrpc();
+
+	const { data: availableTags = [], refetch: refetchTags } = useQuery({
+		queryKey: ['tags'],
+		queryFn: async () => {
+			const response = await tags_client.ListTags(ListTagsRequest.create(), new grpc.Metadata({ ...(token && { authorization: token }) }));
+			console.log(initialTags);
+			return response.tags;
+		}
+	});
+
+	const createTagMutation = useMutation({
+		mutationFn: async (tagName: string) => {
+			const request = CreateTagRequest.create({ name: tagName });
+			const response = await tags_client.CreateTag(request, new grpc.Metadata({ ...(token && { authorization: token }) }));
+			return response;
+		},
+		onSuccess: () => {
+			refetchTags();
+		},
+	});
+
+	const deleteTagMutation = useMutation({
+		mutationFn: async (tagId: string) => {
+			const request = DeleteTagRequest.create({ id: tagId });
+			await tags_client.DeleteTag(request, new grpc.Metadata({ ...(token && { authorization: token }) }));
+			return tagId;
+		},
+		onSuccess: (deletedTagId) => {
+			// Remove the deleted tag from selected tags if it was selected
+			setTags(tags.filter(t => t.id !== deletedTagId));
+			refetchTags();
+		},
+	});
+
+	const handleCreateTag = async () => {
+		const tagName = prompt('Enter new tag name:');
+		if (!tagName) return;
+
+		try {
+			await createTagMutation.mutateAsync(tagName);
+		} catch (error) {
+			console.error('Failed to create tag:', error);
+			alert('Failed to create tag. Please try again.');
+		}
+	};
+
+	const handleDeleteTag = async (tagId: string) => {
+		if (!confirm('Are you sure you want to delete this tag?')) return;
+
+		try {
+			await deleteTagMutation.mutateAsync(tagId);
+		} catch (error) {
+			console.error('Failed to delete tag:', error);
+			alert('Failed to delete tag. Please try again.');
+		}
+	};
+
+	const handleTagToggle = (tag: Tag) => {
+		const isSelected = tags.some(t => t.id === tag.id);
+		if (isSelected) {
+			setTags(tags.filter(t => t.id !== tag.id));
+		} else {
+			setTags([...tags, tag]);
+		}
+	};
 
 	const handleSubmit = () => {
 		onSubmit({
 			content: markdown,
 			title,
 			imageUrl,
+			tags: tags.map(t => t.id)
 		})
 	};
 
@@ -128,6 +200,39 @@ export default function BlogEditor({
 					className={styles.titleInput}
 				/>
 
+				<div className={styles.tagsSection}>
+					<div className={styles.tagsHeader}>
+						<h3>Tags</h3>
+						<Button
+							onClick={handleCreateTag}
+							variant="terminal"
+							size="sm"
+						>
+							Add Tag
+						</Button>
+					</div>
+					<div className={styles.tagsContainer}>
+						{availableTags.map((tag) => (
+							<div key={tag.id} className={styles.tagWrapper}>
+								<Chip
+									label={tag.name}
+									onClick={() => handleTagToggle(tag)}
+									selected={tags.some(t => t.id === tag.id)}
+								/>
+								<button
+									className={styles.deleteTagButton}
+									onClick={(e) => {
+										e.stopPropagation();
+										handleDeleteTag(tag.id);
+									}}
+									title="Delete tag"
+								>
+									×
+								</button>
+							</div>
+						))}
+					</div>
+				</div>
 				<div className={styles.headerButtons}>
 					{headerButtons.map((btn, index) => (
 						<Button

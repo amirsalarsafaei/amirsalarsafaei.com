@@ -1,10 +1,13 @@
 @import "prism-theme";
 @import "variables";
 html, body {
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden;
 }
 
 body {
@@ -14,16 +17,13 @@ body {
   background: $primary-bg;
   color: $text-color;
 
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  height: 100dvh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  position: relative;
 }

@@ -18,7 +18,6 @@ const nextConfig = {
   },
 
   typescript: {
-
     ignoreBuildErrors: true,
   },
   pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
@@ -30,7 +29,6 @@ const nextConfig = {
         port: '3001',
         pathname: '/images/**',
       },
-
       {
         protocol: 'https',
         hostname: 'upload.amirsalarsafaei.com',

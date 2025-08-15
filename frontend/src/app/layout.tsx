@@ -6,13 +6,14 @@ import styles from './page.module.scss';
 import QueryProvider from '@/providers/QueryProvider';
 import { GrpcProvider } from '@/providers/GrpcProvider';
 import Navbar from '@/components/Navbar/Navbar';
+import { GoogleAnalytics } from '@next/third-parties/google'
+
 
 export const metadata: Metadata = {
   title: {
     default: 'Amirsalar Safaei | Software Engineer',
     template: '%s | Amirsalar Safaei'
   },
-  viewport: { width: "device-width", initialScale: 1, userScalable: false },
   description: 'Software engineer passionate about high-performance systems and programming languages. Crafting innovative solutions with Rust, Go, TS and Python. Sharing insights through technical blogs and interactive experiences.',
   keywords: [
     'Software Engineer',
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     'Tech Writing',
     'Engineering Blog'
   ],
-  creator: 'Amirsalar Safaei',
+  creator: 'Amirsalar Safaei Ghaderi',
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     description: 'Building high-performance systems and software with Rust, Go, and modern web technologies',
     siteName: 'Amirsalar Safaei Portfolio',
     images: [{
-      url: '/og-image.png',
+      url: '/icon.png',
       width: 1200,
       height: 630,
       alt: 'Amirsalar Safaei Portfolio'
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Amirsalar Safaei | Software Engineer',
     description: 'Building high-performance systems and software with Rust, Go, and modern web technologies',
-    images: ['/og-image.png']
+    images: ['/icon.png']
   },
   robots: {
     index: true,
@@ -76,19 +77,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <div id="root">
-          <QueryProvider>
-            <GrpcProvider>
-              <div className={styles.contentNavbarWrapper}>
-                <Navbar />
-                <div className={styles.pageContent}>
-                  {children}
-                </div>
-              </div>
-            </GrpcProvider>
-          </QueryProvider>
-        </div>
+        <QueryProvider>
+          <GrpcProvider>
+            <Navbar />
+            <div className={styles.pageContent}>
+              {children}
+            </div>
+          </GrpcProvider>
+        </QueryProvider>
       </body>
+      <GoogleAnalytics gaId="G-QZ0BJG7GNY" />
     </html>
   );
 }

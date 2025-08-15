@@ -18,13 +18,11 @@ export default function AnimatedGopherModel(props: AnimatedGopherProps) {
 
 	useFrame((state) => {
 		if (modelRef.current) {
-			// Hand animation
 			const leftHand = modelRef.current.getObjectByName('left_hand') as Mesh;
 			if (leftHand) {
 				leftHand.rotation.y = 0.09 + Math.sin(state.clock.elapsedTime * 1.5) * 1.5;
 			}
 
-			// Eye tracking
 			const leftEye = modelRef.current.getObjectByName('left_eye') as Mesh;
 			const rightEye = modelRef.current.getObjectByName('right_eye') as Mesh;
 			const leftPupil = modelRef.current.getObjectByName('left_pupil') as Mesh;
@@ -34,13 +32,11 @@ export default function AnimatedGopherModel(props: AnimatedGopherProps) {
 				const isMobile = window.innerWidth <= 768;
 				const pointer = state.pointer;
 
-				// Get world positions
 				const leftEyePosition = new Vector3();
 				const rightEyePosition = new Vector3();
 				leftEye.getWorldPosition(leftEyePosition);
 				rightEye.getWorldPosition(rightEyePosition);
 
-				// Project pointer to world space
 				const vector = new Vector3();
 				vector.set(pointer.x, pointer.y, 0.5);
 				vector.unproject(state.camera);
@@ -48,7 +44,6 @@ export default function AnimatedGopherModel(props: AnimatedGopherProps) {
 				const distance = -state.camera.position.z / dir.z;
 				const lookTarget = state.camera.position.clone().add(dir.multiplyScalar(distance));
 
-				// Apply touch movement for mobile
 				if (isMobile) {
 					lookTarget.add(new Vector3(
 						pointer.x * 20,
@@ -57,18 +52,14 @@ export default function AnimatedGopherModel(props: AnimatedGopherProps) {
 					));
 				}
 
-				// Calculate look directions
 				const lookAtLeft = lookTarget.clone().sub(leftEyePosition);
 				const lookAtRight = lookTarget.clone().sub(rightEyePosition);
 
-				// Maximum pupil movement
 				const maxOffset = 0.15;
 
-				// Left eye
 				leftEye.rotation.x = -0.295;
 				leftEye.rotation.y = -0.285;
 
-				// Calculate left pupil position with smoother movement
 				const leftOffsetX = Math.max(-maxOffset, Math.min(maxOffset, lookAtLeft.x * 0.05));
 				const leftOffsetY = Math.max(-maxOffset, Math.min(maxOffset, lookAtLeft.y * 0.05));
 				leftPupil.position.x = -0.255 + leftOffsetX;
@@ -76,11 +67,9 @@ export default function AnimatedGopherModel(props: AnimatedGopherProps) {
 				leftPupil.rotation.x = -0.296;
 				leftPupil.rotation.y = -0.009;
 
-				// Right eye
 				rightEye.rotation.x = -0.282;
 				rightEye.rotation.y = 0.265;
 
-				// Calculate right pupil position with smoother movement
 				const rightOffsetX = Math.max(-maxOffset, Math.min(maxOffset, lookAtRight.x * 0.05));
 				const rightOffsetY = Math.max(-maxOffset, Math.min(maxOffset, lookAtRight.y * 0.05));
 				rightPupil.position.x = 0.788 + rightOffsetX;

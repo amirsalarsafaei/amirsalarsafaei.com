@@ -1,0 +1,138 @@
+.aboutContainer {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  align-items: stretch;
+  height: 100%;
+  
+  @media (max-width: 1200px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.terminal {
+  background-color: #011627;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+  flex: 1;
+  max-width: 600px;
+  min-height: 600px;
+  
+  @media (max-width: 1200px) {
+    max-width: 900px;
+    width: 100%;
+  }
+}
+
+.canvasContainer {
+  flex: 1;
+  min-height: 600px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  
+  @media (max-width: 1200px) {
+    width: 100%;
+    max-width: 900px;
+    height: 500px;
+    min-height: 500px;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #43D9AD;
+  font-family: monospace;
+  font-size: 1.2rem;
+}
+
+.terminalHeader {
+  background-color: #01111d;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #033042;
+  flex-shrink: 0;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-right: 1rem;
+
+  span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+}
+
+.close {
+  background-color: #ff5f57;
+}
+
+.minimize {
+  background-color: #febc2e;
+}
+
+.maximize {
+  background-color: #28c841;
+}
+
+.termTitle {
+  color: #607B96;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.terminalBody {
+  padding: 1.5rem;
+  color: #607B96;
+  font-family: monospace;
+  line-height: 1.6;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.line {
+  margin-bottom: 1rem;
+}
+
+.prompt {
+  color: #43D9AD;
+  margin-right: 0.5rem;
+}
+
+.content {
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+
+    a {
+      color: #43D9AD;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.cursor {
+  color: #43D9AD;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

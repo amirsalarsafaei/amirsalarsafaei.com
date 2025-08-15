@@ -63,8 +63,7 @@ const RepoCard = ({ repo, position }: { repo: Repository; position: [number, num
                 radius={0.2} // Border radius
                 smoothness={4} // Optional: Number of curve segments
                 material={material}
-                castShadow 
-                receiveShadow
+                renderOrder={-1}
                 onPointerOver={(e) => {
                     e.stopPropagation();
                     setHovered(true);
@@ -114,23 +113,23 @@ const RepoCard = ({ repo, position }: { repo: Repository; position: [number, num
 };
 
 export default function GithubWall() {
-    const wallWidth = 100;  // Fixed width
-    const wallHeight = 50; // Fixed height
+    const wallWidth = 50;  // Fixed width
+    const wallHeight = 35; // Fixed height
 
     const wallGeometry = useMemo(() => new THREE.BoxGeometry(wallWidth, wallHeight, 1), []);
     const wallMaterial = useMemo(() => new THREE.MeshStandardMaterial({ 
         color: '#041a0f',
         metalness: 0.2,
         roughness: 0.9,
-        transparent: true,
-        opacity: 0.95,
+        transparent: false,
+        opacity: 1,
     }), []);
 
     return (
-        <group position={[0, 12, -20]} rotation={[0, 0, 0]}>
+        <group position={[0, wallHeight/2, -20]} rotation={[0, 0, 0]}>
             <mesh geometry={wallGeometry} material={wallMaterial} receiveShadow>
                 <Text
-                    position={[0, wallHeight/2 - 4, 0.51]}
+                    position={[0, wallHeight/2 - 2.5, 0.51]}
                     fontSize={2.5}
                     color="#4eff91"
                 font="/fonts/JetBrainsMono-Bold.ttf"

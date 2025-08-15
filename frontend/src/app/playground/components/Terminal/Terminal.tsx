@@ -34,7 +34,7 @@ export function Terminal({ focused }: TerminalProps) {
 			focusInput();
 			inputRef?.current?.focus();
 		}
-	}, [focused])
+	}, [focused, inputRef?.current]);
 
 	useEffect(() => {
 		scrollToBottom()

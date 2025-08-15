@@ -1,8 +1,9 @@
 'use client';
 
 
-import LaptopModel from '@/models/LaptopModel';
-import Linux from '@/models/Linux';
+import LaptopG14Model from '@/models/LaptopG14Model';
+import DivoomSpeakerModel from '@/models/DivoomSpeakerModel';
+import Tux from '@/models/Tux';
 import AnimatedGopherModel from '@/models/AnimatedGopher';
 import FerrisCrab from '@/models/FerrisCrab';
 
@@ -50,39 +51,20 @@ const Controls = ({ currentView }: { currentView: string }) => {
 	const { camera } = useThree();
 	const isMobile = useIsMobile();
 
-	// Debug function to print camera info
-	const printCameraInfo = useCallback(() => {
-		if (controlsRef.current) {
-			console.log('Camera Position:', [
-				Math.round(camera.position.x * 100) / 100,
-				Math.round(camera.position.y * 100) / 100,
-				Math.round(camera.position.z * 100) / 100
-			]);
-			console.log('Camera Target:', [
-				Math.round(controlsRef.current.target.x * 100) / 100,
-				Math.round(controlsRef.current.target.y * 100) / 100,
-				Math.round(controlsRef.current.target.z * 100) / 100
-			]);
-		}
-	}, [camera]);
-
 	const updateCameraPosition = useCallback((position: [number, number, number], target: [number, number, number]) => {
 		if (controlsRef.current) {
-			// Animate to new position
 			camera.position.set(position[0], position[1], position[2]);
 			controlsRef.current.target.set(target[0], target[1], target[2]);
 			controlsRef.current.update();
 		}
 	}, [camera]);
 
-	// Handle initial mobile/desktop position
 	useEffect(() => {
 		const position = isMobile ? mobilePosition : desktopPosition;
 		const target = isMobile ? mobileTarget : desktopTarget;
 		updateCameraPosition([position[0], position[1], position[2]], [target[0], target[1], target[2]]);
 	}, [isMobile, updateCameraPosition]);
 
-	// Handle view changes
 	useEffect(() => {
 		switch (currentView) {
 			case 'gopher':
@@ -101,7 +83,6 @@ const Controls = ({ currentView }: { currentView: string }) => {
 				updateCameraPosition([0, 12, 10], [0, 10, 0]);
 				break;
 			default:
-				// Reset to default view based on mobile/desktop
 				const position = isMobile ? mobilePosition : desktopPosition;
 				const target = isMobile ? mobileTarget : desktopTarget;
 
@@ -140,63 +121,32 @@ export default function Playground() {
 					rotation: [10, 5, 200],
 					fov: 45
 				}}
-				shadows
 			>
 				<Suspense fallback={<Loading />}>
-					{/* Enhanced lighting setup */}
-					<ambientLight intensity={1.2} />
-					<pointLight
-						position={[-20, 39, 0]}
-						intensity={2.5}
-						color="#ffffff"
-						distance={80}
-						decay={2}
-					/>
-					<pointLight
-						position={[20, 39, 0]}
-						intensity={2.5}
-						color="#ffffff"
-						distance={80}
-						decay={2}
-					/>
-					<spotLight
-						position={[0, 30, 10]}
-						angle={Math.PI / 3}
-						penumbra={0.4}
-						intensity={3}
-						castShadow
-						shadow-bias={-0.0001}
-					/>
-					{/* Enhanced fill light */}
-					<hemisphereLight
-						intensity={1.5}
-						groundColor="#333333"
-						color="#ffffff"
-					/>
-					{/* Additional rim light */}
-					<pointLight
-						position={[0, 10, -20]}
-						intensity={1.5}
-						color="#ffffff"
-						distance={50}
-						decay={2}
-					/>
+								<ambientLight color={"#ffffff"} intensity={0.4} />
 					<RoomEnvironment />
+								
+								<pointLight position={[-15, 12, 15]} intensity={20} color="#f0f8ff" distance={200} />
+								<pointLight position={[15, 12, 15]} intensity={20} color="#f0f8ff" distance={200} />
+								
+								<pointLight position={[-15, 12, -15]} intensity={20} color="#fff5ee" distance={200} />
+								<pointLight position={[15, 12, -15]} intensity={20} color="#fff5ee" distance={200} />
+								
+								<pointLight position={[-25, 8, 0]} intensity={20} color="#f5f5dc" distance={200} />
+								<pointLight position={[25, 8, 0]} intensity={20} color="#f5f5dc" distance={200} />
+								
+								<pointLight position={[0, 20, 10]} intensity={20} color="#ffffff" distance={200} />
+								<pointLight position={[0, 20, -10]} intensity={20} color="#ffffff" distance={200} />
+								
+								<directionalLight 
+									position={[10, 25, 10]} 
+									intensity={1.5} 
+									color="#ffffff"
+									castShadow={false}
+								/>
 
-
-					{/* Floor, Grid and Shadows */}
 					<group position={[0, 0, 0]}>
-						<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.15, 0]} receiveShadow>
-							<planeGeometry args={[100, 100]} />
-							<meshStandardMaterial 
-								color="#202020" 
-								roughness={0.8}
-								metalness={0.2}
-								opacity={1}
-								transparent={false}
-								depthWrite={true}
-							/>
-						</mesh>
+						
 						<Grid
 							position={[0, 0.1, 0]}
 							args={[75, 75]}
@@ -222,18 +172,17 @@ export default function Playground() {
 						/>
 					</group>
 
-					<LaptopModel scale={3.5} />
+					<LaptopG14Model scale={5} />
 					<AnimatedGopherModel
 						scale={3}
 						rotation={[0, 0.5, 0]}
 						position={[-12, 7, -10]}
 					/>
-					<Linux
+					<Tux
 						scale={0.12}
 						position={[12, 0, -10]}
 						rotation={[0, -0.5, 0]}
 					/>
-					<GithubWall />
 					<MusicPlayer />
 					<FerrisCrab 
 						scale={11}
@@ -241,6 +190,7 @@ export default function Playground() {
 						rotation={[0, 0.7, 0]}
 					/>
 					<Screen />
+					<GithubWall />
 					<Controls currentView={currentView} />
 				</Suspense>
 			</Canvas >

@@ -5,27 +5,23 @@ import helvetiker from 'three/examples/fonts/helvetiker_regular.typeface.json';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 
-// Extend JSX.IntrinsicElements
 declare module '@react-three/fiber' {
   interface ThreeElements {
     textGeometry: Object3DNode<TextGeometry, typeof TextGeometry>
   }
 }
 
-// Register TextGeometry as a custom component
 extend({ TextGeometry });
 
 
-// Load the font
 const font = new FontLoader().parse(helvetiker);
 
 export default function RoomEnvironment() {
 
   return (
     <group>
-      {/* Small Floating Particles */}
       <group position={[0, 0, 0]}>
-        {Array.from({ length: 100 }).map((_, i) => (
+        {Array.from({ length: 50 }).map((_, i) => (
           <mesh
             key={`particle-${i}`}
             position={[
@@ -69,10 +65,12 @@ export default function RoomEnvironment() {
           'map()',
           'useState',
           '.tsx',
-          'npm',
+          'nixos',
+          'arch',
           'git',
           'push()',
           'pop()',
+          'neovim'
         ].map((text, i) => (
           <group
             key={i}

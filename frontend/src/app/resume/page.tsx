@@ -3,7 +3,7 @@ import styles from './page.module.scss';
 import { InlineCode } from '@/components/InlineCode/InlineCode';
 import { CodeBlock } from '@/components/CodeBlock/CodeBlock';
 
-export default function Contact() {
+export default function Resume() {
 
   return (
     <div className={styles.terminal}>
@@ -35,8 +35,8 @@ export default function Contact() {
             <CodeBlock language="markdown">
               {`Sharif University of Technology Tehran, Iran
 Bachelors of science in Computer science
-GPA: 18.45/20 (Overall) - 19.16/20 (Final 3 years)
-Oct 2020 - Current`}
+GPA: 17.9/20
+2020 - 2025`}
             </CodeBlock>
           </section>
 
@@ -44,11 +44,9 @@ Oct 2020 - Current`}
             <h2>$ Research Interests</h2>
             <CodeBlock language="markdown">
               {`• Software Engineering
-• Operating Systems
-• Network and Application Security
 • Databases
-• Systems
-• Distributed Systems`}
+• Distributed Systems
+• Operating Systems`}
             </CodeBlock>
           </section>
 
@@ -63,8 +61,7 @@ Iran's largest tech platform
   - Reduced latency from 200ms to <5ms at 99.9% quantile
   - Applied policy code generation
   - Contributed to OPA Envoy plugin
-• Designed & implemented rate-limiting system with protobuf
-• Built multi-datacenter APIs with high traffic support
+• Designed & implemented rate-limiting system in GRPC
 • Developed custom OAuth server per RFC specs
 • Created cross-datacenter business logic sync system
 • Enhanced security against SSRF and Open-Redirect
@@ -163,10 +160,9 @@ Iran's largest tech platform
               {`• Linux Enthusiast
   - NixOS on M2 MacBook via Asahi
   - Custom DE: Hyprland & Waybar
-  - Previous: bspwm, sxhkd, eww
 • Neovim Power User
   - Custom IDE configuration
-• Dotfiles available at: github.com/amirsalarsafaei`}
+• Dotfiles available at: github.com/amirsalarsafaei/dotfiles`}
             </CodeBlock>
           </section>
         </div>

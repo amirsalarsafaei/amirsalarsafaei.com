@@ -11,10 +11,9 @@ export default function Error({
 }) {
   return (
     <>
-      <Navbar />
       <div style={{
-        height: '100dvh',
-        width: '100dvw',
+        height: '100%',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

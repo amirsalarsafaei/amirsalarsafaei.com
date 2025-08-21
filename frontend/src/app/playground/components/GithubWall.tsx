@@ -63,7 +63,7 @@ const RepoCard = ({ repo, position }: { repo: Repository; position: [number, num
                 radius={0.2} // Border radius
                 smoothness={4} // Optional: Number of curve segments
                 material={material}
-                renderOrder={-1}
+                renderOrder={1}
                 onPointerOver={(e) => {
                     e.stopPropagation();
                     setHovered(true);

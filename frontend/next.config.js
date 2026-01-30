@@ -4,6 +4,7 @@ const path = require('path');
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'standalone',
   transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', 'troika-three-text'],
   webpack: (config) => {
     config.resolve.alias = {

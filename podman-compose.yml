@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: amirsalarsafaei-postgres
+    environment:
+      POSTGRES_USER: amirsalarsafaeicom
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-complex-password}
+      POSTGRES_DB: amirsalarsafaeicom
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amirsalarsafaeicom"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: localhost/amirsalarsafaeicom-backend:latest
+    container_name: amirsalarsafaei-backend
+    ports:
+      - "8000:8000"
+      - "3001:3001"
+    volumes:
+      - ./config:/config:Z
+      - uploads:/app/uploads:Z
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: localhost/amirsalarsafaeicom-frontend:latest
+    container_name: amirsalarsafaei-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  uploads:

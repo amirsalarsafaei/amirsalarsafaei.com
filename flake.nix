@@ -10,40 +10,50 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, rust-overlay }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      rust-overlay,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
-        overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
-          inherit system overlays;
+          inherit system;
+          overlays = [ (import rust-overlay) ];
         };
-        lib = pkgs.lib;
 
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-          extensions = [ "rust-src" "rust-analyzer" ];
+          extensions = [
+            "rust-src"
+            "rust-analyzer"
+          ];
         };
 
-        # Import backend module
-        backendModule = import ./nix/backend.nix { inherit pkgs lib; };
-        
-        # Import frontend module  
-        frontendModule = import ./nix/frontend.nix { inherit pkgs lib; };
+        backendModule = import ./nix/backend.nix {
+          inherit pkgs;
+          inherit (pkgs) lib;
+          src = ./.;
+        };
 
-      in {
+        frontendModule = import ./nix/frontend.nix {
+          inherit pkgs;
+          inherit (pkgs) lib;
+          src = ./.;
+        };
+
+      in
+      {
         packages = {
-          # Packages
           backend = backendModule.package;
           frontend = frontendModule.package;
-          
-          # Container images
           backendImage = backendModule.image;
           frontendImage = frontendModule.image;
-          
-          # Default package
           default = backendModule.package;
         };
 
-        # Dev shell with all tools needed
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             rustToolchain

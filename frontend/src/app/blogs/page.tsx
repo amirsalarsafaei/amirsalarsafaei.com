@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { ListPublishedBlogsRequest } from "@generated/blogs/blogs";
+import { GrpcWebError, ListPublishedBlogsRequest } from "@generated/blogs/blogs";
 import BlogsListClient from './components/PublishedBlogs'
 import { createGrpcClients } from '@/clients/grpc';
 

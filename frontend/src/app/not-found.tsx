@@ -1,12 +1,10 @@
 'use client';
 
 import { say } from "cowsay";
-import Navbar from "@/components/Navbar/Navbar";
 
 export default function NotFound() {
   return (
     <>
-      <Navbar />
       <div style={{
         height: '100dvh',
         width: '100dvw',

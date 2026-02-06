@@ -1,16 +1,15 @@
 @import '@/styles/global.scss';
 .screen-block {
-  width: 1230px;
-  height: 765px;
-  display: block;
-  overflow: hidden;
-  background: black;
+  width: 1225px;
+  height: 780px;
+  position: relative;
+  top: -40px;
+
 
 
   .wrapper {
-    margin: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
+    height: 100%;
+    weight: 100%;
   }
 
   * {

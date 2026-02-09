@@ -1,8 +1,7 @@
-use deadpool_postgres::{Config, ManagerConfig, RecyclingMethod, Runtime, Pool, CreatePoolError};
+use deadpool_postgres::{Config, CreatePoolError, ManagerConfig, Pool, RecyclingMethod, Runtime};
 use tokio_postgres::NoTls;
 
 use crate::config::DatabaseConfig;
-
 
 pub async fn create_pool(config: &DatabaseConfig) -> Result<Pool, CreatePoolError> {
     let mut cfg = Config::new();
@@ -13,4 +12,3 @@ pub async fn create_pool(config: &DatabaseConfig) -> Result<Pool, CreatePoolErro
 
     return cfg.create_pool(Some(Runtime::Tokio1), NoTls);
 }
-

@@ -8,8 +8,8 @@ use crate::{
 use deadpool_postgres::Pool;
 use log;
 use salar_interface::blogs::{
-    tags_server::Tags, CreateTagRequest, DeleteTagRequest, ListTagsRequest, ListTagsResponse,
-    SetBlogTagsRequest, SetBlogTagsResponse, Tag,
+    CreateTagRequest, DeleteTagRequest, ListTagsRequest, ListTagsResponse, SetBlogTagsRequest,
+    SetBlogTagsResponse, Tag, tags_server::Tags,
 };
 use uuid::Uuid;
 
@@ -89,8 +89,8 @@ impl Tags for TagServicer {
             })?;
 
         tx.commit().await.map_err(|e| {
-                log::error!("could not commit transaction: {}", e);
-                tonic::Status::internal("could not finalize changes")
+            log::error!("could not commit transaction: {}", e);
+            tonic::Status::internal("could not finalize changes")
         })?;
 
         match get_blog_tags().bind(&connection, &blog_id_uuid).all().await {

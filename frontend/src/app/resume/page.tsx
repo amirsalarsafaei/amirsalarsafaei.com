@@ -1,10 +1,8 @@
-
-import styles from './page.module.scss';
-import { InlineCode } from '@/components/InlineCode/InlineCode';
-import { CodeBlock } from '@/components/CodeBlock/CodeBlock';
+import styles from "./page.module.scss";
+import { InlineCode } from "@/components/InlineCode/InlineCode";
+import { CodeBlock } from "@/components/CodeBlock/CodeBlock";
 
 export default function Resume() {
-
   return (
     <div className={styles.terminal}>
       <div className={styles.terminalHeader}>
@@ -24,8 +22,12 @@ export default function Resume() {
         <div className={styles.content}>
           <h1>AmirSalar Safaei Ghaderi</h1>
           <p className={styles.contact}>
-            <InlineCode>amirsalarsafaeighaderi@gmail.com</InlineCode> §{' '}
-            <a href="https://github.com/amirsalarsafaei" target="_blank" rel="noopener noreferrer">
+            <InlineCode>amirsalarsafaeighaderi@gmail.com</InlineCode> §{" "}
+            <a
+              href="https://github.com/amirsalarsafaei"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               github.com/amirsalarsafaei
             </a>
           </p>

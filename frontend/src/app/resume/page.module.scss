@@ -17,11 +17,11 @@
 
   .contact {
     margin-bottom: 2rem;
-    
+
     a {
       color: var(--highlight-color);
       text-decoration: none;
-      
+
       &:hover {
         text-decoration: underline;
       }
@@ -82,14 +82,14 @@
 }
 
 .termTitle {
-  color: #607B96;
+  color: #607b96;
   font-family: monospace;
   font-size: 0.9rem;
 }
 
 .terminalBody {
   padding: 1.5rem;
-  color: #607B96;
+  color: #607b96;
   font-family: monospace;
   line-height: 1.6;
 }
@@ -99,7 +99,7 @@
 }
 
 .prompt {
-  color: #43D9AD;
+  color: #43d9ad;
   margin-right: 0.5rem;
 }
 
@@ -107,11 +107,11 @@
   pre {
     white-space: pre-wrap;
     word-wrap: break-word;
-    
+
     a {
-      color: #43D9AD;
+      color: #43d9ad;
       text-decoration: none;
-      
+
       &:hover {
         text-decoration: underline;
       }

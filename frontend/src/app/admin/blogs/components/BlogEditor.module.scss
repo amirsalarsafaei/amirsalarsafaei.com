@@ -75,40 +75,40 @@
     font-size: 1rem;
   }
 
-.tagsSection {
+  .tagsSection {
     margin: 1rem 0;
     background: $blog-code-bg;
     padding: 1rem;
     border-radius: $blog-border-radius;
-}
+  }
 
-.tagsHeader {
+  .tagsHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
 
     h3 {
-        margin: 0;
-        font-size: 1rem;
-        color: $highlight-color;
-        font-family: $code-font;
+      margin: 0;
+      font-size: 1rem;
+      color: $highlight-color;
+      font-family: $code-font;
     }
-}
+  }
 
-.tagsContainer {
+  .tagsContainer {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-}
+  }
 
-.tagWrapper {
+  .tagWrapper {
     position: relative;
     display: inline-flex;
     align-items: center;
-}
+  }
 
-.deleteTagButton {
+  .deleteTagButton {
     position: absolute;
     right: -6px;
     top: -6px;
@@ -129,16 +129,16 @@
     font-family: $code-font;
 
     &:hover {
-        background: $blog-text-color;
-        transform: scale(1.1);
+      background: $blog-text-color;
+      transform: scale(1.1);
     }
-}
+  }
 
-.tagWrapper:hover .deleteTagButton {
+  .tagWrapper:hover .deleteTagButton {
     opacity: 1;
-}
+  }
 
-.titleInput {
+  .titleInput {
     flex: 2;
   }
 
@@ -183,7 +183,6 @@
   }
 }
 
-
 .markdownInput {
   width: 100%;
   height: 100%;
@@ -201,7 +200,6 @@
   right: 0;
   bottom: 0;
   padding: 1rem;
-
 
   &:focus {
     outline: none;
@@ -225,7 +223,6 @@
   background: var(--blog-code-bg);
   border-radius: 8px;
 }
-
 
 .headerButtons {
   display: flex;
@@ -315,4 +312,3 @@
     justify-content: center;
   }
 }
-

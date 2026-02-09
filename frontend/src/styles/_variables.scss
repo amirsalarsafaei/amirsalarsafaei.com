@@ -8,7 +8,7 @@ $highlight-color: #4ae168; // Softer green for highlights
 $hover-color: #1c2721; // Dark hover state
 $border-radius: 5px;
 $accent-color: #36b37e; // Professional green accent
-$content-font: 'Inter', sans-serif;
+$content-font: "Inter", sans-serif;
 $primary-bg: #0a0c0b; // Nearly black with hint of green
 
 // Blog specific colors
@@ -33,26 +33,26 @@ $terminal-primary: $highlight-color;
 $terminal-secondary: $accent-color;
 $terminal-white: $blog-text-color;
 
-$content-font: 'Inter', sans-serif;
+$content-font: "Inter", sans-serif;
 // Layout
 $navbar-height: 4rem;
 $mobile-breakpoint: 768px;
 
 // Typography
-$code-font: 'Fira Code', monospace;
+$code-font: "Fira Code", monospace;
 
 // Animation
 $transition-speed: 0.3s;
 
 // Font Sizes
-$font-size-xs: 0.75rem;    // 12px
-$font-size-sm: 0.875rem;   // 14px
-$font-size-base: 1rem;     // 16px
-$font-size-md: 1.125rem;   // 18px
-$font-size-lg: 1.25rem;    // 20px
-$font-size-xl: 1.5rem;     // 24px
-$font-size-2xl: 1.875rem;  // 30px
-$font-size-3xl: 2.25rem;   // 36px
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-md: 1.125rem; // 18px
+$font-size-lg: 1.25rem; // 20px
+$font-size-xl: 1.5rem; // 24px
+$font-size-2xl: 1.875rem; // 30px
+$font-size-3xl: 2.25rem; // 36px
 
 // Line Heights
 $line-height-tight: 1.25;
@@ -67,12 +67,12 @@ $font-weight-semibold: 600;
 $font-weight-bold: 700;
 
 // Spacing
-$spacing-xs: 0.25rem;    // 4px
-$spacing-sm: 0.5rem;     // 8px
-$spacing-base: 1rem;     // 16px
-$spacing-md: 1.5rem;     // 24px
-$spacing-lg: 2rem;       // 32px
-$spacing-xl: 3rem;       // 48px
+$spacing-xs: 0.25rem; // 4px
+$spacing-sm: 0.5rem; // 8px
+$spacing-base: 1rem; // 16px
+$spacing-md: 1.5rem; // 24px
+$spacing-lg: 2rem; // 32px
+$spacing-xl: 3rem; // 48px
 
 // Z-index
 $z-index-dropdown: 1000;
@@ -88,9 +88,15 @@ $transition-timing: ease;
 
 // Shadows
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-base:
+  0 1px 3px 0 rgba(0, 0, 0, 0.1),
+  0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
 // Container
 $container-padding-mobile: 1rem;
@@ -106,7 +112,7 @@ $grid-breakpoints: (
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1200px
+  xl: 1200px,
 );
 
 // Media Queries

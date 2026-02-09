@@ -68,7 +68,7 @@ podman run -d \
 Create a `podman-compose.yml` file:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   backend:

@@ -1,4 +1,4 @@
-import styles from './InlineCode.module.scss';
+import styles from "./InlineCode.module.scss";
 
 interface InlineCodeProps {
   children: React.ReactNode;

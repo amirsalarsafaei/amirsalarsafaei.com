@@ -1,12 +1,12 @@
 use chrono::Utc;
 use log::{error, info};
+use rspotify::AuthCodeSpotify;
 use rspotify::clients::OAuthClient;
 use rspotify::model::PlayableItem::Track;
 use rspotify::model::TimeLimits;
 use rspotify::prelude::*;
-use rspotify::AuthCodeSpotify;
 use salar_interface::playground::{
-    spotify_server, GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse,
+    GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse, spotify_server,
 };
 use std::fs;
 use std::path::PathBuf;
@@ -14,7 +14,7 @@ use std::sync::Arc;
 use time;
 use time::OffsetDateTime;
 use tokio::sync::RwLock;
-use tokio::time::{interval, Duration};
+use tokio::time::{Duration, interval};
 use toml_edit::DocumentMut;
 
 #[derive(Clone)]
@@ -134,7 +134,7 @@ impl SpotifyServicer {
             } else {
                 Some(cached_value.response.clone())
             }
-            })
+        })
     }
 }
 
@@ -144,9 +144,8 @@ impl spotify_server::Spotify for SpotifyServicer {
         &self,
         _request: tonic::Request<GetRecentlyPlayedSongRequest>,
     ) -> std::result::Result<tonic::Response<GetRecentlyPlayedSongResponse>, tonic::Status> {
-
         if let Some(cached_value) = self.get_cache_response().await {
-            return Ok(tonic::Response::new(cached_value))
+            return Ok(tonic::Response::new(cached_value));
         }
 
         let client = self.spotify_client.clone();

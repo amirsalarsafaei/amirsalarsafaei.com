@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { say } from "cowsay";
 import Navbar from "@/components/Navbar/Navbar";
@@ -11,24 +11,27 @@ export default function Error({
 }) {
   return (
     <>
-      <div style={{
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-        <div style={{
-          whiteSpace: "pre",
-          overflow: "hidden"
-        }}>
-          {say({ text: "Either this page is under\nconstruction by cows \nor cows don't know what \nyou are looking for" })}
-        </div>
-        <button
-          onClick={reset}
-          className=""
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            whiteSpace: "pre",
+            overflow: "hidden",
+          }}
         >
+          {say({
+            text: "Either this page is under\nconstruction by cows \nor cows don't know what \nyou are looking for",
+          })}
+        </div>
+        <button onClick={reset} className="">
           Try again
         </button>
       </div>

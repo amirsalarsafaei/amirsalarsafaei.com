@@ -1,11 +1,10 @@
-@import '@/styles/global.scss';
+@import "@/styles/global.scss";
 .screen-block {
   width: 1230px;
   height: 765px;
   display: block;
   overflow: hidden;
   background: black;
-
 
   .wrapper {
     margin: 5px;
@@ -14,7 +13,6 @@
   }
 
   * {
-
     ::selection {
       background-color: $terminal-bg;
     }

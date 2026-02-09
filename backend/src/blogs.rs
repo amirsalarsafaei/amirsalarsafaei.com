@@ -2,9 +2,9 @@ use crate::cornucopia::queries::blogs::{
     blogs_paginated_by_earlier, create_blog, get_blog_by_id, publish_blog,
     published_blogs_paginated_by_earlier, update_blog_details,
 };
-use crate::toproto::{list_to_proto, ToProto};
+use crate::toproto::{ToProto, list_to_proto};
 
-use base64::{engine::general_purpose::URL_SAFE, Engine};
+use base64::{Engine, engine::general_purpose::URL_SAFE};
 use cornucopia_async::GenericClient;
 use deadpool_postgres::Pool;
 use log;

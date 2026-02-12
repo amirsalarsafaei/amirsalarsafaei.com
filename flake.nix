@@ -1,6 +1,11 @@
 {
   description = "amirsalarsafaei.com - Personal website with Next.js frontend and Rust backend";
 
+  nixConfig = {
+    extra-substituters = "https://cache.nixos.org";
+    extra-trusted-public-keys = "cache.nixos.org-1:6NCHdD59X432qBYE9Tm+gkAc4w8q0xEVwK0w3pslAAw=";
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

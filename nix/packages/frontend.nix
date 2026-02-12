@@ -37,14 +37,13 @@ stdenv.mkDerivation {
     python3
   ];
 
-  buildInputs =
-    [
-      vips
-      libiconv
-    ]
-    ++ lib.optionals stdenv.isDarwin [
-      darwin.apple_sdk.frameworks.CoreServices
-    ];
+  buildInputs = [
+    vips
+    libiconv
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    darwin.apple_sdk.frameworks.CoreServices
+  ];
 
   yarnOfflineCache = fetchYarnDeps {
     yarnLock = "${src}/frontend/yarn.lock";
@@ -86,16 +85,25 @@ stdenv.mkDerivation {
 
     mkdir -p $out
 
-    # Copy the full build directory (required for Next.js production)
+    # Copy the full .next directory (contains standalone/, static/, and server.js for standalone mode)
     cp -r .next $out/
     cp package.json $out/
-    [ -d "public" ] && cp -r public $out/ || true
 
-    # In standalone mode, Next.js bundles everything in .next/standalone
-    # We don't need to copy node_modules separately
-    if [ ! -d ".next/standalone" ]; then
-      cp -r node_modules $out/
+    # For Next.js standalone mode, copy static files into .next/standalone/.next/static
+    # so they're available when the server runs
+    if [ -d ".next/standalone" ] && [ -d ".next/static" ]; then
+      mkdir -p $out/.next/standalone/.next/static
+      cp -r .next/static/* $out/.next/standalone/.next/static/
     fi
+
+    # Copy public directory into standalone for static files
+    if [ -d ".next/standalone" ] && [ -d "public" ]; then
+      mkdir -p $out/.next/standalone/public
+      cp -r public/* $out/.next/standalone/public/
+    fi
+
+    # Copy public directory to root as well for non-standalone mode
+    [ -d "public" ] && cp -r public $out/ || true
 
     runHook postInstall
   '';

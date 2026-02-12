@@ -90,9 +90,9 @@ stdenv.mkDerivation {
     cp -r .next $out/
     cp package.json $out/
     [ -d "public" ] && cp -r public $out/ || true
-    [ -d "server.js" ] && cp server.js $out/ || true
 
-    # Include node_modules (needed if not using standalone mode)
+    # In standalone mode, Next.js bundles everything in .next/standalone
+    # We don't need to copy node_modules separately
     if [ ! -d ".next/standalone" ]; then
       cp -r node_modules $out/
     fi

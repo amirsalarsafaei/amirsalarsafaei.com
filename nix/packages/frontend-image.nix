@@ -25,7 +25,7 @@ dockerTools.buildLayeredImage {
 
   config = {
     Entrypoint = [ "${nodejs}/bin/node" ];
-    Cmd = [ "/app/server.js" ];
+    Cmd = [ "/app/.next/standalone/server.js" ];
 
     ExposedPorts = {
       "3000/tcp" = { };

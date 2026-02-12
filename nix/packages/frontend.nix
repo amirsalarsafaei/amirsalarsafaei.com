@@ -9,7 +9,7 @@
   vips,
   libiconv,
   darwin,
-  buildEnv ? "production",
+  frontendEnv ? "production",
 }:
 
 let
@@ -87,8 +87,8 @@ stdenv.mkDerivation {
     # Signal to the app that this is an offline/CI build - skip backend calls
     export NEXT_BUILD_SKIP_BACKEND=1
     # Next.js public env vars must be set at build time
-    export NEXT_PUBLIC_GRPC_WEB_URL="${envVars.${buildEnv}.NEXT_PUBLIC_GRPC_WEB_URL}"
-    export NEXT_PUBLIC_IMAGE_SERVER_WEB_URL="${envVars.${buildEnv}.NEXT_PUBLIC_IMAGE_SERVER_WEB_URL}"
+    export NEXT_PUBLIC_GRPC_WEB_URL="${envVars.${frontendEnv}.NEXT_PUBLIC_GRPC_WEB_URL}"
+    export NEXT_PUBLIC_IMAGE_SERVER_WEB_URL="${envVars.${frontendEnv}.NEXT_PUBLIC_IMAGE_SERVER_WEB_URL}"
 
     yarn build
 

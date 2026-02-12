@@ -86,16 +86,15 @@ stdenv.mkDerivation {
 
     mkdir -p $out
 
-    if [ -d ".next/standalone" ]; then
-      cp -r .next/standalone/* $out/
-      mkdir -p $out/.next/static
-      cp -r .next/static/* $out/.next/static/
-      [ -d "public" ] && cp -r public $out/
-    else
-      cp -r .next $out/
-      cp -r node_modules $out/ || true
-      cp package.json $out/
-      [ -d "public" ] && cp -r public $out/
+    # Copy the full build directory (required for Next.js production)
+    cp -r .next $out/
+    cp package.json $out/
+    [ -d "public" ] && cp -r public $out/ || true
+    [ -d "server.js" ] && cp server.js $out/ || true
+
+    # Include node_modules (needed if not using standalone mode)
+    if [ ! -d ".next/standalone" ]; then
+      cp -r node_modules $out/
     fi
 
     runHook postInstall

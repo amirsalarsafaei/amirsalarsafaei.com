@@ -6,8 +6,8 @@
 
 let
   backend = pkgs.callPackage ./backend.nix { };
-  # callPackage automatically handles buildEnv parameter with "production" as default
-  frontend = pkgs.callPackage ./frontend.nix { };
+  # buildEnv must be explicitly passed to avoid collision with pkgs.buildEnv
+  frontend = pkgs.callPackage ./frontend.nix { buildEnv = "production"; };
 in
 {
   inherit backend frontend;

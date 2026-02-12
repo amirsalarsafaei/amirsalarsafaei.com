@@ -7,6 +7,10 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
+  if (process.env.NEXT_BUILD_SKIP_BACKEND === "1") {
+    return { title: "Blog", description: "Blog post" };
+  }
+
   const { blogs_client } = createGrpcClients();
 
   try {

@@ -9,7 +9,7 @@ use std::{process, time::Duration};
 use tags::TagServicer;
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
-use tower_http::cors::{AllowOrigin, CorsLayer, Any};
+use tower_http::cors::{AllowOrigin, Any, CorsLayer};
 
 const DEFAULT_EXPOSED_HEADERS: [HeaderName; 4] = [
     HeaderName::from_static("grpc-status"),
@@ -134,21 +134,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let image_server =
         imageserver::ImageServer::new(&config.image_server.upload_dir, &config.auth_token);
-    let image_app = image_server.create_router()
-        .layer(
-            CorsLayer::new()
-                .allow_origin(AllowOrigin::mirror_request())
-                .allow_credentials(true)
-                .max_age(DEFAULT_MAX_AGE)
-                .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
-                .allow_headers(
-                    DEFAULT_ALLOW_HEADERS
-                        .iter()
-                        .cloned()
-                        .map(HeaderName::from_static)
-                        .collect::<Vec<HeaderName>>(),
-                )
-        );
+    let image_app = image_server.create_router().layer(
+        CorsLayer::new()
+            .allow_origin(AllowOrigin::mirror_request())
+            .allow_credentials(true)
+            .max_age(DEFAULT_MAX_AGE)
+            .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
+            .allow_headers(
+                DEFAULT_ALLOW_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            ),
+    );
 
     let image_addr = format!("{}:{}", config.server.host, config.image_server.port);
     println!("Starting image server on {}", image_addr);

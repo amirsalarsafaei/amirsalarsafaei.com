@@ -42,7 +42,7 @@ const loadMermaid = async () => {
 import styles from './Markdown.module.scss';
 
 interface MarkdownProps {
-	content: string;
+  content: string;
 }
 
 export default function Markdown({ content }: MarkdownProps) {

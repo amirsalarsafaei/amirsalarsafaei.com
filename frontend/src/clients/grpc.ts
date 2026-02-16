@@ -47,16 +47,13 @@ export function createGrpcClients(): GrpcClients {
   clientInstance = {
     tags_client: new TagsClientImpl(transport),
     spotify_client: new SpotifyClientImpl(transport),
-    blogs_client: new BlogsClientImpl(transport)
+    blogs_client: new BlogsClientImpl(transport),
   };
 
   return clientInstance;
 }
 
-
 export function isClient(): boolean {
-  return typeof window !== 'undefined';
+  return typeof window !== "undefined";
 }
-
-
 // Default transport is set dynamically in createGrpcClients()

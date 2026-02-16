@@ -1,5 +1,5 @@
 use salar_interface::blogs::Blog as BlogPb;
-use salar_interface::blogs::{blog::State, Tag as TagPb};
+use salar_interface::blogs::{Tag as TagPb, blog::State};
 
 use prost_types::Timestamp;
 use time::OffsetDateTime;

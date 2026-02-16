@@ -1,4 +1,4 @@
-import styles from './CodeBlock.module.scss';
+import styles from "./CodeBlock.module.scss";
 
 interface CodeBlockProps {
   children: string;
@@ -8,9 +8,7 @@ interface CodeBlockProps {
 export const CodeBlock: React.FC<CodeBlockProps> = ({ children, language }) => {
   return (
     <pre className={styles.codeBlock}>
-      <code className={language ? `language-${language}` : ''}>
-        {children}
-      </code>
+      <code className={language ? `language-${language}` : ""}>{children}</code>
     </pre>
   );
 };

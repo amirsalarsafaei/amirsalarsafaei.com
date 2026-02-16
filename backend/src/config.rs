@@ -1,6 +1,6 @@
+use clap::Parser;
 use serde::Deserialize;
 use std::path::PathBuf;
-use clap::Parser;
 
 #[derive(Parser)]
 pub struct CliArgs {

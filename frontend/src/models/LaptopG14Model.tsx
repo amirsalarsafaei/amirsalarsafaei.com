@@ -20,17 +20,44 @@ type GLTFResult = GLTF & {
   }
 }
 
-export default function Model(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/laptop-g14-transformed.glb') as GLTFResult
+export default function Model(props: JSX.IntrinsicElements["group"]) {
+  const { nodes, materials } = useGLTF(
+    "/laptop-g14-transformed.glb",
+  ) as GLTFResult;
   return (
     <group {...props} dispose={null}>
-      <mesh geometry={nodes.Object_2.geometry} material={materials['Body_BAKED.002']} rotation={[-1.556, 0, 0]} scale={10} />
-      <mesh geometry={nodes.Object_3.geometry} material={materials['Internals_BAKED.002']} rotation={[-1.556, 0, 0]} scale={10} />
-      <mesh geometry={nodes.Object_5.geometry} material={materials['Keys_BAKED.002']} rotation={[-1.556, 0, 0]} scale={10} />
-      <mesh geometry={nodes.Object_6.geometry} material={materials['Material.001']} rotation={[-1.556, 0, 0]} scale={10} />
-      <mesh geometry={nodes.Object_7.geometry} material={materials['Top_Lid.002_BAKED.002']} rotation={[-1.556, 0, 0]} scale={10} />
+      <mesh
+        geometry={nodes.Object_2.geometry}
+        material={materials["Body_BAKED.002"]}
+        rotation={[-1.556, 0, 0]}
+        scale={10}
+      />
+      <mesh
+        geometry={nodes.Object_3.geometry}
+        material={materials["Internals_BAKED.002"]}
+        rotation={[-1.556, 0, 0]}
+        scale={10}
+      />
+      <mesh
+        geometry={nodes.Object_5.geometry}
+        material={materials["Keys_BAKED.002"]}
+        rotation={[-1.556, 0, 0]}
+        scale={10}
+      />
+      <mesh
+        geometry={nodes.Object_6.geometry}
+        material={materials["Material.001"]}
+        rotation={[-1.556, 0, 0]}
+        scale={10}
+      />
+      <mesh
+        geometry={nodes.Object_7.geometry}
+        material={materials["Top_Lid.002_BAKED.002"]}
+        rotation={[-1.556, 0, 0]}
+        scale={10}
+      />
     </group>
-  )
+  );
 }
 
-useGLTF.preload('/laptop-g14-transformed.glb')
+useGLTF.preload("/laptop-g14-transformed.glb");

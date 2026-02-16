@@ -1,19 +1,26 @@
-'use client'
+"use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Blog, GrpcWebError, ListPublishedBlogsRequest, ListPublishedBlogsResponse } from "@generated/blogs/blogs";
+import {
+  Blog,
+  GrpcWebError,
+  ListPublishedBlogsRequest,
+  ListPublishedBlogsResponse,
+} from "@generated/blogs/blogs";
 import { useSearchParams } from "next/navigation";
 import BlogsList from "@/components/BlogsList/BlogsList";
 import { useGrpc } from "@/providers/GrpcProvider";
 
-export default function BlogsListClient({ 
-  initialData, initialDataUpdatedAt
-}: { 
-  initialData: Awaited<ListPublishedBlogsResponse>, initialDataUpdatedAt: number
+export default function BlogsListClient({
+  initialData,
+  initialDataUpdatedAt,
+}: {
+  initialData: Awaited<ListPublishedBlogsResponse>;
+  initialDataUpdatedAt: number;
 }) {
   const searchParams = useSearchParams();
-  const {blogs_client} = useGrpc();
-  
+  const { blogs_client } = useGrpc();
+
   const getPublishedBlogs = async ({ pageParam = "" }) => {
     const req = ListPublishedBlogsRequest.create({
       pageSize: Number(searchParams.get("page-size")) || 10,
@@ -25,7 +32,7 @@ export default function BlogsListClient({
     } catch (error) {
       console.log(error);
       if (error instanceof GrpcWebError) {
-        console.error('gRPC Error: ', error.message, error.code);
+        console.error("gRPC Error: ", error.message, error.code);
         throw error;
       }
       throw error;
@@ -39,19 +46,23 @@ export default function BlogsListClient({
       if (lastPage.nextPageToken.length == 0) {
         return undefined;
       }
-      return lastPage.nextPageToken
+      return lastPage.nextPageToken;
     },
     initialDataUpdatedAt: initialDataUpdatedAt,
     initialPageParam: "",
     initialData: {
       pages: [initialData],
-      pageParams: [""]
+      pageParams: [""],
     },
     refetchOnMount: true,
   });
 
   return BlogsList({
-    blogs: data?.pages?.reduce((collected, page) => [...collected, ...page.blogs], [] as Blog[]) ?? [],
+    blogs:
+      data?.pages?.reduce(
+        (collected, page) => [...collected, ...page.blogs],
+        [] as Blog[],
+      ) ?? [],
     isLoadingError,
     isFetching,
     isAdmin: false,

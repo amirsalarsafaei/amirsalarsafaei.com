@@ -43,7 +43,7 @@
     position: relative;
 
     &::before {
-      content: '##';
+      content: "##";
       position: absolute;
       left: -1.5em;
       color: rgba($highlight-color, 0.4);
@@ -52,7 +52,7 @@
 
     @media (max-width: 768px) {
       font-size: 1.625rem;
-      
+
       &::before {
         display: none;
       }
@@ -78,7 +78,7 @@
     padding-left: 1rem;
 
     &::before {
-      content: '>';
+      content: ">";
       position: absolute;
       left: 0;
       color: rgba($highlight-color, 0.6);
@@ -164,11 +164,11 @@
       margin: 0.5rem 0;
     }
 
-    >p:first-child {
+    > p:first-child {
       margin-top: 0;
     }
 
-    >p:last-child {
+    > p:last-child {
       margin-bottom: 0;
     }
 

@@ -1,5 +1,5 @@
 // Variables
-@import '/src/styles/variables';
+@import "/src/styles/variables";
 
 .blogsContainer {
   max-width: 1200px;
@@ -25,16 +25,17 @@
   background: $card-bg;
   border-radius: 8px;
 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   border: 1px solid rgba($secondary-color, 0.1);
   position: relative;
   overflow: hidden;
 
   width: 100%;
 
-
   &::before {
-    content: 'fn';
+    content: "fn";
     position: absolute;
     top: -20px;
     left: -10px;
@@ -45,7 +46,7 @@
   }
 
   &::after {
-    content: 'impl';
+    content: "impl";
     position: absolute;
     bottom: -30px;
     right: -10px;
@@ -86,7 +87,7 @@
   z-index: 2;
 
   &::before {
-    content: 'struct';
+    content: "struct";
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -96,7 +97,7 @@
   }
 
   &::after {
-    content: 'package main';
+    content: "package main";
     position: absolute;
     bottom: 1rem;
     right: 1rem;
@@ -105,7 +106,6 @@
     color: rgba($secondary-color, 0.15);
   }
 }
-
 
 .blogImage {
   position: relative;
@@ -127,16 +127,17 @@
   }
 }
 
-
 .imageOverlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg,
-      rgba($accent-color, 0.97) 0%,
-      rgba($accent-color, 0.92) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba($accent-color, 0.97) 0%,
+    rgba($accent-color, 0.92) 100%
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
   display: flex;
@@ -185,7 +186,7 @@
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -0.5rem;
     left: 1.5rem;
@@ -223,15 +224,15 @@
 }
 
 .blogTags {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-	margin-top: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
 
-	:global(.chip) {
-		transform: scale(0.9);
-		transform-origin: left;
-	}
+  :global(.chip) {
+    transform: scale(0.9);
+    transform-origin: left;
+  }
 }
 
 .blogDate {

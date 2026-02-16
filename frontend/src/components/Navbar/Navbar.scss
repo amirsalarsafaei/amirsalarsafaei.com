@@ -15,7 +15,7 @@
   border-bottom: 1px solid rgba($highlight-color, 0.1);
 
   &::before {
-    content: '{';
+    content: "{";
     position: absolute;
     left: 0.5rem;
     color: rgba($highlight-color, 0.2);
@@ -23,7 +23,7 @@
   }
 
   &::after {
-    content: '}';
+    content: "}";
     position: absolute;
     right: 0.5rem;
     color: rgba($highlight-color, 0.2);
@@ -49,7 +49,7 @@
   &:hover {
     color: $hover-color;
     &::after {
-      content: '_';
+      content: "_";
       animation: blink 1s infinite;
     }
   }
@@ -62,7 +62,6 @@
   padding: 0;
 
   @media (max-width: $mobile-breakpoint) {
-
     position: absolute;
     top: 100%;
     left: 0;
@@ -72,8 +71,7 @@
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 300ms ease;
-    box-shadow: 
-      0 6px 8px -1px rgba(40, 40, 40, 0.1);
+    box-shadow: 0 6px 8px -1px rgba(40, 40, 40, 0.1);
     padding: 0;
     margin: 0;
     flex-direction: column;
@@ -99,7 +97,7 @@
 
       .nav-link {
         display: block;
-        padding: 1rem 1.5rem;  /* Reduced left padding by 0.5rem (8px) */
+        padding: 1rem 1.5rem; /* Reduced left padding by 0.5rem (8px) */
         width: 100%;
         transition: all $transition-speed ease;
 
@@ -115,7 +113,7 @@
 
       // Add a subtle indicator
       &::after {
-        content: '>';
+        content: ">";
         position: absolute;
         right: 2rem;
         top: 50%;
@@ -144,9 +142,8 @@
   position: relative;
   padding: 0 2rem;
 
-
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -2px;
     left: 0;
@@ -174,7 +171,7 @@
     color: $highlight-color;
 
     &::before {
-      content: '<';
+      content: "<";
       position: absolute;
       left: -15px;
       opacity: 0.5;
@@ -182,7 +179,7 @@
     }
 
     &::after {
-      content: '/>';
+      content: "/>";
       position: absolute;
       right: -20px;
       opacity: 0.5;
@@ -226,7 +223,6 @@
 
 // Animations
 @keyframes blink {
-
   0%,
   100% {
     opacity: 1;
@@ -251,23 +247,23 @@
 
 @keyframes typeWriter {
   from {
-    content: '';
+    content: "";
   }
 
   25% {
-    content: ' =';
+    content: " =";
   }
 
   50% {
-    content: ' = ';
+    content: " = ";
   }
 
   75% {
-    content: ' = (';
+    content: " = (";
   }
 
   to {
-    content: ' = ()';
+    content: " = ()";
   }
 }
 

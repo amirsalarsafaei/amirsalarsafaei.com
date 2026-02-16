@@ -13,8 +13,6 @@
     appearance: none;
     border-radius: 0;
   }
-
-
 }
 
 .playground-container {
@@ -39,7 +37,6 @@
     border: 1px solid #404040;
 
     &.minimized {
-
       .controls-instructions,
       .camera-controls {
         display: none;
@@ -113,7 +110,7 @@
         }
 
         .gopher-icon {
-          color: #00ADD8;
+          color: #00add8;
         }
 
         .music-icon {

@@ -1,5 +1,4 @@
-const cv = 
-`Name: AmirSalar Safaei Ghaderi
+const cv = `Name: AmirSalar Safaei Ghaderi
 Contact Information:
 
 Email: amirsalarsafaeighaderi@gmail.com

@@ -1,6 +1,7 @@
 @import "prism-theme";
 @import "variables";
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -16,7 +17,6 @@ body {
   font-weight: 400;
   background: $primary-bg;
   color: $text-color;
-
 
   display: grid;
   grid-template-rows: auto 1fr;

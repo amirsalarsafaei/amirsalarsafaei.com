@@ -4,7 +4,7 @@
   padding: 2rem;
   align-items: stretch;
   height: 100%;
-  
+
   @media (max-width: 1200px) {
     flex-direction: column;
     align-items: center;
@@ -21,7 +21,7 @@
   flex: 1;
   max-width: 600px;
   min-height: 600px;
-  
+
   @media (max-width: 1200px) {
     max-width: 900px;
     width: 100%;
@@ -35,7 +35,7 @@
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  
+
   @media (max-width: 1200px) {
     width: 100%;
     max-width: 900px;
@@ -49,7 +49,7 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  color: #43D9AD;
+  color: #43d9ad;
   font-family: monospace;
   font-size: 1.2rem;
 }
@@ -88,14 +88,14 @@
 }
 
 .termTitle {
-  color: #607B96;
+  color: #607b96;
   font-family: monospace;
   font-size: 0.9rem;
 }
 
 .terminalBody {
   padding: 1.5rem;
-  color: #607B96;
+  color: #607b96;
   font-family: monospace;
   line-height: 1.6;
   overflow-y: auto;
@@ -107,7 +107,7 @@
 }
 
 .prompt {
-  color: #43D9AD;
+  color: #43d9ad;
   margin-right: 0.5rem;
 }
 
@@ -117,7 +117,7 @@
     word-wrap: break-word;
 
     a {
-      color: #43D9AD;
+      color: #43d9ad;
       text-decoration: none;
 
       &:hover {
@@ -128,11 +128,16 @@
 }
 
 .cursor {
-  color: #43D9AD;
+  color: #43d9ad;
   animation: blink 1s step-end infinite;
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }

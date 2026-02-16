@@ -1,9 +1,7 @@
-import { Metadata } from "next";
-import { ListPublishedBlogsRequest } from "@generated/blogs/blogs";
-import BlogsListClient from "./components/PublishedBlogs";
-import { createGrpcClients } from "@/clients/grpc";
-
-export const dynamic = "force-dynamic";
+import { Metadata } from 'next'
+import { GrpcWebError, ListPublishedBlogsRequest } from "@generated/blogs/blogs";
+import BlogsListClient from './components/PublishedBlogs'
+import { createGrpcClients } from '@/clients/grpc';
 
 export const metadata: Metadata = {
   title: "Blogs | AmirSalar Safaei",

@@ -1,16 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  FaCamera,
-  FaDesktop,
-  FaGithub,
-  FaMusic,
-  FaLinux,
-  FaChevronUp,
-  FaChevronDown,
-} from "react-icons/fa";
-import { GopherIcon } from "./GopherIcon";
+'use client';
+
+import React, { useState } from 'react';
+import {  FaDesktop, FaGithub, FaMusic, FaLinux, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { GopherIcon } from './GopherIcon';
 
 interface CameraControlsUIProps {
   onViewChange: (view: string) => void;

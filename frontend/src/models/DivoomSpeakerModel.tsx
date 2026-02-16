@@ -1,16 +1,16 @@
-import * as THREE from "three";
-import React from "react";
-import { useGLTF } from "@react-three/drei";
-import { GLTF } from "three-stdlib";
+import { Mesh, MeshStandardMaterial } from 'three'
+import React from 'react'
+import { useGLTF } from '@react-three/drei'
+import { GLTF } from 'three-stdlib'
 
 type GLTFResult = GLTF & {
   nodes: {
-    Cube001_Material001_0: THREE.Mesh;
-  };
+    Cube001_Material001_0: Mesh
+  }
   materials: {
-    PaletteMaterial001: THREE.MeshStandardMaterial;
-  };
-};
+    PaletteMaterial001: MeshStandardMaterial
+  }
+}
 
 export default function Model(props: any) {
   const { nodes, materials } = useGLTF(

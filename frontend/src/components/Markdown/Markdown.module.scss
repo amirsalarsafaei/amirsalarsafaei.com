@@ -290,4 +290,35 @@
       max-width: 100%;
     }
   }
+
+  .loadingCode {
+    padding: 1rem;
+    text-align: center;
+    color: #9cdcfe;
+    background: #1e1e1e;
+    font-family: $code-font;
+    font-size: 0.9rem;
+    border-radius: 0 0 4px 4px;
+    
+    &::after {
+      content: '...';
+      animation: loadingDots 1.5s infinite;
+    }
+  }
+
+  .spotifyError {
+    padding: 1rem;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: $blog-border-radius;
+    color: #ff6b6b;
+    text-align: center;
+    margin: 1rem 0;
+  }
+}
+
+@keyframes loadingDots {
+  0%, 20% { opacity: 0; }
+  50% { opacity: 1; }
+  80%, 100% { opacity: 0; }
 }

@@ -1,10 +1,16 @@
 "use client";
 
-import { Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import FloatingProfileCard from "./FloatingProfileCard";
-import styles from "../page.module.scss";
+import { Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import dynamic from 'next/dynamic';
+import styles from '../page.module.scss';
+
+// Dynamic import for the heavy floating profile card component
+const FloatingProfileCard = dynamic(() => import('./FloatingProfileCard'), {
+	loading: () => null,
+	ssr: false,
+});
 
 function Loading() {
   return (

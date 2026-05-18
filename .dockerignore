@@ -1,0 +1,36 @@
+# git
+.git
+.gitignore
+
+# nix
+nix
+flake.nix
+flake.lock
+
+# node
+node_modules
+frontend/node_modules
+frontend/.next
+frontend/.env*
+
+# rust
+target
+backend/target
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# build artifacts
+backend/uploads
+
+# workspace files
+.env
+.env.local
+*.code-workspace

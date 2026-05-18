@@ -49,13 +49,7 @@ dockerTools.buildLayeredImage {
     # Create app directory structure
     mkdir -p app
 
-    # Copy the entire frontend build output
-    # The frontend derivation already has:
-    # - .next/standalone/  (Next.js standalone server with bundled dependencies)
-    # - .next/standalone/.next/static/  (static assets copied during frontend build)
-    # - .next/standalone/public/        (public assets copied during frontend build)
-    # - public/            (public assets)
-    # - package.json       (metadata)
+    # Copy the entire frontend build output (includes .next/standalone/, public/, package.json)
     cp -rT ${frontend} app
 
     # Verify structure

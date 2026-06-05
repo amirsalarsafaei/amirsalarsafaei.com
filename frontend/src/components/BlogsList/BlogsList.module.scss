@@ -1,5 +1,5 @@
 // Variables
-@import "/src/styles/variables";
+@use "@/styles/variables" as *;
 
 .blogsContainer {
   max-width: 1200px;

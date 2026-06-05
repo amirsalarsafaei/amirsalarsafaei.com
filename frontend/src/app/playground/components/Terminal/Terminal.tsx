@@ -26,15 +26,10 @@ export function Terminal({ focused }: TerminalProps) {
   };
 
   useEffect(() => {
-    focusInput();
-  }, []);
-
-  useEffect(() => {
     if (focused) {
       focusInput();
-      inputRef?.current?.focus();
     }
-  }, [focused, inputRef?.current]);
+  }, [focused]);
 
   useEffect(() => {
     scrollToBottom();
@@ -48,7 +43,7 @@ export function Terminal({ focused }: TerminalProps) {
   };
 
   return (
-    <div className="commands" ref={listRef}>
+    <div className="commands" ref={listRef} onClick={focusInput}>
       {termainalController.getCommands().map((c) => (
         <Command {...c} key={c.id} />
       ))}

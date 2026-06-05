@@ -1,14 +1,10 @@
-use crate::cornucopia::queries::blogs::{
-    blogs_paginated_by_earlier, create_blog, get_blog_by_id, publish_blog,
-    published_blogs_paginated_by_earlier, update_blog_details,
-};
+use crate::db;
 use crate::toproto::{ToProto, list_to_proto};
 
 use base64::{Engine, engine::general_purpose::URL_SAFE};
-use cornucopia_async::GenericClient;
-use deadpool_postgres::Pool;
 use log;
 use prost::Message;
+use sqlx::PgPool;
 use time::OffsetDateTime;
 use tonic;
 use uuid::Uuid;
@@ -23,12 +19,12 @@ use salar_interface::blogs::{
 };
 
 pub struct BlogServicer {
-    pool: Pool,
+    pool: PgPool,
     auth_token: String,
 }
 
 impl BlogServicer {
-    pub fn new(pool: Pool, auth_token: String) -> Self {
+    pub fn new(pool: PgPool, auth_token: String) -> Self {
         Self { pool, auth_token }
     }
 }
@@ -125,12 +121,8 @@ impl BlogServicer {
         }
     }
 
-    async fn get_blog_by_id<C: GenericClient>(
-        &self,
-        client: &C,
-        uuid: &Uuid,
-    ) -> Result<Blog, tonic::Status> {
-        match get_blog_by_id().bind(client, &uuid).opt().await {
+    async fn get_blog_by_id(&self, uuid: &Uuid) -> Result<Blog, tonic::Status> {
+        match db::blogs::get_blog_by_id(&self.pool, uuid).await {
             Ok(Some(blog)) => Ok(blog.as_proto()),
             Ok(None) => Err(tonic::Status::not_found("The blog not found")),
             Err(err) => {
@@ -160,17 +152,7 @@ impl Blogs for BlogServicer {
             x => x,
         } as i64;
 
-        let connection = self
-            .pool
-            .get()
-            .await
-            .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
-
-        match published_blogs_paginated_by_earlier()
-            .bind(&connection, &last_published_at, &page_size)
-            .all()
-            .await
-        {
+        match db::blogs::published_blogs_paginated(&self.pool, last_published_at, page_size).await {
             Ok(blogs) => {
                 let blogs_pb: Vec<Blog> = blogs.iter().map(|blog| blog.as_proto()).collect();
 
@@ -192,17 +174,11 @@ impl Blogs for BlogServicer {
         &self,
         request: tonic::Request<GetBlogRequest>,
     ) -> Result<tonic::Response<GetBlogResponse>, tonic::Status> {
-        let connection = self
-            .pool
-            .get()
-            .await
-            .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
-
         let uuid = Uuid::try_parse(&request.get_ref().id)
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
         Ok(tonic::Response::new(GetBlogResponse {
-            blog: Some(self.get_blog_by_id(&connection, &uuid).await?),
+            blog: Some(self.get_blog_by_id(&uuid).await?),
         }))
     }
 
@@ -212,36 +188,19 @@ impl Blogs for BlogServicer {
     ) -> Result<tonic::Response<CreateBlogResponse>, tonic::Status> {
         self.check_auth_token(request.metadata())?;
 
-        let mut connection = self
-            .pool
-            .get()
-            .await
-            .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
+        let blog_id = db::blogs::create_blog(
+            &self.pool,
+            &request.get_ref().title,
+            &request.get_ref().content,
+            &request.get_ref().image_url,
+        )
+        .await
+        .map_err(|e| {
+            log::error!("could not create blog in database: {}", e);
+            tonic::Status::internal("Could not add blog to storage")
+        })?;
 
-        let tx = connection
-            .transaction()
-            .await
-            .map_err(|_| tonic::Status::internal("Could start process to storage"))?;
-
-        let blog_id = create_blog()
-            .bind(
-                &tx,
-                &request.get_ref().title,
-                &request.get_ref().content,
-                &request.get_ref().image_url,
-            )
-            .one()
-            .await
-            .map_err(|e| {
-                log::error!("could not create blog in database: {}", e);
-                tonic::Status::internal("Could not add blog to storage")
-            })?;
-
-        let blog = self.get_blog_by_id(&tx, &blog_id).await?;
-
-        tx.commit()
-            .await
-            .map_err(|_| tonic::Status::internal("could not finalize changes"))?;
+        let blog = self.get_blog_by_id(&blog_id).await?;
 
         Ok(tonic::Response::new(CreateBlogResponse {
             blog: Some(blog),
@@ -254,38 +213,21 @@ impl Blogs for BlogServicer {
     ) -> Result<tonic::Response<UpdateBlogResponse>, tonic::Status> {
         self.check_auth_token(request.metadata())?;
 
-        let mut connection = self
-            .pool
-            .get()
-            .await
-            .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
-
-        let tx = connection
-            .transaction()
-            .await
-            .map_err(|_| tonic::Status::internal("Could start process to storage"))?;
-
         let uuid_str = Uuid::try_parse(&request.get_ref().id)
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
-        match update_blog_details()
-            .bind(
-                &tx,
-                &request.get_ref().title,
-                &request.get_ref().content,
-                &request.get_ref().image_url.clone(),
-                &uuid_str,
-            )
-            .opt()
-            .await
+        match db::blogs::update_blog_details(
+            &self.pool,
+            &request.get_ref().title,
+            &request.get_ref().content,
+            &request.get_ref().image_url.clone(),
+            &uuid_str,
+        )
+        .await
         {
             Ok(None) => Err(tonic::Status::not_found("Blog not found")),
             Ok(_) => {
-                let blog = self.get_blog_by_id(&tx, &uuid_str).await?;
-
-                tx.commit()
-                    .await
-                    .map_err(|_| tonic::Status::internal("could not finalize changes"))?;
+                let blog = self.get_blog_by_id(&uuid_str).await?;
 
                 Ok(tonic::Response::new(UpdateBlogResponse {
                     blog: Some(blog),
@@ -304,28 +246,13 @@ impl Blogs for BlogServicer {
     ) -> Result<tonic::Response<PublishBlogResponse>, tonic::Status> {
         self.check_auth_token(request.metadata())?;
 
-        let mut connection = self
-            .pool
-            .get()
-            .await
-            .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
-
-        let tx = connection
-            .transaction()
-            .await
-            .map_err(|_| tonic::Status::internal("Could start process to storage"))?;
-
         let uuid_str = Uuid::try_parse(&request.get_ref().id)
             .map_err(|_| tonic::Status::invalid_argument("invalid uuid was provided"))?;
 
-        match publish_blog().bind(&tx, &uuid_str).opt().await {
+        match db::blogs::publish_blog(&self.pool, &uuid_str).await {
             Ok(None) => Err(tonic::Status::not_found("Blog not found")),
             Ok(_) => {
-                let blog = self.get_blog_by_id(&tx, &uuid_str).await?;
-
-                tx.commit()
-                    .await
-                    .map_err(|_| tonic::Status::internal("could not finalize changes"))?;
+                let blog = self.get_blog_by_id(&uuid_str).await?;
 
                 Ok(tonic::Response::new(PublishBlogResponse {
                     blog: Some(blog),
@@ -355,17 +282,7 @@ impl Blogs for BlogServicer {
             x => x,
         } as i64;
 
-        let connection = self
-            .pool
-            .get()
-            .await
-            .map_err(|_| tonic::Status::internal("Could not connect to storage"))?;
-
-        match blogs_paginated_by_earlier()
-            .bind(&connection, &last_created_at, &page_size)
-            .all()
-            .await
-        {
+        match db::blogs::blogs_paginated(&self.pool, last_created_at, page_size).await {
             Ok(blogs) => {
                 let blogs_pb: Vec<Blog> = list_to_proto(&blogs);
                 Ok(tonic::Response::new(ListBlogsResponse {

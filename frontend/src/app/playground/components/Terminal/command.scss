@@ -1,4 +1,4 @@
-@import "src/styles/global.scss";
+@use "@/styles/mixins" as *;
 
 // Terminal Theme Colors
 $terminal-bg: #282c34;

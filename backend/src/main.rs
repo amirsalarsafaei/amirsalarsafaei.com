@@ -1,7 +1,7 @@
 use blogs::BlogServicer;
 use clap::Parser;
 use env_logger;
-use http::HeaderName;
+use http::{HeaderName, HeaderValue};
 use rspotify::{AuthCodeSpotify, Credentials, OAuth};
 use salar_interface;
 use spotify::{PrivateCreds, SpotifyServicer};
@@ -9,7 +9,7 @@ use std::{process, time::Duration};
 use tags::TagServicer;
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
-use tower_http::cors::{AllowOrigin, Any, CorsLayer};
+use tower_http::cors::{AllowOrigin, CorsLayer};
 
 const DEFAULT_EXPOSED_HEADERS: [HeaderName; 4] = [
     HeaderName::from_static("grpc-status"),
@@ -30,7 +30,6 @@ const DEFAULT_MAX_AGE: Duration = Duration::from_secs(24 * 60 * 60);
 
 mod blogs;
 mod config;
-mod cornucopia;
 mod db;
 mod imageserver;
 mod spotify;
@@ -42,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
 
     let args = config::CliArgs::parse();
-    let config = match config::load_config(&args.config_path) {
+    let mut config = match config::load_config(&args.config_path) {
         Ok(config) => config,
         Err(err) => {
             eprintln!("Failed to load config: {}", err);
@@ -50,13 +49,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let spotify_config = match config::load_spotify_config(&args.spotify_cred_path) {
+    let mut spotify_config = match config::load_spotify_config(&args.spotify_cred_path) {
         Ok(config) => config,
         Err(err) => {
             eprintln!("Failed to load spotify config: {}", err);
             process::exit(1);
         }
     };
+
+    config::override_with_env(&mut config, &mut spotify_config);
 
     let pool = match db::create_pool(&config.database).await {
         Ok(pool) => pool,
@@ -65,6 +66,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             process::exit(1);
         }
     };
+
+    if args.migrate_only {
+        println!("Database migrations completed");
+        return Ok(());
+    }
 
     let creds = Credentials::new(&spotify_config.client_id, &spotify_config.client_secret);
 
@@ -90,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     let spotify_servier = salar_interface::playground::spotify_server::SpotifyServer::new(
-        SpotifyServicer::new(PrivateCreds::new(spotify, &args.spotify_cred_path)),
+        SpotifyServicer::new(PrivateCreds::new(spotify)),
     );
 
     let blogs_servicer = salar_interface::blogs::blogs_server::BlogsServer::new(BlogServicer::new(
@@ -103,24 +109,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         config.auth_token.clone(),
     ));
 
-    let allowed_origins = [
-        "http://localhost:3000".parse().unwrap(),
-        "http://localhost:5173".parse().unwrap(),
-        "https://amirsalarsafaei.com".parse().unwrap(),
-        "http://amirsalarsafaei.com".parse().unwrap(),
-    ];
-    let cors_layer = CorsLayer::new()
-        .allow_origin(allowed_origins)
-        .allow_credentials(true)
-        .max_age(DEFAULT_MAX_AGE)
-        .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
-        .allow_headers(
-            DEFAULT_ALLOW_HEADERS
-                .iter()
-                .cloned()
-                .map(HeaderName::from_static)
-                .collect::<Vec<HeaderName>>(),
-        );
+    let cors_layer = if config.server.allowed_origins.contains(&"*".to_string()) {
+        // Wildcard origin cannot be combined with credentials per CORS spec
+        CorsLayer::new()
+            .max_age(DEFAULT_MAX_AGE)
+            .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
+            .allow_origin(AllowOrigin::any())
+            .allow_headers(
+                DEFAULT_ALLOW_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            )
+    } else {
+        CorsLayer::new()
+            .allow_credentials(true)
+            .max_age(DEFAULT_MAX_AGE)
+            .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
+            .allow_origin(AllowOrigin::list(
+                config
+                    .server
+                    .allowed_origins
+                    .iter()
+                    .map(|origin| HeaderValue::from_str(&origin).unwrap()),
+            ))
+            .allow_headers(
+                DEFAULT_ALLOW_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            )
+    };
 
     let grpc_server = Server::builder()
         .accept_http1(true)

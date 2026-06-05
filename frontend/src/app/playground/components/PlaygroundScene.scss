@@ -1,4 +1,4 @@
-@import "@/styles/global.scss";
+@use "@/styles/variables" as *;
 
 .playground {
   background: $primary-bg;

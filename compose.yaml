@@ -1,0 +1,82 @@
+x-backend-build: &backend-build
+  context: .
+  dockerfile: ./backend/Dockerfile
+  args:
+    CARGO_REGISTRY: ${CARGO_REGISTRY:-}
+    CARGO_REGISTRY_TOKEN: ${CARGO_REGISTRY_TOKEN:-}
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgres://${POSTGRES_USER:-amirsalarsafaeicom}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-amirsalarsafaeicom}
+  AUTH_TOKEN: ${AUTH_TOKEN:-dev-token}
+  SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+  SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+  SPOTIFY_REFRESH_TOKEN: ${SPOTIFY_REFRESH_TOKEN:-}
+  SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI:-}
+  IMAGE_SERVER_HOST: "0.0.0.0"
+  RUST_LOG: ${RUST_LOG:-info}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-amirsalarsafaeicom}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-amirsalarsafaeicom}
+    expose:
+      - "5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-amirsalarsafaeicom} -d ${POSTGRES_DB:-amirsalarsafaeicom}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    image: amirsalarsafaeicom-backend:local
+    build: *backend-build
+    command: ["/usr/local/bin/amirsalarsafaeicom-backend", "--migrate-only"]
+    environment: *backend-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    image: amirsalarsafaeicom-backend:local
+    build: *backend-build
+    ports:
+      - "8000:8000"
+      - "3001:3001"
+    environment: *backend-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - uploads:/uploads
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-}
+        NPM_REGISTRY_TOKEN: ${NPM_REGISTRY_TOKEN:-}
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_GRPC_WEB_URL: ${NEXT_PUBLIC_GRPC_WEB_URL:-http://localhost:8000}
+      NEXT_PUBLIC_IMAGE_SERVER_WEB_URL: ${NEXT_PUBLIC_IMAGE_SERVER_WEB_URL:-http://localhost:3001}
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  uploads:

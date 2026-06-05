@@ -1,7 +1,5 @@
 {
   pkgs,
-  inputs,
-  system,
 }:
 
 let
@@ -10,7 +8,6 @@ let
 in
 {
   inherit backend frontend;
-  # Allow overriding build environment: nix build .#frontend.override { frontendEnv = "local"; }
   frontendLocal = frontend.override { frontendEnv = "local"; };
   backendImage = pkgs.callPackage ./backend-image.nix { inherit backend; };
   frontendImage = pkgs.callPackage ./frontend-image.nix { inherit frontend; };

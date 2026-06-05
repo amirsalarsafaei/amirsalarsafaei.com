@@ -12,7 +12,6 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Home", path: "/" },
-  { label: "Resume", path: "/resume" },
   { label: "Blogs", path: "/blogs" },
   { label: "About Me", path: "/aboutme" },
   { label: "Github", path: "https://github.com/amirsalarsafaei" },

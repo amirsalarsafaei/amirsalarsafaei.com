@@ -1,3 +1,242 @@
-@import "variables";
-@import "mixins";
-@import "reset";
+@use "variables" as *;
+@use "mixins" as *;
+// Shared field box styling
+%field-base {
+  width: 100%;
+  font-family: $content-font;
+  font-size: $font-size-base;
+  color: $blog-text-color;
+  background-color: $primary-color;
+  border: 1px solid $blog-border-color;
+  border-radius: $border-radius;
+  padding: $spacing-sm $spacing-base;
+  line-height: $line-height-base;
+  transition:
+    border-color $transition-speed $transition-timing,
+    box-shadow $transition-speed $transition-timing,
+    background-color $transition-speed $transition-timing;
+
+  &::placeholder {
+    color: $text-color;
+    opacity: 0.7;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $accent-color;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: $secondary-color;
+    box-shadow: 0 0 0 3px rgba($secondary-color, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: $card-bg;
+  }
+}
+
+// Text-like inputs + textarea + select
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  @extend %field-base;
+}
+
+textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2398a3a0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-base center;
+  padding-right: $spacing-xl;
+}
+
+// ============================================
+// LABELS
+// ============================================
+
+label,
+.form-label {
+  display: block;
+  margin-bottom: $spacing-xs;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-color;
+  letter-spacing: 0.01em;
+
+  .required {
+    color: $blog-code-color;
+    margin-left: $spacing-xs;
+  }
+}
+
+// ============================================
+// FORM GROUP + VALIDATION STATES
+// ============================================
+
+.form-group {
+  margin-bottom: $spacing-md;
+}
+
+// Error state
+.form-error,
+.error-text {
+  display: block;
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $blog-code-color;
+  line-height: $line-height-tight;
+}
+
+// Helper / hint text
+.form-hint {
+  display: block;
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $text-color;
+  opacity: 0.8;
+}
+
+// Field-level validation modifiers
+.is-invalid {
+  border-color: $blog-code-color !important;
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($blog-code-color, 0.2) !important;
+  }
+}
+
+.is-valid {
+  border-color: $highlight-color !important;
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($highlight-color, 0.2) !important;
+  }
+}
+
+// ============================================
+// BUTTONS
+// ============================================
+
+%btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  font-family: $content-font;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid transparent;
+  border-radius: $border-radius;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition:
+    background-color $transition-speed $transition-timing,
+    border-color $transition-speed $transition-timing,
+    color $transition-speed $transition-timing,
+    transform $transition-speed $transition-timing,
+    box-shadow $transition-speed $transition-timing;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($secondary-color, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn {
+  @extend %btn-base;
+}
+
+// Primary (filled accent)
+.btn-primary {
+  @extend %btn-base;
+  background-color: $accent-color;
+  color: $primary-bg;
+  font-weight: $font-weight-semibold;
+
+  &:hover:not(:disabled) {
+    background-color: $highlight-color;
+    box-shadow: $shadow-md;
+  }
+}
+
+// Secondary (outline)
+.btn-secondary {
+  @extend %btn-base;
+  background-color: transparent;
+  color: $secondary-color;
+  border-color: $secondary-color;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($secondary-color, 0.1);
+  }
+}
+
+// Ghost (subtle)
+.btn-ghost {
+  @extend %btn-base;
+  background-color: transparent;
+  color: $text-color;
+
+  &:hover:not(:disabled) {
+    background-color: $hover-color;
+    color: $blog-text-color;
+  }
+}
+
+// Danger
+.btn-danger {
+  @extend %btn-base;
+  background-color: $blog-code-color;
+  color: $primary-bg;
+
+  &:hover:not(:disabled) {
+    background-color: darken($blog-code-color, 8%);
+    box-shadow: $shadow-md;
+  }
+}
+
+// Sizes
+.btn-sm {
+  font-size: $font-size-sm;
+  padding: $spacing-xs $spacing-base;
+}
+
+.btn-lg {
+  font-size: $font-size-md;
+  padding: $spacing-base $spacing-lg;
+}
+
+// Full width
+.btn-block {
+  width: 100%;
+}

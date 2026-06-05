@@ -1,4 +1,5 @@
 use clap::Parser;
+use log::info;
 use serde::Deserialize;
 use std::path::PathBuf;
 
@@ -9,6 +10,9 @@ pub struct CliArgs {
 
     #[clap(short, long, default_value = "spotify.toml")]
     pub spotify_cred_path: PathBuf,
+
+    #[clap(long)]
+    pub migrate_only: bool,
 }
 
 #[derive(Deserialize)]
@@ -79,12 +83,31 @@ pub fn override_with_env(config: &mut Config, spotify: &mut SpotifyConfig) {
         }
     }
     if let Ok(id) = std::env::var("SPOTIFY_CLIENT_ID") {
-        spotify.client_id = id;
+        let id = id.trim();
+        if !id.is_empty() {
+            info!("Overriding SPOTIFY_CLIENT_ID from env");
+            spotify.client_id = id.to_string();
+        }
     }
     if let Ok(secret) = std::env::var("SPOTIFY_CLIENT_SECRET") {
-        spotify.client_secret = secret;
+        let secret = secret.trim();
+        if !secret.is_empty() {
+            info!("Overriding SPOTIFY_CLIENT_SECRET from env");
+            spotify.client_secret = secret.to_string();
+        }
     }
     if let Ok(refresh) = std::env::var("SPOTIFY_REFRESH_TOKEN") {
-        spotify.refresh_token = refresh;
+        let refresh = refresh.trim();
+        if !refresh.is_empty() {
+            info!("Overriding SPOTIFY_REFRESH_TOKEN from env");
+            spotify.refresh_token = refresh.to_string();
+        }
+    }
+    if let Ok(redirect) = std::env::var("SPOTIFY_REDIRECT_URI") {
+        let redirect = redirect.trim();
+        if !redirect.is_empty() {
+            info!("Overriding SPOTIFY_REDIRECT_URI from env");
+            spotify.redirect_uri = redirect.to_string();
+        }
     }
 }

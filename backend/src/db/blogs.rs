@@ -191,8 +191,6 @@ async fn enrich_blogs_with_tags(
         .collect())
 }
 
-/// Batch-fetch tags for multiple blogs in a single query (dynamic IN clause).
-/// Dynamic → raw query via QueryBuilder.  No compile-time check.
 async fn all_tags_for_blogs(
     pool: &PgPool,
     blog_ids: &[Uuid],
@@ -201,28 +199,26 @@ async fn all_tags_for_blogs(
         return Ok(HashMap::new());
     }
 
-    let mut query = sqlx::QueryBuilder::new(
-        "SELECT blog_id, tag_id, name FROM blogs_blog_tags
-         JOIN blogs_tags ON blogs_tags.id = blogs_blog_tags.tag_id
-         WHERE blog_id IN (",
-    );
-
-    let mut separated = query.separated(", ");
-    for id in blog_ids {
-        separated.push_bind(id);
-    }
-    separated.push(") ORDER BY blog_id");
-
-    let raw_rows = query.build().fetch_all(pool).await?;
-
-    // Map raw rows to typed tuples
-    let rows: Vec<(Uuid, Uuid, String)> = raw_rows
-        .into_iter()
-        .map(|row| Ok((row.try_get(0)?, row.try_get(1)?, row.try_get(2)?)))
-        .collect::<Result<Vec<_>, sqlx::Error>>()?;
+    let rows = sqlx::query(
+        r#"
+        SELECT blog_id, tag_id, name
+        FROM blogs_blog_tags
+        JOIN blogs_tags ON blogs_tags.id = blogs_blog_tags.tag_id
+        WHERE blog_id = ANY($1)
+        ORDER BY blog_id
+        "#,
+    )
+    .bind(blog_ids)
+    .fetch_all(pool)
+    .await?;
 
     let mut result: HashMap<Uuid, Vec<TagRow>> = HashMap::new();
-    for (blog_id, tag_id, name) in rows {
+
+    for row in rows {
+        let blog_id: Uuid = row.try_get("blog_id")?;
+        let tag_id: Uuid = row.try_get("tag_id")?;
+        let name: String = row.try_get("name")?;
+
         result
             .entry(blog_id)
             .or_default()

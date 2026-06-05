@@ -22,7 +22,6 @@
     "cowsay": "^1.6.0",
     "grpc-web": "^1.5.0",
     "next": "14.2.30",
-    "phaser": "^3.90.0",
     "prismjs": "^1.30.0",
     "protoc-gen-js": "^3.21.4",
     "mermaid": "^11.10.1",

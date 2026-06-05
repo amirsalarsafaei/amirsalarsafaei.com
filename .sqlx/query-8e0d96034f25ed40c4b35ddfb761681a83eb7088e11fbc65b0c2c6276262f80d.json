@@ -40,20 +40,9 @@
       }
     ],
     "parameters": {
-      "Left": [
-        "Timestamptz",
-        "Int8"
-      ]
+      "Left": ["Timestamptz", "Int8"]
     },
-    "nullable": [
-      false,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true
-    ]
+    "nullable": [false, false, false, true, false, true, true]
   },
   "hash": "8e0d96034f25ed40c4b35ddfb761681a83eb7088e11fbc65b0c2c6276262f80d"
 }

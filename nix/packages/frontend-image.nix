@@ -41,18 +41,14 @@ dockerTools.buildLayeredImage {
 
     WorkingDir = "/app";
 
-    # Best practice: run as non-root user
     User = "node:node";
   };
 
   extraCommands = ''
-    # Create app directory structure
     mkdir -p app
 
-    # Copy the entire frontend build output (includes .next/standalone/, public/, package.json)
     cp -rT ${frontend} app
 
-    # Verify structure
     if [ -f "app/.next/standalone/server.js" ]; then
       echo "✓ Next.js standalone server found"
     else
@@ -60,7 +56,6 @@ dockerTools.buildLayeredImage {
       exit 1
     fi
 
-    # Verify static assets are in standalone
     if [ -d "app/.next/standalone/.next/static" ]; then
       echo "✓ Static assets found in standalone/.next/static"
     else
@@ -68,18 +63,16 @@ dockerTools.buildLayeredImage {
       exit 1
     fi
 
-    # Create non-root user
     mkdir -p etc
     echo "node:x:1000:1000:node:/app:/sbin/nologin" > etc/passwd
     echo "node:x:1000:" > etc/group
 
-    # Set proper permissions for app directory
-    # Note: we can't use chown in the Nix builder, but the User config will handle running as non-root
     chmod -R a+r app
   '';
 
   meta = {
     description = "Docker image for amirsalarsafaei.com frontend";
     license = lib.licenses.mit;
+    platforms = lib.platforms.linux;
   };
 }

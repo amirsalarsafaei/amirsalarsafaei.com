@@ -1,179 +1,114 @@
-# Deployment Guide
+# Deployment
 
-This project uses Nix to build OCI container images compatible with Podman.
+The project ships as two Docker images (`backend`, `frontend`) plus a
+PostgreSQL container, orchestrated with Docker Compose.
 
 ## Prerequisites
 
-- Nix with flakes enabled
-- Podman
+- Docker Engine ≥ 24 (or Podman with `docker compose` shim)
+- A `.env` file at the repo root (copy from `.env.example`)
 
-## Building Container Images
-
-### Backend
+## Configure
 
 ```bash
-# Build the backend container image
-nix build .#backendImage
-
-# Load into Podman
-podman load < result
+cp .env.example .env
+$EDITOR .env
 ```
 
-### Frontend
+Required:
+
+| Variable            | Purpose                                 |
+| ------------------- | --------------------------------------- |
+| `POSTGRES_PASSWORD` | Postgres user password                  |
+| `AUTH_TOKEN`        | Token the admin UI sends to the backend |
+
+Optional:
+
+| Variable                                                                                      | Purpose                              |
+| --------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`, `SPOTIFY_REDIRECT_URI` | Spotify "now playing" integration    |
+| `NEXT_PUBLIC_GRPC_WEB_URL`, `NEXT_PUBLIC_IMAGE_SERVER_WEB_URL`                                | Frontend → backend URLs (build-time) |
+| `CARGO_REGISTRY` / `CARGO_REGISTRY_TOKEN`                                                     | Private cargo mirror for image build |
+| `NPM_REGISTRY` / `NPM_REGISTRY_TOKEN`                                                         | Private npm mirror for image build   |
+
+## Build & run locally
 
 ```bash
-# Build the frontend container image
-nix build .#frontendImage
-
-# Load into Podman
-podman load < result
+just docker-build   # docker compose build
+just up             # docker compose up -d
+just logs           # tail logs
+just down           # stop & remove
 ```
 
-## Running Containers
+The stack:
 
-### Backend
+```diagram
+╭───────────╮      ╭──────────╮      ╭──────────╮
+│ frontend  │─────▶│ backend  │─────▶│ postgres │
+│ :3000     │ gRPC │ :8000    │ sqlx │ :5432    │
+╰───────────╯ Web  │ :3001    │      ╰──────────╯
+                   ╰──────────╯
+                        │
+                  uploads volume
+```
+
+A separate `migrate` one-shot service runs `--migrate-only` on the backend
+binary before `backend` starts, so the schema is always current.
+
+## Dev hot-reload
+
+`compose.override.yaml` adds a `frontend-dev` service (under the `dev`
+profile) that mounts your source tree and runs `next dev`:
 
 ```bash
-# Create config directory and copy configuration files
-mkdir -p /opt/amirsalarsafaei/config
-cp backend/config.toml /opt/amirsalarsafaei/config/
-cp backend/spotify.toml /opt/amirsalarsafaei/config/
+docker compose --profile dev up -d postgres backend frontend-dev
+# or
+just dev
+```
 
-# Create uploads directory
-mkdir -p /opt/amirsalarsafaei/uploads
+## Deploying to a VPS
 
-# Run the backend container
-podman run -d \
-  --name amirsalarsafaei-backend \
-  -p 8000:8000 \
-  -p 3001:3001 \
-  -v /opt/amirsalarsafaei/config:/config:Z \
-  -v /opt/amirsalarsafaei/uploads:/app/uploads:Z \
+### Option A — Build remotely (rsync source + build on host)
+
+```bash
+just deploy-rsync     # rsyncs source to your VPS
+ssh finRoot 'cd /root/amirsalarsafaei.com && just docker-build && just up'
+```
+
+### Option B — Build locally, ship images over SSH
+
+```bash
+just deploy-docker    # docker save | gzip | ssh remote 'gunzip | docker load'
+ssh finRoot 'cd /path/to/compose && docker compose up -d'
+```
+
+### Option C — Pull from GHCR (CI-built images)
+
+The workflow at `.github/workflows/build-publish.yml` publishes:
+
+- `ghcr.io/<owner>/amirsalarsafaei-com/backend:<tag>`
+- `ghcr.io/<owner>/amirsalarsafaei-com/frontend:<tag>`
+
+Reference those images in a remote `compose.yaml` and `docker compose pull && up -d`.
+
+## Backend configuration
+
+The backend reads from environment variables (preferred in containers) **or**
+a TOML file (see `backend/config.example.toml`). The container `entrypoint`
+already wires env vars from `compose.yaml`, so you usually only need `.env`.
+
+If you mount a TOML file, place it at `/config/config.toml`:
+
+```bash
+docker run -d \
+  -v $PWD/backend/config.toml:/config/config.toml:ro \
+  -v amirsalarsafaeicom_uploads:/uploads \
+  -p 8000:8000 -p 3001:3001 \
   amirsalarsafaeicom-backend:latest
 ```
 
-### Frontend
+## Healthchecks
 
-```bash
-# Run the frontend container
-podman run -d \
-  --name amirsalarsafaei-frontend \
-  -p 3000:3000 \
-  -e NEXT_PUBLIC_API_URL=http://your-backend-host:8000 \
-  amirsalarsafaeicom-frontend:latest
-```
-
-## Using Podman Compose
-
-Create a `podman-compose.yml` file:
-
-```yaml
-version: "3.8"
-
-services:
-  backend:
-    image: amirsalarsafaeicom-backend:latest
-    container_name: amirsalarsafaei-backend
-    ports:
-      - "8000:8000"
-      - "3001:3001"
-    volumes:
-      - /opt/amirsalarsafaei/config:/config:Z
-      - /opt/amirsalarsafaei/uploads:/app/uploads:Z
-    restart: unless-stopped
-
-  frontend:
-    image: amirsalarsafaeicom-frontend:latest
-    container_name: amirsalarsafaei-frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8000
-    depends_on:
-      - backend
-    restart: unless-stopped
-```
-
-Run with:
-
-```bash
-podman-compose up -d
-```
-
-## Deploying to VPS
-
-### 1. Build images locally
-
-```bash
-nix build .#backendImage
-nix build .#frontendImage
-```
-
-### 2. Transfer to VPS
-
-```bash
-# Save and compress images
-nix build .#backendImage -o backend-image
-nix build .#frontendImage -o frontend-image
-
-# Transfer to VPS
-scp backend-image your-user@your-vps:/tmp/
-scp frontend-image your-user@your-vps:/tmp/
-
-# On VPS: load images
-ssh your-user@your-vps "podman load < /tmp/backend-image"
-ssh your-user@your-vps "podman load < /tmp/frontend-image"
-```
-
-### 3. Or use a registry
-
-```bash
-# Tag and push to registry
-podman tag amirsalarsafaeicom-backend:latest your-registry.com/amirsalarsafaeicom-backend:latest
-podman push your-registry.com/amirsalarsafaeicom-backend:latest
-
-podman tag amirsalarsafaeicom-frontend:latest your-registry.com/amirsalarsafaeicom-frontend:latest
-podman push your-registry.com/amirsalarsafaeicom-frontend:latest
-```
-
-## Configuration
-
-### Backend Config (`config.toml`)
-
-```toml
-auth_token = "your-secure-token"
-
-[database]
-url = "postgres://user:password@host:5432/dbname"
-max_connections = 20
-
-[server]
-host = "0.0.0.0"
-port = 8000
-
-[image_server]
-host = "0.0.0.0"
-port = 3001
-upload_dir = "/app/uploads"
-```
-
-### Environment Variables (Frontend)
-
-- `PORT` - Server port (default: 3000)
-- `HOSTNAME` - Bind address (default: 0.0.0.0)
-- `NEXT_PUBLIC_API_URL` - Backend API URL
-
-## Development
-
-Enter development shell:
-
-```bash
-nix develop
-```
-
-Build packages without containerization:
-
-```bash
-nix build .#backend
-nix build .#frontend
-```
+Both services expose Docker healthchecks (see Dockerfiles). `compose.yaml`
+uses `depends_on: condition: service_healthy`, so the frontend only starts
+after the backend is responsive.

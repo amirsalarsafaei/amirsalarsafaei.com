@@ -1,5 +1,5 @@
-@import "prism-theme";
-@import "variables";
+@use "prism-theme";
+@use "variables" as *;
 html,
 body {
   height: 100%;
@@ -7,11 +7,10 @@ body {
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
+  margin: 0;
   font-family: "JetBrains Mono", monospace;
   line-height: 1.5;
   font-weight: 400;

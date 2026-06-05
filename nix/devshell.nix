@@ -12,12 +12,16 @@ pkgs.mkShell {
     pkgs.yarn
     pkgs.protobuf
     pkgs.buf
+    pkgs.just
+    pkgs.sqlx-cli
     pkgs.pkg-config
     pkgs.openssl
     pkgs.openssl.dev
     pkgs.postgresql
-    pkgs.podman
-    pkgs.skopeo
+    pkgs.treefmt
+    pkgs.nixfmt-rfc-style
+    pkgs.nodePackages.prettier
+    pkgs.rustfmt
   ];
 
   env = {
@@ -33,6 +37,7 @@ pkgs.mkShell {
     echo "🚀 amirsalarsafaei.com development shell"
     echo ""
     echo "Available commands:"
+    echo "  just                         - List project tasks"
     echo "  nix build .#backend        - Build backend"
     echo "  nix build .#frontend       - Build frontend"
     echo "  nix build .#backendImage   - Build backend Docker image"

@@ -1,0 +1,18 @@
+# Copy to backend/config.toml and fill in real values.
+# In Docker, override individual fields via environment variables (see compose.yaml).
+
+auth_token = "change-me"
+
+[database]
+url             = "postgres://user:password@localhost:5432/amirsalarsafaeicom"
+max_connections = 20
+
+[server]
+host             = "0.0.0.0"
+port             = 8000
+allowed_origins  = ["*"]
+
+[image_server]
+host       = "0.0.0.0"
+port       = 3001
+upload_dir = "/uploads"

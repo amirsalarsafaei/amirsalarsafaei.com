@@ -1,18 +1,18 @@
 use chrono::Utc;
 use log::{error, info};
+use rspotify::AuthCodeSpotify;
 use rspotify::clients::OAuthClient;
 use rspotify::model::TimeLimits;
 use rspotify::model::TrackId;
 use rspotify::prelude::*;
-use rspotify::AuthCodeSpotify;
 use salar_interface::playground::{
-    spotify_server, GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse,
+    GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse, spotify_server,
 };
 use std::sync::Arc;
 use time;
 use time::OffsetDateTime;
 use tokio::sync::RwLock;
-use tokio::time::{interval, Duration};
+use tokio::time::{Duration, interval};
 use tonic::Code;
 use tonic::Status;
 

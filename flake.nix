@@ -31,6 +31,14 @@
       treefmt-nix,
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
+      flake = {
+        nixosModule = inputs.self.nixosModules.default;
+        nixosModules = {
+          amirsalarsafaei-com = import ./nix/modules/amirsalarsafaei-com.nix { inherit inputs; };
+          default = inputs.self.nixosModules.amirsalarsafaei-com;
+        };
+      };
+
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -40,9 +48,7 @@
 
       perSystem =
         {
-          pkgs,
           system,
-          config,
           ...
         }:
         let
@@ -60,7 +66,6 @@
 
           packages' = import ./nix/packages {
             pkgs = pkgsWithOverlays;
-            inherit inputs system;
           };
 
           treefmtEval = treefmt-nix.lib.evalModule pkgsWithOverlays ./nix/treefmt.nix;

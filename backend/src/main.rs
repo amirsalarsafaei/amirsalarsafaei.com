@@ -67,6 +67,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
+    if args.migrate_only {
+        println!("Database migrations completed");
+        return Ok(());
+    }
+
     let creds = Credentials::new(&spotify_config.client_id, &spotify_config.client_secret);
 
     let oauth = OAuth {
@@ -104,24 +109,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         config.auth_token.clone(),
     ));
 
-    let cors_layer = CorsLayer::new()
-        .allow_credentials(true)
-        .max_age(DEFAULT_MAX_AGE)
-        .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
-        .allow_origin(AllowOrigin::list(
-            config
-                .server
-                .allowed_origins
-                .iter()
-                .map(|origin| HeaderValue::from_str(&origin).unwrap()),
-        ))
-        .allow_headers(
-            DEFAULT_ALLOW_HEADERS
-                .iter()
-                .cloned()
-                .map(HeaderName::from_static)
-                .collect::<Vec<HeaderName>>(),
-        );
+    let cors_layer = if config.server.allowed_origins.contains(&"*".to_string()) {
+        // Wildcard origin cannot be combined with credentials per CORS spec
+        CorsLayer::new()
+            .max_age(DEFAULT_MAX_AGE)
+            .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
+            .allow_origin(AllowOrigin::any())
+            .allow_headers(
+                DEFAULT_ALLOW_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            )
+    } else {
+        CorsLayer::new()
+            .allow_credentials(true)
+            .max_age(DEFAULT_MAX_AGE)
+            .expose_headers(DEFAULT_EXPOSED_HEADERS.iter().cloned().collect::<Vec<_>>())
+            .allow_origin(AllowOrigin::list(
+                config
+                    .server
+                    .allowed_origins
+                    .iter()
+                    .map(|origin| HeaderValue::from_str(&origin).unwrap()),
+            ))
+            .allow_headers(
+                DEFAULT_ALLOW_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            )
+    };
 
     let grpc_server = Server::builder()
         .accept_http1(true)

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.2/.schema/devbox.schema.json",
+  "packages": {
+    "rustup": "latest",
+    "nodejs_24": "latest",
+    "yarn": "latest",
+    "protobuf": "latest",
+    "buf": "latest",
+    "just": "latest",
+    "sqlx-cli": "latest",
+    "postgresql": "latest",
+    "pkg-config": "latest",
+    "openssl": { "version": "latest", "outputs": ["out", "dev"] },
+    "treefmt": "latest",
+    "rustfmt": "latest",
+    "nodePackages.prettier": "latest"
+  },
+  "env": {
+    "RUST_BACKTRACE": "full",
+    "OPENSSL_NO_VENDOR": "1"
+  },
+  "shell": {
+    "init_hook": [
+      "projectDir=$(pwd)",
+      "export RUSTUP_HOME=\"$projectDir/.rustup\"",
+      "export CARGO_HOME=\"$projectDir/.cargo\"",
+      "mkdir -p \"$RUSTUP_HOME\" \"$CARGO_HOME\"",
+      "rustup default stable >/dev/null 2>&1 || true",
+      "rustup component add rust-analyzer rust-src >/dev/null 2>&1 || true",
+      "export PATH=\"$CARGO_HOME/bin:$PATH\"",
+      "unset OPENSSL_DIR",
+      "export OPENSSL_INCLUDE_DIR=\"$(pkg-config --variable=includedir openssl)\"",
+      "export OPENSSL_LIB_DIR=\"$(pkg-config --variable=libdir openssl)\"",
+      "echo '🚀 amirsalarsafaei.com dev shell ready'",
+      "echo '   run tasks with: just <recipe>  (list: just)'"
+    ],
+    "scripts": {
+      "tasks": "just --list"
+    }
+  }
+}

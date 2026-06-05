@@ -1,0 +1,5 @@
+# Copy to backend/spotify.toml and fill in real values.
+client_id     = ""
+client_secret = ""
+refresh_token = ""
+redirect_uri  = "http://localhost:3001/callback"

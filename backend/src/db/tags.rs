@@ -14,20 +14,17 @@ pub async fn all_tags(pool: &PgPool) -> Result<Vec<TagRow>, sqlx::Error> {
 }
 
 pub async fn create_tag(pool: &PgPool, name: &str) -> Result<TagRow, sqlx::Error> {
-    sqlx::query_as::<_, TagRow>(
-        "INSERT INTO blogs_tags(name) VALUES($1) RETURNING id, name",
-    )
-    .bind(name)
-    .fetch_one(pool)
-    .await
+    sqlx::query_as::<_, TagRow>("INSERT INTO blogs_tags(name) VALUES($1) RETURNING id, name")
+        .bind(name)
+        .fetch_one(pool)
+        .await
 }
 
 pub async fn delete_tag(pool: &PgPool, id: &Uuid) -> Result<Option<Uuid>, sqlx::Error> {
-    let row: Option<(Uuid,)> =
-        sqlx::query_as("DELETE FROM blogs_tags WHERE id = $1 RETURNING id")
-            .bind(id)
-            .fetch_optional(pool)
-            .await?;
+    let row: Option<(Uuid,)> = sqlx::query_as("DELETE FROM blogs_tags WHERE id = $1 RETURNING id")
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
 
     Ok(row.map(|r| r.0))
 }
@@ -55,13 +52,12 @@ pub async fn delete_blog_tags(
     blog_id: &Uuid,
     keep_tag_ids: &[Uuid],
 ) -> Result<u64, sqlx::Error> {
-    let result = sqlx::query(
-        "DELETE FROM blogs_blog_tags WHERE blog_id = $1 AND tag_id != ALL($2)",
-    )
-    .bind(blog_id)
-    .bind(keep_tag_ids)
-    .execute(pool)
-    .await?;
+    let result =
+        sqlx::query("DELETE FROM blogs_blog_tags WHERE blog_id = $1 AND tag_id != ALL($2)")
+            .bind(blog_id)
+            .bind(keep_tag_ids)
+            .execute(pool)
+            .await?;
 
     Ok(result.rows_affected())
 }

@@ -1,4 +1,4 @@
-@import "src/styles/global.scss";
+@use "@/styles/variables" as *;
 
 .chip {
   display: inline-flex;

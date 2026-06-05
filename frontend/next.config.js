@@ -21,6 +21,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Emit a self-contained server bundle at .next/standalone/server.js, which is
+  // what the Docker image and the NixOS service run in production.
+  output: "standalone",
+
   reactStrictMode: true,
   swcMinify: true,
 

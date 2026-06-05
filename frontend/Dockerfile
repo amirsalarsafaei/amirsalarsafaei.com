@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # stage 1: build
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Optional artifactory / npm mirror.
 # Pass via: --build-arg NPM_REGISTRY=https://artifactory.example.com/api/npm/npm-remote/
@@ -33,7 +33,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN yarn build
 
 # stage 2: production
-FROM node:20-alpine AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 

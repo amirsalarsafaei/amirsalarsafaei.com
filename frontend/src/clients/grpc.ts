@@ -32,7 +32,23 @@ const getNodeHttpTransport = () => {
 };
 
 
-const GRPC_WEB_URL = process.env.NEXT_PUBLIC_GRPC_WEB_URL || 'http://localhost:8000';
+// Resolve the gRPC-web endpoint. On the server (SSR, build-time SSG/ISR, and
+// generateStaticParams/generateMetadata) prefer GRPC_WEB_INTERNAL_URL so we can
+// hit the backend directly over localhost without going through the public
+// nginx/TLS path. In the browser, only the NEXT_PUBLIC_* value is available
+// (and it's the only one that gets inlined into the client bundle), so server
+// and browser deliberately use different URLs.
+function getGrpcWebUrl(): string {
+  if (typeof window === "undefined") {
+    return (
+      process.env.GRPC_WEB_INTERNAL_URL ||
+      process.env.NEXT_PUBLIC_GRPC_WEB_URL ||
+      "http://localhost:8000"
+    );
+  }
+
+  return process.env.NEXT_PUBLIC_GRPC_WEB_URL || "http://localhost:8000";
+}
 
 interface GrpcClients {
   spotify_client: Spotify;
@@ -54,7 +70,7 @@ export function createGrpcClients(): GrpcClients {
     grpc.setDefaultTransport(NodeHttpTransport());
   }
 
-  const transport = new GrpcWebImpl(GRPC_WEB_URL, {
+  const transport = new GrpcWebImpl(getGrpcWebUrl(), {
     debug: process.env.NODE_ENV === 'development',
     transport: typeof window === 'undefined' && NodeHttpTransport ? NodeHttpTransport() : undefined
   });

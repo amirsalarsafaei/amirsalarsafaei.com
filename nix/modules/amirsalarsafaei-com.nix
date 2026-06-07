@@ -80,6 +80,22 @@ let
       --config-path ${backendConfigFile} \
       --spotify-cred-path ${spotifyConfigFile}
   '';
+
+  # Gate the backend unit's "started" state on the gRPC-web port actually
+  # accepting connections. With Type=simple the unit is otherwise considered
+  # up the instant the process spawns — before it has connected to Postgres,
+  # run migrations, and begun serving. Used as ExecStartPost so dependents
+  # ordered `after` the backend (frontend, ssh) only start once it is ready.
+  backendReadyScript = pkgs.writeShellScript "amirsalarsafaei-com-backend-ready" ''
+    for _ in $(${pkgs.coreutils}/bin/seq 1 60); do
+      if (exec 3<>/dev/tcp/${cfg.backend.host}/${toString cfg.backend.port}) 2>/dev/null; then
+        exit 0
+      fi
+      ${pkgs.coreutils}/bin/sleep 1
+    done
+    echo "amirsalarsafaei.com backend not ready on ${cfg.backend.host}:${toString cfg.backend.port}" >&2
+    exit 1
+  '';
 in
 {
   options.services.amirsalarsafaei-com = {
@@ -349,6 +365,10 @@ in
       serviceConfig = {
         Type = "simple";
         ExecStart = backendLauncher;
+        # Hold the unit "starting" until the gRPC-web port is serving, so
+        # units ordered after the backend only start once it is ready.
+        ExecStartPost = backendReadyScript;
+        TimeoutStartSec = "90s";
         Restart = "on-failure";
         RestartSec = "5s";
         User = cfg.user;

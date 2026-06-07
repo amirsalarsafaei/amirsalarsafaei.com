@@ -9,6 +9,7 @@
   vips,
   libiconv,
   darwin,
+  backend,
   frontendEnv ? "production",
 }:
 
@@ -55,6 +56,10 @@ stdenv.mkDerivation {
     yarnConfigHook
     pkg-config
     python3
+    # Build-order dependency only: forces the backend to build before the
+    # frontend so backend changes are compiled and ready. The backend is not
+    # run during the frontend build.
+    backend
   ];
 
   buildInputs = [

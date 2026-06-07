@@ -11,3 +11,9 @@ pub mod playground {
     include!("playground.rs");
     // @@protoc_insertion_point(playground)
 }
+#[cfg(feature = "profile")]
+// @@protoc_insertion_point(attribute:profile)
+pub mod profile {
+    include!("profile.rs");
+    // @@protoc_insertion_point(profile)
+}

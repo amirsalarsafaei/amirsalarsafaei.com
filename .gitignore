@@ -38,6 +38,9 @@ backend/config.toml
 backend/spotify.toml
 backend/uploads/
 
+# SSH server runtime (locally generated host keys)
+ssh/.ssh/
+
 # Devbox / direnv
 .devbox/
 .direnv/

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package profile;
+
+// Profile exposes the "about me" content that is shared by every client
+// (website + SSH terminal) so it has a single source of truth in the backend.
+service Profile {
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+}
+
+message GetProfileRequest {}
+
+message Link {
+  string label = 1;
+  string url = 2;
+}
+
+message GetProfileResponse {
+  string name = 1;
+  string title = 2;
+  // Bio rendered as Markdown.
+  string bio = 3;
+  repeated Link links = 4;
+}

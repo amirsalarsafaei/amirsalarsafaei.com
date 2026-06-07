@@ -32,6 +32,7 @@ mod blogs;
 mod config;
 mod db;
 mod imageserver;
+mod profile;
 mod spotify;
 mod tags;
 mod toproto;
@@ -92,6 +93,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reflection_service = tonic_reflection::server::Builder::configure()
         .register_encoded_file_descriptor_set(salar_interface::playground::FILE_DESCRIPTOR_SET)
         .register_encoded_file_descriptor_set(salar_interface::blogs::FILE_DESCRIPTOR_SET)
+        .register_encoded_file_descriptor_set(salar_interface::profile::FILE_DESCRIPTOR_SET)
         .build_v1alpha()
         .unwrap();
 
@@ -108,6 +110,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         pool.clone(),
         config.auth_token.clone(),
     ));
+
+    let profile_servicer = salar_interface::profile::profile_server::ProfileServer::new(
+        profile::ProfileServicer::new(),
+    );
 
     let cors_layer = if config.server.allowed_origins.contains(&"*".to_string()) {
         // Wildcard origin cannot be combined with credentials per CORS spec
@@ -150,6 +156,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(spotify_servier)
         .add_service(blogs_servicer)
         .add_service(tags_servicer)
+        .add_service(profile_servicer)
         .add_service(reflection_service)
         .serve(addr);
 

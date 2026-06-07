@@ -62,6 +62,9 @@ let
     SPOTIFY_REFRESH_TOKEN = cfg.spotify.refreshToken;
   };
 
+  sshEnvironment = {
+
+  };
   backendLauncher = pkgs.writeShellScript "amirsalarsafaei-com-backend" ''
     set -eu
 

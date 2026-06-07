@@ -77,6 +77,25 @@ services:
       backend:
         condition: service_healthy
 
+  ssh:
+    image: amirsalarsafaeicom-ssh:local
+    build:
+      context: .
+      dockerfile: ./ssh/Dockerfile
+    # Expose the SSH UI on port 22 of the host (map to a different host port if
+    # 22 is taken by the host's own sshd, e.g. "2222:23234").
+    ports:
+      - "${SSH_PUBLIC_PORT:-2222}:23234"
+    environment:
+      GRPC_ADDR: ${SSH_GRPC_ADDR:-backend:8000}
+      GRPC_TLS: ${SSH_GRPC_TLS:-false}
+    volumes:
+      - ssh_host_key:/app/.ssh
+    depends_on:
+      backend:
+        condition: service_healthy
+
 volumes:
   pgdata:
   uploads:
+  ssh_host_key:

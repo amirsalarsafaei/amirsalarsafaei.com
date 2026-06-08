@@ -17,15 +17,15 @@ import (
 	"syscall"
 	"time"
 
+	tea "charm.land/bubbletea/v2"
+	"charm.land/wish/v2"
+	"charm.land/wish/v2/activeterm"
+	bm "charm.land/wish/v2/bubbletea"
+	"charm.land/wish/v2/logging"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/ssh/internal/rpc"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/ssh/internal/ui"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
-	"github.com/charmbracelet/wish"
-	"github.com/charmbracelet/wish/activeterm"
-	bm "github.com/charmbracelet/wish/bubbletea"
-	"github.com/charmbracelet/wish/logging"
 )
 
 func main() {
@@ -78,9 +78,8 @@ func teaHandler(client *rpc.Client) bm.Handler {
 			return nil, nil
 		}
 
-		renderer := bm.MakeRenderer(s)
-		m := ui.New(client, renderer, pty.Window.Width, pty.Window.Height)
-		return m, []tea.ProgramOption{tea.WithAltScreen()}
+		m := ui.New(client, pty.Window.Width, pty.Window.Height)
+		return m, nil
 	}
 }
 

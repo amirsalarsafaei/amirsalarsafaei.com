@@ -2,10 +2,15 @@ package ui
 
 import (
 	"context"
+	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
+
+// songRefreshInterval is how often the now-playing card is refreshed via the
+// ticker started in Model.Init.
+const songRefreshInterval = 15 * time.Second
 
 type songInfo struct {
 	track    string
@@ -17,6 +22,16 @@ type songInfo struct {
 type songLoadedMsg struct {
 	song *songInfo
 	err  error
+}
+
+// tickMsg is emitted by the ticker; each one triggers a now-playing refresh.
+type tickMsg time.Time
+
+// tickCmd schedules the next ticker message.
+func tickCmd() tea.Cmd {
+	return tea.Tick(songRefreshInterval, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
 }
 
 // loadSong calls Spotify.GetRecentlyPlayedSong — the same RPC the website's

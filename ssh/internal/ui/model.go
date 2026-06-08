@@ -3,12 +3,12 @@
 package ui
 
 import (
+	"charm.land/bubbles/v2/spinner"
+	"charm.land/bubbles/v2/viewport"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/ssh/internal/rpc"
-	"github.com/charmbracelet/bubbles/spinner"
-	"github.com/charmbracelet/bubbles/viewport"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type view int
@@ -25,7 +25,6 @@ const (
 type Model struct {
 	client *rpc.Client
 	styles *Styles
-	render *lipgloss.Renderer
 
 	width  int
 	height int
@@ -58,17 +57,17 @@ type Model struct {
 }
 
 // New builds a root model for a session of the given size.
-func New(client *rpc.Client, r *lipgloss.Renderer, width, height int) Model {
-	sp := spinner.New()
-	sp.Spinner = spinner.Dot
+func New(client *rpc.Client, width, height int) Model {
+	styles := NewStyles()
 
-	styles := NewStyles(r)
-	sp.Style = styles.Spinner
+	sp := spinner.New(
+		spinner.WithSpinner(spinner.Dot),
+		spinner.WithStyle(styles.Spinner),
+	)
 
 	return Model{
 		client:  client,
 		styles:  styles,
-		render:  r,
 		width:   width,
 		height:  height,
 		view:    viewMenu,
@@ -78,8 +77,9 @@ func New(client *rpc.Client, r *lipgloss.Renderer, width, height int) Model {
 
 func (m Model) Init() tea.Cmd {
 	// Eagerly fetch the shared profile (About/Links) and the now-playing song
-	// (shown on the main menu) so both are ready up front.
-	return tea.Batch(m.spinner.Tick, m.loadProfile(), m.loadSong())
+	// (shown on the main menu) so both are ready up front, and start the
+	// ticker that periodically refreshes the now-playing song.
+	return tea.Batch(m.spinner.Tick, m.loadProfile(), m.loadSong(), tickCmd())
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -90,7 +90,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resizeViewport()
 		return m, nil
 
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		return m.handleKey(msg)
 
 	case blogsLoadedMsg:
@@ -104,6 +104,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.songErr = msg.err
 		m.song = msg.song
 		return m, nil
+
+	case tickMsg:
+		// On each tick, refresh the now-playing song and schedule the next tick.
+		return m, tea.Batch(m.loadSong(), tickCmd())
 
 	case profileLoadedMsg:
 		m.profileLoaded = true
@@ -133,7 +137,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c", "q":
 		if m.view == viewMenu || msg.String() == "ctrl+c" {
@@ -168,9 +172,13 @@ func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) View() string {
+func (m Model) View() tea.View {
+	var v tea.View
+	v.AltScreen = true
+
 	if m.quitting {
-		return m.styles.Subtitle.Render("Thanks for visiting — see you on amirsalarsafaei.com 👋") + "\n"
+		v.Content = m.styles.Subtitle.Render("Thanks for visiting — see you on amirsalarsafaei.com 👋") + "\n"
+		return v
 	}
 
 	var body string
@@ -189,7 +197,7 @@ func (m Model) View() string {
 		body = m.blogListView()
 	}
 
-	return m.styles.App.Render(
+	v.Content = m.styles.App.Render(
 		lipgloss.JoinVertical(lipgloss.Left,
 			m.header(),
 			"",
@@ -198,6 +206,7 @@ func (m Model) View() string {
 			m.footer(),
 		),
 	)
+	return v
 }
 
 func (m Model) header() string {
@@ -253,11 +262,11 @@ func (m Model) contentHeight() int {
 func (m *Model) resizeViewport() {
 	w, h := m.contentWidth(), m.contentHeight()
 	if !m.readyViewport {
-		m.viewport = viewport.New(w, h)
+		m.viewport = viewport.New(viewport.WithWidth(w), viewport.WithHeight(h))
 		m.readyViewport = true
 	} else {
-		m.viewport.Width = w
-		m.viewport.Height = h
+		m.viewport.SetWidth(w)
+		m.viewport.SetHeight(h)
 	}
 }
 

@@ -1,8 +1,8 @@
 package ui
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 type menuEntry struct {
@@ -17,7 +17,7 @@ var menuEntries = []menuEntry{
 	{"Links", "Where to find me", viewLinks},
 }
 
-func (m Model) updateMenu(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+func (m Model) updateMenu(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "up", "k":
 		if m.menuIdx > 0 {

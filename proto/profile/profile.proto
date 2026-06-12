@@ -21,4 +21,37 @@ message GetProfileResponse {
   // Bio rendered as Markdown.
   string bio = 3;
   repeated Link links = 4;
+  // The skills shown as an `ls -la skills/` listing on the website.
+  repeated Skill skills = 5;
+  // "Current focus" rendered as Markdown.
+  string current_focus = 6;
+  // Structured CV, one ResumeSection per CV heading.
+  Resume resume = 7;
+}
+
+// A single skill/interest with a proficiency level.
+message Skill {
+  string name = 1; // e.g. "golang"
+  Level level = 2;
+
+  enum Level {
+    LEVEL_UNSPECIFIED = 0;
+    EXPERT = 1;
+    PROFICIENT = 2;
+    LEARNING = 3;
+    PASSION = 4;
+  }
+}
+
+// Structured CV shared by every client.
+message Resume {
+  string full_name = 1;
+  string email = 2;
+  string github_url = 3;
+  repeated ResumeSection sections = 4;
+}
+
+message ResumeSection {
+  string heading = 1; // e.g. "Education"
+  string body = 2; // preformatted text block
 }

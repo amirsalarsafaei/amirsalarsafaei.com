@@ -25,6 +25,103 @@ export interface GetProfileResponse {
   /** Bio rendered as Markdown. */
   bio: string;
   links: Link[];
+  /** The skills shown as an `ls -la skills/` listing on the website. */
+  skills: Skill[];
+  /** "Current focus" rendered as Markdown. */
+  currentFocus: string;
+  /** Structured CV, one ResumeSection per CV heading. */
+  resume?: Resume | undefined;
+}
+
+/** A single skill/interest with a proficiency level. */
+export interface Skill {
+  /** e.g. "golang" */
+  name: string;
+  level: Skill_Level;
+}
+
+export enum Skill_Level {
+  LEVEL_UNSPECIFIED = "LEVEL_UNSPECIFIED",
+  EXPERT = "EXPERT",
+  PROFICIENT = "PROFICIENT",
+  LEARNING = "LEARNING",
+  PASSION = "PASSION",
+  UNRECOGNIZED = "UNRECOGNIZED",
+}
+
+export function skill_LevelFromJSON(object: any): Skill_Level {
+  switch (object) {
+    case 0:
+    case "LEVEL_UNSPECIFIED":
+      return Skill_Level.LEVEL_UNSPECIFIED;
+    case 1:
+    case "EXPERT":
+      return Skill_Level.EXPERT;
+    case 2:
+    case "PROFICIENT":
+      return Skill_Level.PROFICIENT;
+    case 3:
+    case "LEARNING":
+      return Skill_Level.LEARNING;
+    case 4:
+    case "PASSION":
+      return Skill_Level.PASSION;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Skill_Level.UNRECOGNIZED;
+  }
+}
+
+export function skill_LevelToJSON(object: Skill_Level): string {
+  switch (object) {
+    case Skill_Level.LEVEL_UNSPECIFIED:
+      return "LEVEL_UNSPECIFIED";
+    case Skill_Level.EXPERT:
+      return "EXPERT";
+    case Skill_Level.PROFICIENT:
+      return "PROFICIENT";
+    case Skill_Level.LEARNING:
+      return "LEARNING";
+    case Skill_Level.PASSION:
+      return "PASSION";
+    case Skill_Level.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export function skill_LevelToNumber(object: Skill_Level): number {
+  switch (object) {
+    case Skill_Level.LEVEL_UNSPECIFIED:
+      return 0;
+    case Skill_Level.EXPERT:
+      return 1;
+    case Skill_Level.PROFICIENT:
+      return 2;
+    case Skill_Level.LEARNING:
+      return 3;
+    case Skill_Level.PASSION:
+      return 4;
+    case Skill_Level.UNRECOGNIZED:
+    default:
+      return -1;
+  }
+}
+
+/** Structured CV shared by every client. */
+export interface Resume {
+  fullName: string;
+  email: string;
+  githubUrl: string;
+  sections: ResumeSection[];
+}
+
+export interface ResumeSection {
+  /** e.g. "Education" */
+  heading: string;
+  /** preformatted text block */
+  body: string;
 }
 
 function createBaseGetProfileRequest(): GetProfileRequest {
@@ -147,7 +244,7 @@ export const Link: MessageFns<Link> = {
 };
 
 function createBaseGetProfileResponse(): GetProfileResponse {
-  return { name: "", title: "", bio: "", links: [] };
+  return { name: "", title: "", bio: "", links: [], skills: [], currentFocus: "", resume: undefined };
 }
 
 export const GetProfileResponse: MessageFns<GetProfileResponse> = {
@@ -163,6 +260,15 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
     }
     for (const v of message.links) {
       Link.encode(v!, writer.uint32(34).fork()).join();
+    }
+    for (const v of message.skills) {
+      Skill.encode(v!, writer.uint32(42).fork()).join();
+    }
+    if (message.currentFocus !== "") {
+      writer.uint32(50).string(message.currentFocus);
+    }
+    if (message.resume !== undefined) {
+      Resume.encode(message.resume, writer.uint32(58).fork()).join();
     }
     return writer;
   },
@@ -206,6 +312,30 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
           message.links.push(Link.decode(reader, reader.uint32()));
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.skills.push(Skill.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.currentFocus = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.resume = Resume.decode(reader, reader.uint32());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -221,6 +351,13 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
       title: isSet(object.title) ? globalThis.String(object.title) : "",
       bio: isSet(object.bio) ? globalThis.String(object.bio) : "",
       links: globalThis.Array.isArray(object?.links) ? object.links.map((e: any) => Link.fromJSON(e)) : [],
+      skills: globalThis.Array.isArray(object?.skills) ? object.skills.map((e: any) => Skill.fromJSON(e)) : [],
+      currentFocus: isSet(object.currentFocus)
+        ? globalThis.String(object.currentFocus)
+        : isSet(object.current_focus)
+        ? globalThis.String(object.current_focus)
+        : "",
+      resume: isSet(object.resume) ? Resume.fromJSON(object.resume) : undefined,
     };
   },
 
@@ -238,6 +375,15 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
     if (message.links?.length) {
       obj.links = message.links.map((e) => Link.toJSON(e));
     }
+    if (message.skills?.length) {
+      obj.skills = message.skills.map((e) => Skill.toJSON(e));
+    }
+    if (message.currentFocus !== "") {
+      obj.currentFocus = message.currentFocus;
+    }
+    if (message.resume !== undefined) {
+      obj.resume = Resume.toJSON(message.resume);
+    }
     return obj;
   },
 
@@ -250,6 +396,281 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
     message.title = object.title ?? "";
     message.bio = object.bio ?? "";
     message.links = object.links?.map((e) => Link.fromPartial(e)) || [];
+    message.skills = object.skills?.map((e) => Skill.fromPartial(e)) || [];
+    message.currentFocus = object.currentFocus ?? "";
+    message.resume = (object.resume !== undefined && object.resume !== null)
+      ? Resume.fromPartial(object.resume)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseSkill(): Skill {
+  return { name: "", level: Skill_Level.LEVEL_UNSPECIFIED };
+}
+
+export const Skill: MessageFns<Skill> = {
+  encode(message: Skill, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.level !== Skill_Level.LEVEL_UNSPECIFIED) {
+      writer.uint32(16).int32(skill_LevelToNumber(message.level));
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Skill {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSkill();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.level = skill_LevelFromJSON(reader.int32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Skill {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      level: isSet(object.level) ? skill_LevelFromJSON(object.level) : Skill_Level.LEVEL_UNSPECIFIED,
+    };
+  },
+
+  toJSON(message: Skill): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.level !== Skill_Level.LEVEL_UNSPECIFIED) {
+      obj.level = skill_LevelToJSON(message.level);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Skill>, I>>(base?: I): Skill {
+    return Skill.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Skill>, I>>(object: I): Skill {
+    const message = createBaseSkill();
+    message.name = object.name ?? "";
+    message.level = object.level ?? Skill_Level.LEVEL_UNSPECIFIED;
+    return message;
+  },
+};
+
+function createBaseResume(): Resume {
+  return { fullName: "", email: "", githubUrl: "", sections: [] };
+}
+
+export const Resume: MessageFns<Resume> = {
+  encode(message: Resume, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.fullName !== "") {
+      writer.uint32(10).string(message.fullName);
+    }
+    if (message.email !== "") {
+      writer.uint32(18).string(message.email);
+    }
+    if (message.githubUrl !== "") {
+      writer.uint32(26).string(message.githubUrl);
+    }
+    for (const v of message.sections) {
+      ResumeSection.encode(v!, writer.uint32(34).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Resume {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResume();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fullName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.githubUrl = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.sections.push(ResumeSection.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Resume {
+    return {
+      fullName: isSet(object.fullName)
+        ? globalThis.String(object.fullName)
+        : isSet(object.full_name)
+        ? globalThis.String(object.full_name)
+        : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+      githubUrl: isSet(object.githubUrl)
+        ? globalThis.String(object.githubUrl)
+        : isSet(object.github_url)
+        ? globalThis.String(object.github_url)
+        : "",
+      sections: globalThis.Array.isArray(object?.sections)
+        ? object.sections.map((e: any) => ResumeSection.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: Resume): unknown {
+    const obj: any = {};
+    if (message.fullName !== "") {
+      obj.fullName = message.fullName;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    if (message.githubUrl !== "") {
+      obj.githubUrl = message.githubUrl;
+    }
+    if (message.sections?.length) {
+      obj.sections = message.sections.map((e) => ResumeSection.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Resume>, I>>(base?: I): Resume {
+    return Resume.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Resume>, I>>(object: I): Resume {
+    const message = createBaseResume();
+    message.fullName = object.fullName ?? "";
+    message.email = object.email ?? "";
+    message.githubUrl = object.githubUrl ?? "";
+    message.sections = object.sections?.map((e) => ResumeSection.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseResumeSection(): ResumeSection {
+  return { heading: "", body: "" };
+}
+
+export const ResumeSection: MessageFns<ResumeSection> = {
+  encode(message: ResumeSection, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.heading !== "") {
+      writer.uint32(10).string(message.heading);
+    }
+    if (message.body !== "") {
+      writer.uint32(18).string(message.body);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ResumeSection {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResumeSection();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.heading = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.body = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ResumeSection {
+    return {
+      heading: isSet(object.heading) ? globalThis.String(object.heading) : "",
+      body: isSet(object.body) ? globalThis.String(object.body) : "",
+    };
+  },
+
+  toJSON(message: ResumeSection): unknown {
+    const obj: any = {};
+    if (message.heading !== "") {
+      obj.heading = message.heading;
+    }
+    if (message.body !== "") {
+      obj.body = message.body;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ResumeSection>, I>>(base?: I): ResumeSection {
+    return ResumeSection.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ResumeSection>, I>>(object: I): ResumeSection {
+    const message = createBaseResumeSection();
+    message.heading = object.heading ?? "";
+    message.body = object.body ?? "";
     return message;
   },
 };

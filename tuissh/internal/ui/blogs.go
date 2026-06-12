@@ -98,7 +98,7 @@ func (m Model) blogMarkdown(b blogItem) string {
 
 func (m Model) blogListView() string {
 	if !m.blogsLoaded {
-		return m.styles.Spinner.Render(m.spinner.View()) + " fetching posts over gRPC…"
+		return m.styles.Spinner.Render(m.spinner.View()) + " fetching posts…"
 	}
 	if m.blogsErr != nil {
 		return m.styles.Err.Render("Failed to load blogs: " + m.blogsErr.Error())

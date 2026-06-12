@@ -1,6 +1,7 @@
 # amirsalarsafaei.com — task runner. Run `just` to list recipes.
 
-set shell := ["bash", "-cu"]
+# NixOS has no FHS /bin/bash; resolve bash from PATH via env.
+set shell := ["/usr/bin/env", "bash", "-cu"]
 
 _default:
     @just --list --unsorted
@@ -27,11 +28,11 @@ clean:
 
 # ─── Build / dev ────────────────────────────────────────────────────────────
 
-# Build backend + frontend + ssh server locally
+# Build backend + frontend + tuissh server locally
 build:
     cargo build --workspace
     cd frontend && yarn build
-    cd ssh && go build ./...
+    cd tuissh && go build ./...
 
 # Run backend locally (cargo run)
 backend:
@@ -41,21 +42,21 @@ backend:
 frontend:
     cd frontend && yarn dev
 
-# Run the SSH server locally (connect: ssh -p 23234 localhost). Set GRPC_ADDR to
-# point at a running backend (default localhost:8000).
-ssh-server:
-    cd ssh && go run .
+# Run the tuissh server locally (connect: ssh -p 23234 localhost). Set GRPC_ADDR
+# to point at a running backend (default localhost:8000).
+tuissh:
+    cd tuissh && go run .
 
 # Run all tests
 test:
     cargo test --workspace -- --show-output
-    cd ssh && go test ./...
+    cd tuissh && go test ./...
 
 # Run clippy + next lint + go vet
 lint:
     cargo clippy --workspace -- -D warnings
     cd frontend && yarn lint
-    cd ssh && go vet ./...
+    cd tuissh && go vet ./...
 
 # Format the whole tree (treefmt)
 format:
@@ -89,15 +90,23 @@ down:
 logs:
     docker compose logs -f
 
-# Start dev stack (postgres + backend + frontend with hot reload)
+# Dev stack fully in Docker (use this, NOT `docker compose --profile dev up`)
 dev:
     docker compose --profile dev up -d postgres backend frontend-dev
+
+# Backend only in Docker (postgres + migrate + backend)
+backends:
+    docker compose up -d backend
+
+# Backends in Docker + frontend on the host with hot reload (the usual setup)
+dev-local: backends
+    cd frontend && yarn install && yarn dev
 
 # ─── Deploy ─────────────────────────────────────────────────────────────────
 
 # Build images locally and push to remote host via SSH
 deploy-docker: docker-build
-    docker save amirsalarsafaeicom-backend:local amirsalarsafaeicom-frontend:local amirsalarsafaeicom-ssh:local \
+    docker save amirsalarsafaeicom-backend:local amirsalarsafaeicom-frontend:local amirsalarsafaeicom-tuissh:local \
         | gzip \
         | ssh finRoot "gunzip | docker load"
 

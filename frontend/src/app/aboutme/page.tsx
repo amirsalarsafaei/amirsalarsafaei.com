@@ -25,6 +25,13 @@ const FALLBACK_PROFILE = {
 M.Sc. in Computer Science at the University of British Columbia.
 
 I love building distributed systems and writing type-safe & maintainable code.`,
+  links: [
+    { label: "Website", url: "https://amirsalarsafaei.com" },
+    { label: "GitHub", url: "https://github.com/amirsalarsafaei" },
+    { label: "Email", url: "mailto:amirs.s.g.o@gmail.com" },
+    { label: "Telegram", url: "https://t.me/amirsalarsafaei" },
+    { label: "LinkedIn", url: "https://linkedin.com/in/amir-salar-safaei" },
+  ],
 };
 
 async function getProfile() {
@@ -273,19 +280,34 @@ Iran's largest tech platform
           </div>
 
           <div className={styles.line}>
-            <span className={styles.prompt}>visitor@amirsalar:~$</span> echo
-            "Let's connect!"
+            <span className={styles.prompt}>visitor@amirsalar:~$</span> cat
+            links.md
           </div>
           <div className={styles.content}>
             <pre>
-              {`Let's connect!
-
-📧 Email: amirs.s.g.o@gmail.com
-🐙 GitHub: github.com/amirsalarsafaei
-💬 Telegram: @amirsalarsafaei
-💼 LinkedIn: linkedin.com/in/amir-salar-safaei
-
-Always open to interesting conversations and collaborations!`}
+              {"Let's connect!\n\n"}
+              {profile.links?.map((link) => {
+                const isWeb = link.url.startsWith("http");
+                const isMail = link.url.startsWith("mailto:");
+                return (
+                  <span key={link.label}>
+                    {`${link.label.padEnd(9)} `}
+                    {isWeb || isMail ? (
+                      <a
+                        href={link.url}
+                        target={isWeb ? "_blank" : undefined}
+                        rel={isWeb ? "noopener noreferrer" : undefined}
+                      >
+                        {link.url.replace(/^mailto:/, "")}
+                      </a>
+                    ) : (
+                      <InlineCode>{link.url}</InlineCode>
+                    )}
+                    {"\n"}
+                  </span>
+                );
+              })}
+              {"\nAlways open to interesting conversations and collaborations!"}
             </pre>
           </div>
 

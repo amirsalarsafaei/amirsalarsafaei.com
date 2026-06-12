@@ -3,6 +3,7 @@ package ui
 import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/shader"
 )
 
 type menuEntry struct {
@@ -13,7 +14,7 @@ type menuEntry struct {
 
 var menuEntries = []menuEntry{
 	{"About Me", "Who I am and what I build", viewAbout},
-	{"Blog", "Posts pulled live over gRPC", viewBlogList},
+	{"Blog", "Latest writing, fresh from the backend", viewBlogList},
 	{"Links", "Where to find me", viewLinks},
 }
 
@@ -29,8 +30,6 @@ func (m Model) updateMenu(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		}
 	case "enter", "right", "l":
 		return m.enterMenu(menuEntries[m.menuIdx].view)
-	case "r":
-		return m, m.loadSong()
 	}
 	return m, nil
 }
@@ -54,10 +53,35 @@ func (m Model) enterMenu(v view) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// shaderBanner renders the animated plasma strip with the site name beneath
+// it. Falls back to a static subtitle when the terminal lacks colour or the
+// shader is toggled off.
+func (m Model) shaderBanner() string {
+	tagline := m.styles.Subtitle.Render(
+		"Software Engineer · Distributed Systems · UBC M.Sc.")
+
+	if !m.shaderOn || !m.colorful {
+		return lipgloss.JoinVertical(lipgloss.Center,
+			m.styles.BannerName.Render("a m i r s a l a r"),
+			tagline,
+		)
+	}
+
+	w := m.contentWidth()
+	t := float64(m.frame) * 0.12
+	strip := shader.Render(w, 3, t, shader.Plasma)
+	name := lipgloss.Place(w, 1, lipgloss.Center, lipgloss.Center,
+		m.styles.BannerName.Render("~/amirsalar  ·  terminal"))
+
+	return lipgloss.JoinVertical(lipgloss.Center,
+		strip,
+		name,
+		tagline,
+	)
+}
+
 func (m Model) menuView() string {
-	banner := m.styles.Subtitle.Render(
-		"Software Engineer · Distributed Systems · UBC M.Sc.\n" +
-			"You're browsing my site over SSH. Pick a section:")
+	banner := m.shaderBanner()
 
 	var rows []string
 	for i, e := range menuEntries {
@@ -75,11 +99,12 @@ func (m Model) menuView() string {
 	// behind a menu entry.
 	card := m.nowPlayingCard()
 
-	body := lipgloss.JoinVertical(lipgloss.Center,
-		card,
-		"",
-		menu,
-	)
+	sections := []string{card, "", menu}
+	if m.cowOn {
+		cow := m.styles.Subtitle.Render(cowsay(cowFortunes[m.cowIdx%len(cowFortunes)]))
+		sections = append(sections, "", cow)
+	}
+	body := lipgloss.JoinVertical(lipgloss.Center, sections...)
 
 	// Centre the whole thing across the full content area.
 	return lipgloss.Place(

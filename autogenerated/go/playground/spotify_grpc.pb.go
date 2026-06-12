@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Spotify_GetRecentlyPlayedSong_FullMethodName = "/playground.Spotify/GetRecentlyPlayedSong"
+	Spotify_GetRecentlyPlayedSong_FullMethodName    = "/playground.Spotify/GetRecentlyPlayedSong"
+	Spotify_StreamRecentlyPlayedSong_FullMethodName = "/playground.Spotify/StreamRecentlyPlayedSong"
 )
 
 // SpotifyClient is the client API for Spotify service.
@@ -27,6 +28,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SpotifyClient interface {
 	GetRecentlyPlayedSong(ctx context.Context, in *GetRecentlyPlayedSongRequest, opts ...grpc.CallOption) (*GetRecentlyPlayedSongResponse, error)
+	// StreamRecentlyPlayedSong pushes the now-playing/last-played track to the
+	// client whenever it changes. A single shared backend poller talks to
+	// Spotify and fans the result out to every subscriber, so clients never poll
+	// themselves. The current track is sent immediately on subscribe.
+	StreamRecentlyPlayedSong(ctx context.Context, in *GetRecentlyPlayedSongRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetRecentlyPlayedSongResponse], error)
 }
 
 type spotifyClient struct {
@@ -47,11 +53,35 @@ func (c *spotifyClient) GetRecentlyPlayedSong(ctx context.Context, in *GetRecent
 	return out, nil
 }
 
+func (c *spotifyClient) StreamRecentlyPlayedSong(ctx context.Context, in *GetRecentlyPlayedSongRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetRecentlyPlayedSongResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Spotify_ServiceDesc.Streams[0], Spotify_StreamRecentlyPlayedSong_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Spotify_StreamRecentlyPlayedSongClient = grpc.ServerStreamingClient[GetRecentlyPlayedSongResponse]
+
 // SpotifyServer is the server API for Spotify service.
 // All implementations must embed UnimplementedSpotifyServer
 // for forward compatibility.
 type SpotifyServer interface {
 	GetRecentlyPlayedSong(context.Context, *GetRecentlyPlayedSongRequest) (*GetRecentlyPlayedSongResponse, error)
+	// StreamRecentlyPlayedSong pushes the now-playing/last-played track to the
+	// client whenever it changes. A single shared backend poller talks to
+	// Spotify and fans the result out to every subscriber, so clients never poll
+	// themselves. The current track is sent immediately on subscribe.
+	StreamRecentlyPlayedSong(*GetRecentlyPlayedSongRequest, grpc.ServerStreamingServer[GetRecentlyPlayedSongResponse]) error
 	mustEmbedUnimplementedSpotifyServer()
 }
 
@@ -64,6 +94,9 @@ type UnimplementedSpotifyServer struct{}
 
 func (UnimplementedSpotifyServer) GetRecentlyPlayedSong(context.Context, *GetRecentlyPlayedSongRequest) (*GetRecentlyPlayedSongResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetRecentlyPlayedSong not implemented")
+}
+func (UnimplementedSpotifyServer) StreamRecentlyPlayedSong(*GetRecentlyPlayedSongRequest, grpc.ServerStreamingServer[GetRecentlyPlayedSongResponse]) error {
+	return status.Error(codes.Unimplemented, "method StreamRecentlyPlayedSong not implemented")
 }
 func (UnimplementedSpotifyServer) mustEmbedUnimplementedSpotifyServer() {}
 func (UnimplementedSpotifyServer) testEmbeddedByValue()                 {}
@@ -104,6 +137,17 @@ func _Spotify_GetRecentlyPlayedSong_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Spotify_StreamRecentlyPlayedSong_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetRecentlyPlayedSongRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(SpotifyServer).StreamRecentlyPlayedSong(m, &grpc.GenericServerStream[GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Spotify_StreamRecentlyPlayedSongServer = grpc.ServerStreamingServer[GetRecentlyPlayedSongResponse]
+
 // Spotify_ServiceDesc is the grpc.ServiceDesc for Spotify service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -116,6 +160,12 @@ var Spotify_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Spotify_GetRecentlyPlayedSong_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamRecentlyPlayedSong",
+			Handler:       _Spotify_StreamRecentlyPlayedSong_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "playground/spotify.proto",
 }

@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { label: "Home", path: "/" },
   { label: "Blogs", path: "/blogs" },
   { label: "About Me", path: "/aboutme" },
+  { label: "Terminal", path: "/terminal" },
   { label: "Github", path: "https://github.com/amirsalarsafaei" },
 ];
 

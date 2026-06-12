@@ -42,11 +42,11 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend
 
-      - name: Extract metadata (tags, labels) for ssh
-        id: meta-ssh
+      - name: Extract metadata (tags, labels) for tuissh
+        id: meta-tuissh
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/ssh
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/tuissh
 
       - name: Build & push backend
         uses: docker/build-push-action@v6
@@ -72,14 +72,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build & push ssh
+      - name: Build & push tuissh
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./ssh/Dockerfile
+          file: ./tuissh/Dockerfile
           target: runtime
           push: true
-          tags: ${{ steps.meta-ssh.outputs.tags }}
-          labels: ${{ steps.meta-ssh.outputs.labels }}
+          tags: ${{ steps.meta-tuissh.outputs.tags }}
+          labels: ${{ steps.meta-tuissh.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

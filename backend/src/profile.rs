@@ -55,12 +55,24 @@ impl Profile for ProfileServicer {
                     url: "https://amirsalarsafaei.com".to_string(),
                 },
                 Link {
-                    label: "SSH".to_string(),
-                    url: "ssh ssh.amirsalarsafaei.com".to_string(),
-                },
-                Link {
                     label: "GitHub".to_string(),
                     url: "https://github.com/amirsalarsafaei".to_string(),
+                },
+                Link {
+                    label: "Email".to_string(),
+                    url: "mailto:amirs.s.g.o@gmail.com".to_string(),
+                },
+                Link {
+                    label: "Telegram".to_string(),
+                    url: "https://t.me/amirsalarsafaei".to_string(),
+                },
+                Link {
+                    label: "LinkedIn".to_string(),
+                    url: "https://linkedin.com/in/amir-salar-safaei".to_string(),
+                },
+                Link {
+                    label: "SSH".to_string(),
+                    url: "ssh ssh.amirsalarsafaei.com".to_string(),
                 },
             ],
         }))

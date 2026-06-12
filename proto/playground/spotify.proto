@@ -4,6 +4,12 @@ package playground;
 
 service Spotify {
   rpc GetRecentlyPlayedSong(GetRecentlyPlayedSongRequest) returns (GetRecentlyPlayedSongResponse);
+
+  // StreamRecentlyPlayedSong pushes the now-playing/last-played track to the
+  // client whenever it changes. A single shared backend poller talks to
+  // Spotify and fans the result out to every subscriber, so clients never poll
+  // themselves. The current track is sent immediately on subscribe.
+  rpc StreamRecentlyPlayedSong(GetRecentlyPlayedSongRequest) returns (stream GetRecentlyPlayedSongResponse);
 }
 
 message GetRecentlyPlayedSongRequest {}

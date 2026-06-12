@@ -36,8 +36,11 @@ type Styles struct {
 	Tag              lipgloss.Style
 
 	NowPlaying lipgloss.Style
+	TrackTitle lipgloss.Style
 	Pill       lipgloss.Style
 	PillLive   lipgloss.Style
+
+	BannerName lipgloss.Style
 }
 
 // NewStyles builds the style set.
@@ -92,8 +95,14 @@ func NewStyles() *Styles {
 		BorderForeground(colorPrimary).
 		Padding(1, 3)
 
+	s.TrackTitle = lipgloss.NewStyle().Foreground(colorText).Bold(true)
+
 	s.Pill = lipgloss.NewStyle().Foreground(colorBg).Background(colorMuted).Padding(0, 1).Bold(true)
 	s.PillLive = lipgloss.NewStyle().Foreground(colorBg).Background(colorAccent).Padding(0, 1).Bold(true)
+
+	// BannerName is the large site name shown under the shader strip on the
+	// home screen.
+	s.BannerName = lipgloss.NewStyle().Foreground(colorText).Bold(true)
 
 	return s
 }

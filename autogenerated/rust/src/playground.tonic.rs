@@ -2,8 +2,8 @@
 /// Generated client implementations.
 pub mod spotify_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::http::Uri;
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct SpotifyClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -42,13 +42,14 @@ pub mod spotify_client {
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
             T: tonic::codegen::Service<
-                    http::Request<tonic::body::BoxBody>,
-                    Response = http::Response<
-                        <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                    >,
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
-            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
-                Into<StdError> + Send + Sync,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
         {
             SpotifyClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -86,23 +87,56 @@ pub mod spotify_client {
         pub async fn get_recently_played_song(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRecentlyPlayedSongRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetRecentlyPlayedSongResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRecentlyPlayedSongResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path =
-                http::uri::PathAndQuery::from_static("/playground.Spotify/GetRecentlyPlayedSong");
+            let path = http::uri::PathAndQuery::from_static(
+                "/playground.Spotify/GetRecentlyPlayedSong",
+            );
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new(
-                "playground.Spotify",
-                "GetRecentlyPlayedSong",
-            ));
+            req.extensions_mut()
+                .insert(GrpcMethod::new("playground.Spotify", "GetRecentlyPlayedSong"));
             self.inner.unary(req, path, codec).await
+        }
+        pub async fn stream_recently_played_song(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetRecentlyPlayedSongRequest>,
+        ) -> std::result::Result<
+            tonic::Response<
+                tonic::codec::Streaming<super::GetRecentlyPlayedSongResponse>,
+            >,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/playground.Spotify/StreamRecentlyPlayedSong",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("playground.Spotify", "StreamRecentlyPlayedSong"),
+                );
+            self.inner.server_streaming(req, path, codec).await
         }
     }
 }
@@ -116,7 +150,26 @@ pub mod spotify_server {
         async fn get_recently_played_song(
             &self,
             request: tonic::Request<super::GetRecentlyPlayedSongRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetRecentlyPlayedSongResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::GetRecentlyPlayedSongResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the StreamRecentlyPlayedSong method.
+        type StreamRecentlyPlayedSongStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<
+                    super::GetRecentlyPlayedSongResponse,
+                    tonic::Status,
+                >,
+            >
+            + Send
+            + 'static;
+        async fn stream_recently_played_song(
+            &self,
+            request: tonic::Request<super::GetRecentlyPlayedSongRequest>,
+        ) -> std::result::Result<
+            tonic::Response<Self::StreamRecentlyPlayedSongStream>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct SpotifyServer<T: Spotify> {
@@ -139,7 +192,10 @@ pub mod spotify_server {
                 max_encoding_message_size: None,
             }
         }
-        pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
         where
             F: tonic::service::Interceptor,
         {
@@ -194,19 +250,23 @@ pub mod spotify_server {
                 "/playground.Spotify/GetRecentlyPlayedSong" => {
                     #[allow(non_camel_case_types)]
                     struct GetRecentlyPlayedSongSvc<T: Spotify>(pub Arc<T>);
-                    impl<T: Spotify>
-                        tonic::server::UnaryService<super::GetRecentlyPlayedSongRequest>
-                        for GetRecentlyPlayedSongSvc<T>
-                    {
+                    impl<
+                        T: Spotify,
+                    > tonic::server::UnaryService<super::GetRecentlyPlayedSongRequest>
+                    for GetRecentlyPlayedSongSvc<T> {
                         type Response = super::GetRecentlyPlayedSongResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::GetRecentlyPlayedSongRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Spotify>::get_recently_played_song(&inner, request).await
+                                <T as Spotify>::get_recently_played_song(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -233,17 +293,69 @@ pub mod spotify_server {
                     };
                     Box::pin(fut)
                 }
-                _ => Box::pin(async move {
-                    Ok(http::Response::builder()
-                        .status(200)
-                        .header("grpc-status", tonic::Code::Unimplemented as i32)
-                        .header(
-                            http::header::CONTENT_TYPE,
-                            tonic::metadata::GRPC_CONTENT_TYPE,
+                "/playground.Spotify/StreamRecentlyPlayedSong" => {
+                    #[allow(non_camel_case_types)]
+                    struct StreamRecentlyPlayedSongSvc<T: Spotify>(pub Arc<T>);
+                    impl<
+                        T: Spotify,
+                    > tonic::server::ServerStreamingService<
+                        super::GetRecentlyPlayedSongRequest,
+                    > for StreamRecentlyPlayedSongSvc<T> {
+                        type Response = super::GetRecentlyPlayedSongResponse;
+                        type ResponseStream = T::StreamRecentlyPlayedSongStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetRecentlyPlayedSongRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as Spotify>::stream_recently_played_song(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = StreamRecentlyPlayedSongSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", tonic::Code::Unimplemented as i32)
+                                .header(
+                                    http::header::CONTENT_TYPE,
+                                    tonic::metadata::GRPC_CONTENT_TYPE,
+                                )
+                                .body(empty_body())
+                                .unwrap(),
                         )
-                        .body(empty_body())
-                        .unwrap())
-                }),
+                    })
+                }
             }
         }
     }

@@ -85,10 +85,13 @@ func (c *Client) GetProfile(ctx context.Context) (*profilepb.GetProfileResponse,
 	return c.Profile.GetProfile(ctx, &profilepb.GetProfileRequest{})
 }
 
-// RecentlyPlayed fetches the currently/recently played Spotify track.
-func (c *Client) RecentlyPlayed(ctx context.Context) (*playgroundpb.GetRecentlyPlayedSongResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
+// SongStream is a server-stream of now-playing updates.
+type SongStream = playgroundpb.Spotify_StreamRecentlyPlayedSongClient
 
-	return c.Spotify.GetRecentlyPlayedSong(ctx, &playgroundpb.GetRecentlyPlayedSongRequest{})
+// StreamRecentlyPlayed subscribes to live now-playing updates. The backend
+// pushes the current track immediately and then on every change, so the caller
+// never polls. The stream stays open for the lifetime of ctx (e.g. the SSH
+// session).
+func (c *Client) StreamRecentlyPlayed(ctx context.Context) (SongStream, error) {
+	return c.Spotify.StreamRecentlyPlayedSong(ctx, &playgroundpb.GetRecentlyPlayedSongRequest{})
 }

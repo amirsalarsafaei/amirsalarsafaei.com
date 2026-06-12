@@ -77,20 +77,23 @@ services:
       backend:
         condition: service_healthy
 
-  ssh:
-    image: amirsalarsafaeicom-ssh:local
+  tuissh:
+    image: amirsalarsafaeicom-tuissh:local
     build:
       context: .
-      dockerfile: ./ssh/Dockerfile
-    # Expose the SSH UI on port 22 of the host (map to a different host port if
-    # 22 is taken by the host's own sshd, e.g. "2222:23234").
+      dockerfile: ./tuissh/Dockerfile
+    # Expose the TUI-over-SSH on port 22 of the host (map to a different host
+    # port if 22 is taken by the host's own sshd, e.g. "2222:23234").
     ports:
       - "${SSH_PUBLIC_PORT:-2222}:23234"
+      # Browser bridge (xterm.js ↔ the same TUI over WebSocket).
+      - "${TUISSH_WEB_PORT:-2223}:2223"
     environment:
       GRPC_ADDR: ${SSH_GRPC_ADDR:-backend:8000}
       GRPC_TLS: ${SSH_GRPC_TLS:-false}
+      WEB_ADDR: ${TUISSH_WEB_ADDR:-:2223}
     volumes:
-      - ssh_host_key:/app/.ssh
+      - tuissh_host_key:/app/.ssh
     depends_on:
       backend:
         condition: service_healthy
@@ -98,4 +101,4 @@ services:
 volumes:
   pgdata:
   uploads:
-  ssh_host_key:
+  tuissh_host_key:

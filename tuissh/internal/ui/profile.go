@@ -34,6 +34,9 @@ var fallbackProfile = profileInfo{
 	links: []profileLink{
 		{label: "Website", url: "https://amirsalarsafaei.com"},
 		{label: "GitHub", url: "https://github.com/amirsalarsafaei"},
+		{label: "Email", url: "mailto:amirs.s.g.o@gmail.com"},
+		{label: "Telegram", url: "https://t.me/amirsalarsafaei"},
+		{label: "LinkedIn", url: "https://linkedin.com/in/amir-salar-safaei"},
 	},
 }
 
@@ -65,8 +68,8 @@ func aboutMarkdown(p profileInfo) string {
 	sb.WriteString("**" + p.title + "**\n\n")
 	sb.WriteString(p.bio)
 	sb.WriteString("\n\n---\n\n")
-	sb.WriteString("_This page is served over SSH — the same backend gRPC services " +
-		"that power the website are answering your terminal._\n")
+	sb.WriteString("_Served live to your terminal over SSH, straight from the same " +
+		"backend that powers the website._\n")
 	return sb.String()
 }
 

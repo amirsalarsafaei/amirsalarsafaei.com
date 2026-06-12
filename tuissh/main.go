@@ -1,16 +1,18 @@
-// Command ssh-site serves amirsalarsafaei.com over SSH. Connect with:
+// Command tuissh serves amirsalarsafaei.com as a terminal UI over SSH.
+// Connect with:
 //
 //	ssh ssh.amirsalarsafaei.com
 //
-// It renders a Bubble Tea UI (Wish + Lip Gloss) whose content — blog posts and
-// the currently playing Spotify track — is fetched from the very same backend
-// gRPC services the website consumes over gRPC-Web.
+// It renders a Bubble Tea UI (Wish + Lip Gloss v2) — blog posts, an about
+// page and the currently playing track, with album art rendered inline and an
+// animated shader banner on capable terminals.
 package main
 
 import (
 	"context"
 	"errors"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -22,8 +24,10 @@ import (
 	"charm.land/wish/v2/activeterm"
 	bm "charm.land/wish/v2/bubbletea"
 	"charm.land/wish/v2/logging"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/ssh/internal/rpc"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/ssh/internal/ui"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/rpc"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/termcaps"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/ui"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/web"
 	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
 )
@@ -60,10 +64,25 @@ func main() {
 		}
 	}()
 
+	// Browser bridge: the same TUI over a WebSocket for xterm.js clients.
+	var webSrv *http.Server
+	if cfg.webAddr != "" {
+		webSrv = &http.Server{Addr: cfg.webAddr, Handler: web.Handler(client)}
+		log.Info("starting web terminal bridge", "addr", cfg.webAddr)
+		go func() {
+			if err := webSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Fatal("web bridge error", "err", err)
+			}
+		}()
+	}
+
 	<-done
 	log.Info("shutting down")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+	if webSrv != nil {
+		_ = webSrv.Shutdown(ctx)
+	}
 	if err := srv.Shutdown(ctx); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
 		log.Error("could not shut down cleanly", "err", err)
 	}
@@ -78,7 +97,8 @@ func teaHandler(client *rpc.Client) bm.Handler {
 			return nil, nil
 		}
 
-		m := ui.New(client, pty.Window.Width, pty.Window.Height)
+		caps := termcaps.Detect(pty.Term, s.Environ())
+		m := ui.New(s.Context(), client, pty.Window.Width, pty.Window.Height, caps)
 		return m, nil
 	}
 }
@@ -89,6 +109,7 @@ type config struct {
 	hostKeyPath string
 	grpcAddr    string
 	grpcTLS     bool
+	webAddr     string
 }
 
 func loadConfig() config {
@@ -98,6 +119,8 @@ func loadConfig() config {
 		hostKeyPath: env("SSH_HOST_KEY_PATH", ".ssh/id_ed25519"),
 		grpcAddr:    env("GRPC_ADDR", "localhost:8000"),
 		grpcTLS:     envBool("GRPC_TLS", false),
+		// WEB_ADDR="" disables the browser bridge.
+		webAddr: env("WEB_ADDR", ":2223"),
 	}
 }
 

@@ -57,14 +57,35 @@ binary before `backend` starts, so the schema is always current.
 
 ## Dev hot-reload
 
+### Backends in Docker, frontend on the host (recommended)
+
+The usual setup — run the backends in Docker and the Next.js app natively for
+the fastest feedback loop:
+
+```bash
+just dev-local      # = `just backends` (docker) then `yarn dev` (host)
+# or run the two halves yourself:
+just backends       # postgres + migrate + backend in Docker
+cd frontend && yarn install && yarn dev
+```
+
+`frontend/.env.local` points the app at the published localhost ports
+(`:8000` gRPC-web, `:3001` images, `:2223` the tuissh browser bridge).
+
+### Everything in Docker
+
 `compose.override.yaml` adds a `frontend-dev` service (under the `dev`
 profile) that mounts your source tree and runs `next dev`:
 
 ```bash
-docker compose --profile dev up -d postgres backend frontend-dev
-# or
-just dev
+just dev            # docker compose --profile dev up -d postgres backend frontend-dev
 ```
+
+> ⚠️ Use `just dev`, **not** `docker compose --profile dev up`. The bare
+> `--profile dev up` also starts every profile-less service — including the
+> production `frontend` — and both it and `frontend-dev` publish host port
+> `3000`, so the second one fails to bind. `just dev` names only
+> `postgres backend frontend-dev`, avoiding the clash.
 
 ## Deploying to a VPS
 

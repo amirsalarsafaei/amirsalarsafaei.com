@@ -3,11 +3,16 @@
 package ui
 
 import (
+	"context"
+	"time"
+
 	"charm.land/bubbles/v2/spinner"
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/ssh/internal/rpc"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/rpc"
+	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/termcaps"
+	"github.com/charmbracelet/colorprofile"
 	"github.com/charmbracelet/glamour"
 )
 
@@ -21,10 +26,16 @@ const (
 	viewLinks
 )
 
+// frameInterval drives the shader animation (~12fps — smooth but light on the
+// wire for a remote session).
+const frameInterval = 80 * time.Millisecond
+
 // Model is the root Bubble Tea model for one SSH session.
 type Model struct {
+	ctx    context.Context
 	client *rpc.Client
 	styles *Styles
+	caps   termcaps.Caps
 
 	width  int
 	height int
@@ -32,6 +43,24 @@ type Model struct {
 	view     view
 	menuIdx  int
 	quitting bool
+
+	// terminal colour capability, learned at runtime from Bubble Tea.
+	colorProfile colorprofile.Profile
+	colorful     bool // truecolor or 256 — worth animating
+	trueColor    bool // worth half-block image rendering
+
+	// shader (animated banner) state
+	shaderOn      bool
+	shaderTicking bool
+	frame         int
+
+	// image rendering toggle
+	imagesOn bool
+
+	// cowsay easter egg: a fortune-spouting cow on the home screen, cycled
+	// each time the user presses 'c'.
+	cowOn  bool
+	cowIdx int
 
 	spinner spinner.Model
 
@@ -45,10 +74,12 @@ type Model struct {
 	viewport      viewport.Model
 	readyViewport bool
 
-	// spotify state
+	// spotify state (pushed over a live stream — see subscribeSong/recvSong)
+	songStream rpc.SongStream
 	song       *songInfo
 	songLoaded bool
 	songErr    error
+	albumArt   *albumArt
 
 	// profile state (shared about/links content, loaded once per session)
 	profile       profileInfo
@@ -56,8 +87,10 @@ type Model struct {
 	profileErr    error
 }
 
-// New builds a root model for a session of the given size.
-func New(client *rpc.Client, width, height int) Model {
+// New builds a root model for a session of the given size and capabilities.
+// ctx is the session context; the now-playing stream lives for its lifetime
+// and is torn down when the SSH session ends.
+func New(ctx context.Context, client *rpc.Client, width, height int, caps termcaps.Caps) Model {
 	styles := NewStyles()
 
 	sp := spinner.New(
@@ -66,20 +99,23 @@ func New(client *rpc.Client, width, height int) Model {
 	)
 
 	return Model{
-		client:  client,
-		styles:  styles,
-		width:   width,
-		height:  height,
-		view:    viewMenu,
-		spinner: sp,
+		ctx:      ctx,
+		client:   client,
+		styles:   styles,
+		caps:     caps,
+		width:    width,
+		height:   height,
+		view:     viewMenu,
+		spinner:  sp,
+		shaderOn: true,
+		imagesOn: true,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	// Eagerly fetch the shared profile (About/Links) and the now-playing song
-	// (shown on the main menu) so both are ready up front, and start the
-	// ticker that periodically refreshes the now-playing song.
-	return tea.Batch(m.spinner.Tick, m.loadProfile(), m.loadSong(), tickCmd())
+	// Eagerly fetch the shared profile (About/Links) and subscribe to the live
+	// now-playing stream so the menu fills in as soon as data arrives.
+	return tea.Batch(m.spinner.Tick, m.loadProfile(), m.subscribeSong())
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -88,10 +124,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		m.resizeViewport()
+		m.renderAlbumArt()
 		return m, nil
+
+	case tea.ColorProfileMsg:
+		m.colorProfile = msg.Profile
+		m.trueColor = msg.Profile == colorprofile.TrueColor
+		m.colorful = msg.Profile == colorprofile.TrueColor || msg.Profile == colorprofile.ANSI256
+		// Half-block rendering needs the colour profile, which we only learn
+		// now — re-render any art that loaded before this message arrived.
+		m.renderAlbumArt()
+		return m, tea.Batch(m.maybeStartShader(), m.maybeLoadAlbumArt())
 
 	case tea.KeyPressMsg:
 		return m.handleKey(msg)
+
+	case frameMsg:
+		m.frame++
+		if m.shaderRunning() {
+			return m, frameCmd()
+		}
+		m.shaderTicking = false
+		return m, nil
 
 	case blogsLoadedMsg:
 		m.blogsLoaded = true
@@ -99,15 +153,38 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.blogs = msg.blogs
 		return m, nil
 
-	case songLoadedMsg:
-		m.songLoaded = true
-		m.songErr = msg.err
-		m.song = msg.song
-		return m, nil
+	case songStreamMsg:
+		if msg.err != nil {
+			// Couldn't open the stream — show the error and retry shortly.
+			m.songLoaded = true
+			m.songErr = msg.err
+			return m, resubscribeCmd()
+		}
+		m.songStream = msg.stream
+		m.songErr = nil
+		return m, recvSong(m.songStream)
 
-	case tickMsg:
-		// On each tick, refresh the now-playing song and schedule the next tick.
-		return m, tea.Batch(m.loadSong(), tickCmd())
+	case songLoadedMsg:
+		if msg.err != nil {
+			// Stream dropped — reconnect after a short backoff.
+			m.songErr = msg.err
+			m.songStream = nil
+			return m, resubscribeCmd()
+		}
+		m.songLoaded = true
+		m.songErr = nil
+		m.song = msg.song
+		return m, tea.Batch(m.maybeLoadAlbumArt(), recvSong(m.songStream))
+
+	case resubscribeMsg:
+		return m, m.subscribeSong()
+
+	case albumArtMsg:
+		if msg.err == nil && msg.img != nil {
+			m.albumArt = &albumArt{url: msg.url, img: msg.img}
+			m.renderAlbumArt()
+		}
+		return m, nil
 
 	case profileLoadedMsg:
 		m.profileLoaded = true
@@ -146,7 +223,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		}
 		// In a sub-view "q" goes back to the menu.
 		m.view = viewMenu
-		return m, nil
+		return m, m.maybeStartShader()
 
 	case "esc", "left", "h":
 		if m.view != viewMenu {
@@ -156,7 +233,40 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 				m.view = viewMenu
 			}
 		}
+		return m, m.maybeStartShader()
+
+	case "s":
+		// Toggle the animated shader banner (only meaningful on the menu).
+		if m.view == viewMenu {
+			m.shaderOn = !m.shaderOn
+			return m, m.maybeStartShader()
+		}
 		return m, nil
+
+	case "c":
+		// Cow easter egg: first press wakes the cow, each subsequent press
+		// gives it a new fortune; it goes quiet once it loops back around.
+		if m.view == viewMenu {
+			if !m.cowOn {
+				m.cowOn = true
+				m.cowIdx = 0
+			} else {
+				m.cowIdx++
+				if m.cowIdx >= len(cowFortunes) {
+					m.cowOn = false
+				}
+			}
+		}
+		return m, nil
+
+	case "i":
+		// Toggle inline album-art rendering.
+		m.imagesOn = !m.imagesOn
+		if !m.imagesOn {
+			m.albumArt = nil
+			return m, nil
+		}
+		return m, m.maybeLoadAlbumArt()
 	}
 
 	switch m.view {
@@ -172,12 +282,32 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// shaderRunning reports whether the shader banner should keep animating.
+func (m Model) shaderRunning() bool {
+	return m.shaderOn && m.colorful && m.view == viewMenu
+}
+
+// maybeStartShader (re)starts the frame ticker if the shader should be running
+// and isn't already.
+func (m *Model) maybeStartShader() tea.Cmd {
+	if m.shaderRunning() && !m.shaderTicking {
+		m.shaderTicking = true
+		return frameCmd()
+	}
+	return nil
+}
+
 func (m Model) View() tea.View {
 	var v tea.View
 	v.AltScreen = true
 
 	if m.quitting {
-		v.Content = m.styles.Subtitle.Render("Thanks for visiting — see you on amirsalarsafaei.com 👋") + "\n"
+		bye := lipgloss.JoinVertical(lipgloss.Left,
+			m.styles.Subtitle.Render("Thanks for visiting — see you on amirsalarsafaei.com 👋"),
+			"",
+			m.styles.Subtitle.Render(cowsay("So long, and thanks for all the SSH.")),
+		)
+		v.Content = bye + "\n"
 		return v
 	}
 
@@ -187,7 +317,7 @@ func (m Model) View() tea.View {
 		body = m.menuView()
 	case viewAbout, viewLinks:
 		if !m.profileLoaded {
-			body = m.styles.Spinner.Render(m.spinner.View()) + " loading profile over gRPC…"
+			body = m.styles.Spinner.Render(m.spinner.View()) + " loading profile…"
 		} else {
 			body = m.viewport.View()
 		}
@@ -232,7 +362,7 @@ func (m Model) footer() string {
 	var help string
 	switch m.view {
 	case viewMenu:
-		help = "↑/↓ move • enter select • r refresh song • q quit"
+		help = "↑/↓ move • enter select • s shader • i images • c cow • q quit"
 	case viewBlogList:
 		help = "↑/↓ move • enter read • esc back • q menu"
 	case viewBlogRead, viewAbout, viewLinks:
@@ -290,4 +420,11 @@ func (m *Model) showMarkdown(md string) {
 	m.resizeViewport()
 	m.viewport.SetContent(m.renderMarkdown(md))
 	m.viewport.GotoTop()
+}
+
+// frameMsg advances the shader animation.
+type frameMsg struct{}
+
+func frameCmd() tea.Cmd {
+	return tea.Tick(frameInterval, func(time.Time) tea.Msg { return frameMsg{} })
 }

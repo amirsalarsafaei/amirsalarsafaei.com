@@ -5,16 +5,16 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 
-// The browser bridge served by the tuissh binary (its WEB_ADDR). In prod this
-// is proxied to a public path; locally it defaults to the bridge's dev port.
+// The browser bridge served by the tuissh binary (its WEB_ADDR). The apex
+// domain is fronted by Cloudflare, which won't pass the bridge's raw port, so
+// in prod we connect to the SSH host directly (ssh.amirsalarsafaei.com), where
+// nginx terminates TLS and reverse-proxies wss → the bridge. The page is HTTPS,
+// so this must be wss. Override with NEXT_PUBLIC_TUISSH_WS_URL for local dev
+// (e.g. ws://localhost:2223/ws).
 function wsUrl(cols: number, rows: number): string {
   const base =
     process.env.NEXT_PUBLIC_TUISSH_WS_URL ||
-    (typeof window !== "undefined"
-      ? `${window.location.protocol === "https:" ? "wss" : "ws"}://${
-          window.location.hostname
-        }:2223/ws`
-      : "");
+    "wss://ssh.amirsalarsafaei.com/ws";
   const sep = base.includes("?") ? "&" : "?";
   return `${base}${sep}cols=${cols}&rows=${rows}`;
 }

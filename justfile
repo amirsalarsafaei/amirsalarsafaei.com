@@ -62,6 +62,13 @@ lint:
 format:
     treefmt
 
+# ─── Nix ────────────────────────────────────────────────────────────────────
+
+# Recompute the yarn offline cache + Go vendor hashes (no full build) and write
+# them into nix/packages/. Run after changing frontend/yarn.lock or tuissh/go.{mod,sum}.
+update-nix-hashes:
+    ./nix/update-hashes.sh
+
 # ─── Database ───────────────────────────────────────────────────────────────
 
 # Apply sqlx migrations to $DATABASE_URL

@@ -21,6 +21,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Skill_Level int32
+
+const (
+	Skill_LEVEL_UNSPECIFIED Skill_Level = 0
+	Skill_EXPERT            Skill_Level = 1
+	Skill_PROFICIENT        Skill_Level = 2
+	Skill_LEARNING          Skill_Level = 3
+	Skill_PASSION           Skill_Level = 4
+)
+
+// Enum value maps for Skill_Level.
+var (
+	Skill_Level_name = map[int32]string{
+		0: "LEVEL_UNSPECIFIED",
+		1: "EXPERT",
+		2: "PROFICIENT",
+		3: "LEARNING",
+		4: "PASSION",
+	}
+	Skill_Level_value = map[string]int32{
+		"LEVEL_UNSPECIFIED": 0,
+		"EXPERT":            1,
+		"PROFICIENT":        2,
+		"LEARNING":          3,
+		"PASSION":           4,
+	}
+)
+
+func (x Skill_Level) Enum() *Skill_Level {
+	p := new(Skill_Level)
+	*p = x
+	return p
+}
+
+func (x Skill_Level) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Skill_Level) Descriptor() protoreflect.EnumDescriptor {
+	return file_profile_profile_proto_enumTypes[0].Descriptor()
+}
+
+func (Skill_Level) Type() protoreflect.EnumType {
+	return &file_profile_profile_proto_enumTypes[0]
+}
+
+func (x Skill_Level) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Skill_Level.Descriptor instead.
+func (Skill_Level) EnumDescriptor() ([]byte, []int) {
+	return file_profile_profile_proto_rawDescGZIP(), []int{3, 0}
+}
+
 type GetProfileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -114,8 +169,14 @@ type GetProfileResponse struct {
 	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Title string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	// Bio rendered as Markdown.
-	Bio           string  `protobuf:"bytes,3,opt,name=bio,proto3" json:"bio,omitempty"`
-	Links         []*Link `protobuf:"bytes,4,rep,name=links,proto3" json:"links,omitempty"`
+	Bio   string  `protobuf:"bytes,3,opt,name=bio,proto3" json:"bio,omitempty"`
+	Links []*Link `protobuf:"bytes,4,rep,name=links,proto3" json:"links,omitempty"`
+	// The skills shown as an `ls -la skills/` listing on the website.
+	Skills []*Skill `protobuf:"bytes,5,rep,name=skills,proto3" json:"skills,omitempty"`
+	// "Current focus" rendered as Markdown.
+	CurrentFocus string `protobuf:"bytes,6,opt,name=current_focus,json=currentFocus,proto3" json:"current_focus,omitempty"`
+	// Structured CV, one ResumeSection per CV heading.
+	Resume        *Resume `protobuf:"bytes,7,opt,name=resume,proto3" json:"resume,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -178,6 +239,201 @@ func (x *GetProfileResponse) GetLinks() []*Link {
 	return nil
 }
 
+func (x *GetProfileResponse) GetSkills() []*Skill {
+	if x != nil {
+		return x.Skills
+	}
+	return nil
+}
+
+func (x *GetProfileResponse) GetCurrentFocus() string {
+	if x != nil {
+		return x.CurrentFocus
+	}
+	return ""
+}
+
+func (x *GetProfileResponse) GetResume() *Resume {
+	if x != nil {
+		return x.Resume
+	}
+	return nil
+}
+
+// A single skill/interest with a proficiency level.
+type Skill struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"` // e.g. "golang"
+	Level         Skill_Level            `protobuf:"varint,2,opt,name=level,proto3,enum=profile.Skill_Level" json:"level,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Skill) Reset() {
+	*x = Skill{}
+	mi := &file_profile_profile_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Skill) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Skill) ProtoMessage() {}
+
+func (x *Skill) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_profile_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Skill.ProtoReflect.Descriptor instead.
+func (*Skill) Descriptor() ([]byte, []int) {
+	return file_profile_profile_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Skill) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Skill) GetLevel() Skill_Level {
+	if x != nil {
+		return x.Level
+	}
+	return Skill_LEVEL_UNSPECIFIED
+}
+
+// Structured CV shared by every client.
+type Resume struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FullName      string                 `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	GithubUrl     string                 `protobuf:"bytes,3,opt,name=github_url,json=githubUrl,proto3" json:"github_url,omitempty"`
+	Sections      []*ResumeSection       `protobuf:"bytes,4,rep,name=sections,proto3" json:"sections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Resume) Reset() {
+	*x = Resume{}
+	mi := &file_profile_profile_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Resume) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Resume) ProtoMessage() {}
+
+func (x *Resume) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_profile_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Resume.ProtoReflect.Descriptor instead.
+func (*Resume) Descriptor() ([]byte, []int) {
+	return file_profile_profile_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Resume) GetFullName() string {
+	if x != nil {
+		return x.FullName
+	}
+	return ""
+}
+
+func (x *Resume) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *Resume) GetGithubUrl() string {
+	if x != nil {
+		return x.GithubUrl
+	}
+	return ""
+}
+
+func (x *Resume) GetSections() []*ResumeSection {
+	if x != nil {
+		return x.Sections
+	}
+	return nil
+}
+
+type ResumeSection struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Heading       string                 `protobuf:"bytes,1,opt,name=heading,proto3" json:"heading,omitempty"` // e.g. "Education"
+	Body          string                 `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`       // preformatted text block
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResumeSection) Reset() {
+	*x = ResumeSection{}
+	mi := &file_profile_profile_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResumeSection) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResumeSection) ProtoMessage() {}
+
+func (x *ResumeSection) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_profile_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResumeSection.ProtoReflect.Descriptor instead.
+func (*ResumeSection) Descriptor() ([]byte, []int) {
+	return file_profile_profile_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ResumeSection) GetHeading() string {
+	if x != nil {
+		return x.Heading
+	}
+	return ""
+}
+
+func (x *ResumeSection) GetBody() string {
+	if x != nil {
+		return x.Body
+	}
+	return ""
+}
+
 var File_profile_profile_proto protoreflect.FileDescriptor
 
 const file_profile_profile_proto_rawDesc = "" +
@@ -186,12 +442,35 @@ const file_profile_profile_proto_rawDesc = "" +
 	"\x11GetProfileRequest\".\n" +
 	"\x04Link\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\x10\n" +
-	"\x03url\x18\x02 \x01(\tR\x03url\"u\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\"\xeb\x01\n" +
 	"\x12GetProfileResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x10\n" +
 	"\x03bio\x18\x03 \x01(\tR\x03bio\x12#\n" +
-	"\x05links\x18\x04 \x03(\v2\r.profile.LinkR\x05links2P\n" +
+	"\x05links\x18\x04 \x03(\v2\r.profile.LinkR\x05links\x12&\n" +
+	"\x06skills\x18\x05 \x03(\v2\x0e.profile.SkillR\x06skills\x12#\n" +
+	"\rcurrent_focus\x18\x06 \x01(\tR\fcurrentFocus\x12'\n" +
+	"\x06resume\x18\a \x01(\v2\x0f.profile.ResumeR\x06resume\"\x9e\x01\n" +
+	"\x05Skill\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12*\n" +
+	"\x05level\x18\x02 \x01(\x0e2\x14.profile.Skill.LevelR\x05level\"U\n" +
+	"\x05Level\x12\x15\n" +
+	"\x11LEVEL_UNSPECIFIED\x10\x00\x12\n" +
+	"\n" +
+	"\x06EXPERT\x10\x01\x12\x0e\n" +
+	"\n" +
+	"PROFICIENT\x10\x02\x12\f\n" +
+	"\bLEARNING\x10\x03\x12\v\n" +
+	"\aPASSION\x10\x04\"\x8e\x01\n" +
+	"\x06Resume\x12\x1b\n" +
+	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1d\n" +
+	"\n" +
+	"github_url\x18\x03 \x01(\tR\tgithubUrl\x122\n" +
+	"\bsections\x18\x04 \x03(\v2\x16.profile.ResumeSectionR\bsections\"=\n" +
+	"\rResumeSection\x12\x18\n" +
+	"\aheading\x18\x01 \x01(\tR\aheading\x12\x12\n" +
+	"\x04body\x18\x02 \x01(\tR\x04body2P\n" +
 	"\aProfile\x12E\n" +
 	"\n" +
 	"GetProfile\x12\x1a.profile.GetProfileRequest\x1a\x1b.profile.GetProfileResponseB\xa0\x01\n" +
@@ -209,21 +488,30 @@ func file_profile_profile_proto_rawDescGZIP() []byte {
 	return file_profile_profile_proto_rawDescData
 }
 
-var file_profile_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_profile_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_profile_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_profile_profile_proto_goTypes = []any{
-	(*GetProfileRequest)(nil),  // 0: profile.GetProfileRequest
-	(*Link)(nil),               // 1: profile.Link
-	(*GetProfileResponse)(nil), // 2: profile.GetProfileResponse
+	(Skill_Level)(0),           // 0: profile.Skill.Level
+	(*GetProfileRequest)(nil),  // 1: profile.GetProfileRequest
+	(*Link)(nil),               // 2: profile.Link
+	(*GetProfileResponse)(nil), // 3: profile.GetProfileResponse
+	(*Skill)(nil),              // 4: profile.Skill
+	(*Resume)(nil),             // 5: profile.Resume
+	(*ResumeSection)(nil),      // 6: profile.ResumeSection
 }
 var file_profile_profile_proto_depIdxs = []int32{
-	1, // 0: profile.GetProfileResponse.links:type_name -> profile.Link
-	0, // 1: profile.Profile.GetProfile:input_type -> profile.GetProfileRequest
-	2, // 2: profile.Profile.GetProfile:output_type -> profile.GetProfileResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: profile.GetProfileResponse.links:type_name -> profile.Link
+	4, // 1: profile.GetProfileResponse.skills:type_name -> profile.Skill
+	5, // 2: profile.GetProfileResponse.resume:type_name -> profile.Resume
+	0, // 3: profile.Skill.level:type_name -> profile.Skill.Level
+	6, // 4: profile.Resume.sections:type_name -> profile.ResumeSection
+	1, // 5: profile.Profile.GetProfile:input_type -> profile.GetProfileRequest
+	3, // 6: profile.Profile.GetProfile:output_type -> profile.GetProfileResponse
+	6, // [6:7] is the sub-list for method output_type
+	5, // [5:6] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_profile_profile_proto_init() }
@@ -236,13 +524,14 @@ func file_profile_profile_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profile_profile_proto_rawDesc), len(file_profile_profile_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   3,
+			NumEnums:      1,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_profile_profile_proto_goTypes,
 		DependencyIndexes: file_profile_profile_proto_depIdxs,
+		EnumInfos:         file_profile_profile_proto_enumTypes,
 		MessageInfos:      file_profile_profile_proto_msgTypes,
 	}.Build()
 	File_profile_profile_proto = out.File

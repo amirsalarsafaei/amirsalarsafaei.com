@@ -2,8 +2,8 @@
 /// Generated client implementations.
 pub mod blogs_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::http::Uri;
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct BlogsClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -42,13 +42,14 @@ pub mod blogs_client {
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
             T: tonic::codegen::Service<
-                    http::Request<tonic::body::BoxBody>,
-                    Response = http::Response<
-                        <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                    >,
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
-            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
-                Into<StdError> + Send + Sync,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
         {
             BlogsClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -86,33 +87,45 @@ pub mod blogs_client {
         pub async fn list_blogs(
             &mut self,
             request: impl tonic::IntoRequest<super::ListBlogsRequest>,
-        ) -> std::result::Result<tonic::Response<super::ListBlogsResponse>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::ListBlogsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Blogs/ListBlogs");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Blogs", "ListBlogs"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Blogs", "ListBlogs"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn list_published_blogs(
             &mut self,
             request: impl tonic::IntoRequest<super::ListPublishedBlogsRequest>,
-        ) -> std::result::Result<tonic::Response<super::ListPublishedBlogsResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::ListPublishedBlogsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/blogs.Blogs/ListPublishedBlogs");
+            let path = http::uri::PathAndQuery::from_static(
+                "/blogs.Blogs/ListPublishedBlogs",
+            );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("blogs.Blogs", "ListPublishedBlogs"));
@@ -121,72 +134,89 @@ pub mod blogs_client {
         pub async fn create_blog(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::CreateBlogResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateBlogResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Blogs/CreateBlog");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Blogs", "CreateBlog"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Blogs", "CreateBlog"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn get_blog(
             &mut self,
             request: impl tonic::IntoRequest<super::GetBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetBlogResponse>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::GetBlogResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Blogs/GetBlog");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Blogs", "GetBlog"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Blogs", "GetBlog"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn update_blog(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::UpdateBlogResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateBlogResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Blogs/UpdateBlog");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Blogs", "UpdateBlog"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Blogs", "UpdateBlog"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn publish_blog(
             &mut self,
             request: impl tonic::IntoRequest<super::PublishBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::PublishBlogResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::PublishBlogResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Blogs/PublishBlog");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Blogs", "PublishBlog"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Blogs", "PublishBlog"));
             self.inner.unary(req, path, codec).await
         }
     }
@@ -201,15 +231,24 @@ pub mod blogs_server {
         async fn list_blogs(
             &self,
             request: tonic::Request<super::ListBlogsRequest>,
-        ) -> std::result::Result<tonic::Response<super::ListBlogsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListBlogsResponse>,
+            tonic::Status,
+        >;
         async fn list_published_blogs(
             &self,
             request: tonic::Request<super::ListPublishedBlogsRequest>,
-        ) -> std::result::Result<tonic::Response<super::ListPublishedBlogsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListPublishedBlogsResponse>,
+            tonic::Status,
+        >;
         async fn create_blog(
             &self,
             request: tonic::Request<super::CreateBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::CreateBlogResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::CreateBlogResponse>,
+            tonic::Status,
+        >;
         async fn get_blog(
             &self,
             request: tonic::Request<super::GetBlogRequest>,
@@ -217,11 +256,17 @@ pub mod blogs_server {
         async fn update_blog(
             &self,
             request: tonic::Request<super::UpdateBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::UpdateBlogResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateBlogResponse>,
+            tonic::Status,
+        >;
         async fn publish_blog(
             &self,
             request: tonic::Request<super::PublishBlogRequest>,
-        ) -> std::result::Result<tonic::Response<super::PublishBlogResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::PublishBlogResponse>,
+            tonic::Status,
+        >;
     }
     #[derive(Debug)]
     pub struct BlogsServer<T: Blogs> {
@@ -244,7 +289,10 @@ pub mod blogs_server {
                 max_encoding_message_size: None,
             }
         }
-        pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
         where
             F: tonic::service::Interceptor,
         {
@@ -299,16 +347,21 @@ pub mod blogs_server {
                 "/blogs.Blogs/ListBlogs" => {
                     #[allow(non_camel_case_types)]
                     struct ListBlogsSvc<T: Blogs>(pub Arc<T>);
-                    impl<T: Blogs> tonic::server::UnaryService<super::ListBlogsRequest> for ListBlogsSvc<T> {
+                    impl<T: Blogs> tonic::server::UnaryService<super::ListBlogsRequest>
+                    for ListBlogsSvc<T> {
                         type Response = super::ListBlogsResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::ListBlogsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut =
-                                async move { <T as Blogs>::list_blogs(&inner, request).await };
+                            let fut = async move {
+                                <T as Blogs>::list_blogs(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -337,11 +390,15 @@ pub mod blogs_server {
                 "/blogs.Blogs/ListPublishedBlogs" => {
                     #[allow(non_camel_case_types)]
                     struct ListPublishedBlogsSvc<T: Blogs>(pub Arc<T>);
-                    impl<T: Blogs> tonic::server::UnaryService<super::ListPublishedBlogsRequest>
-                        for ListPublishedBlogsSvc<T>
-                    {
+                    impl<
+                        T: Blogs,
+                    > tonic::server::UnaryService<super::ListPublishedBlogsRequest>
+                    for ListPublishedBlogsSvc<T> {
                         type Response = super::ListPublishedBlogsResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::ListPublishedBlogsRequest>,
@@ -378,16 +435,21 @@ pub mod blogs_server {
                 "/blogs.Blogs/CreateBlog" => {
                     #[allow(non_camel_case_types)]
                     struct CreateBlogSvc<T: Blogs>(pub Arc<T>);
-                    impl<T: Blogs> tonic::server::UnaryService<super::CreateBlogRequest> for CreateBlogSvc<T> {
+                    impl<T: Blogs> tonic::server::UnaryService<super::CreateBlogRequest>
+                    for CreateBlogSvc<T> {
                         type Response = super::CreateBlogResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::CreateBlogRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut =
-                                async move { <T as Blogs>::create_blog(&inner, request).await };
+                            let fut = async move {
+                                <T as Blogs>::create_blog(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -416,15 +478,21 @@ pub mod blogs_server {
                 "/blogs.Blogs/GetBlog" => {
                     #[allow(non_camel_case_types)]
                     struct GetBlogSvc<T: Blogs>(pub Arc<T>);
-                    impl<T: Blogs> tonic::server::UnaryService<super::GetBlogRequest> for GetBlogSvc<T> {
+                    impl<T: Blogs> tonic::server::UnaryService<super::GetBlogRequest>
+                    for GetBlogSvc<T> {
                         type Response = super::GetBlogResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::GetBlogRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { <T as Blogs>::get_blog(&inner, request).await };
+                            let fut = async move {
+                                <T as Blogs>::get_blog(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -453,16 +521,21 @@ pub mod blogs_server {
                 "/blogs.Blogs/UpdateBlog" => {
                     #[allow(non_camel_case_types)]
                     struct UpdateBlogSvc<T: Blogs>(pub Arc<T>);
-                    impl<T: Blogs> tonic::server::UnaryService<super::UpdateBlogRequest> for UpdateBlogSvc<T> {
+                    impl<T: Blogs> tonic::server::UnaryService<super::UpdateBlogRequest>
+                    for UpdateBlogSvc<T> {
                         type Response = super::UpdateBlogResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::UpdateBlogRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut =
-                                async move { <T as Blogs>::update_blog(&inner, request).await };
+                            let fut = async move {
+                                <T as Blogs>::update_blog(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -491,16 +564,21 @@ pub mod blogs_server {
                 "/blogs.Blogs/PublishBlog" => {
                     #[allow(non_camel_case_types)]
                     struct PublishBlogSvc<T: Blogs>(pub Arc<T>);
-                    impl<T: Blogs> tonic::server::UnaryService<super::PublishBlogRequest> for PublishBlogSvc<T> {
+                    impl<T: Blogs> tonic::server::UnaryService<super::PublishBlogRequest>
+                    for PublishBlogSvc<T> {
                         type Response = super::PublishBlogResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::PublishBlogRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut =
-                                async move { <T as Blogs>::publish_blog(&inner, request).await };
+                            let fut = async move {
+                                <T as Blogs>::publish_blog(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -526,17 +604,21 @@ pub mod blogs_server {
                     };
                     Box::pin(fut)
                 }
-                _ => Box::pin(async move {
-                    Ok(http::Response::builder()
-                        .status(200)
-                        .header("grpc-status", tonic::Code::Unimplemented as i32)
-                        .header(
-                            http::header::CONTENT_TYPE,
-                            tonic::metadata::GRPC_CONTENT_TYPE,
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", tonic::Code::Unimplemented as i32)
+                                .header(
+                                    http::header::CONTENT_TYPE,
+                                    tonic::metadata::GRPC_CONTENT_TYPE,
+                                )
+                                .body(empty_body())
+                                .unwrap(),
                         )
-                        .body(empty_body())
-                        .unwrap())
-                }),
+                    })
+                }
             }
         }
     }
@@ -559,8 +641,8 @@ pub mod blogs_server {
 /// Generated client implementations.
 pub mod tags_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::http::Uri;
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
     pub struct TagsClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -591,18 +673,22 @@ pub mod tags_client {
             let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
-        pub fn with_interceptor<F>(inner: T, interceptor: F) -> TagsClient<InterceptedService<T, F>>
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> TagsClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
             T: tonic::codegen::Service<
-                    http::Request<tonic::body::BoxBody>,
-                    Response = http::Response<
-                        <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                    >,
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
-            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
-                Into<StdError> + Send + Sync,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
         {
             TagsClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -640,70 +726,83 @@ pub mod tags_client {
         pub async fn set_blog_tags(
             &mut self,
             request: impl tonic::IntoRequest<super::SetBlogTagsRequest>,
-        ) -> std::result::Result<tonic::Response<super::SetBlogTagsResponse>, tonic::Status>
-        {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::SetBlogTagsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Tags/SetBlogTags");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Tags", "SetBlogTags"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Tags", "SetBlogTags"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn create_tag(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateTagRequest>,
         ) -> std::result::Result<tonic::Response<super::Tag>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Tags/CreateTag");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Tags", "CreateTag"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Tags", "CreateTag"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn list_tags(
             &mut self,
             request: impl tonic::IntoRequest<super::ListTagsRequest>,
-        ) -> std::result::Result<tonic::Response<super::ListTagsResponse>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+        ) -> std::result::Result<
+            tonic::Response<super::ListTagsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Tags/ListTags");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Tags", "ListTags"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Tags", "ListTags"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn delete_tag(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteTagRequest>,
         ) -> std::result::Result<tonic::Response<()>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/blogs.Tags/DeleteTag");
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("blogs.Tags", "DeleteTag"));
+            req.extensions_mut().insert(GrpcMethod::new("blogs.Tags", "DeleteTag"));
             self.inner.unary(req, path, codec).await
         }
     }
@@ -718,7 +817,10 @@ pub mod tags_server {
         async fn set_blog_tags(
             &self,
             request: tonic::Request<super::SetBlogTagsRequest>,
-        ) -> std::result::Result<tonic::Response<super::SetBlogTagsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::SetBlogTagsResponse>,
+            tonic::Status,
+        >;
         async fn create_tag(
             &self,
             request: tonic::Request<super::CreateTagRequest>,
@@ -726,7 +828,10 @@ pub mod tags_server {
         async fn list_tags(
             &self,
             request: tonic::Request<super::ListTagsRequest>,
-        ) -> std::result::Result<tonic::Response<super::ListTagsResponse>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<super::ListTagsResponse>,
+            tonic::Status,
+        >;
         async fn delete_tag(
             &self,
             request: tonic::Request<super::DeleteTagRequest>,
@@ -753,7 +858,10 @@ pub mod tags_server {
                 max_encoding_message_size: None,
             }
         }
-        pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
         where
             F: tonic::service::Interceptor,
         {
@@ -808,16 +916,21 @@ pub mod tags_server {
                 "/blogs.Tags/SetBlogTags" => {
                     #[allow(non_camel_case_types)]
                     struct SetBlogTagsSvc<T: Tags>(pub Arc<T>);
-                    impl<T: Tags> tonic::server::UnaryService<super::SetBlogTagsRequest> for SetBlogTagsSvc<T> {
+                    impl<T: Tags> tonic::server::UnaryService<super::SetBlogTagsRequest>
+                    for SetBlogTagsSvc<T> {
                         type Response = super::SetBlogTagsResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::SetBlogTagsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut =
-                                async move { <T as Tags>::set_blog_tags(&inner, request).await };
+                            let fut = async move {
+                                <T as Tags>::set_blog_tags(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -846,15 +959,21 @@ pub mod tags_server {
                 "/blogs.Tags/CreateTag" => {
                     #[allow(non_camel_case_types)]
                     struct CreateTagSvc<T: Tags>(pub Arc<T>);
-                    impl<T: Tags> tonic::server::UnaryService<super::CreateTagRequest> for CreateTagSvc<T> {
+                    impl<T: Tags> tonic::server::UnaryService<super::CreateTagRequest>
+                    for CreateTagSvc<T> {
                         type Response = super::Tag;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::CreateTagRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { <T as Tags>::create_tag(&inner, request).await };
+                            let fut = async move {
+                                <T as Tags>::create_tag(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -883,15 +1002,21 @@ pub mod tags_server {
                 "/blogs.Tags/ListTags" => {
                     #[allow(non_camel_case_types)]
                     struct ListTagsSvc<T: Tags>(pub Arc<T>);
-                    impl<T: Tags> tonic::server::UnaryService<super::ListTagsRequest> for ListTagsSvc<T> {
+                    impl<T: Tags> tonic::server::UnaryService<super::ListTagsRequest>
+                    for ListTagsSvc<T> {
                         type Response = super::ListTagsResponse;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::ListTagsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { <T as Tags>::list_tags(&inner, request).await };
+                            let fut = async move {
+                                <T as Tags>::list_tags(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -920,15 +1045,21 @@ pub mod tags_server {
                 "/blogs.Tags/DeleteTag" => {
                     #[allow(non_camel_case_types)]
                     struct DeleteTagSvc<T: Tags>(pub Arc<T>);
-                    impl<T: Tags> tonic::server::UnaryService<super::DeleteTagRequest> for DeleteTagSvc<T> {
+                    impl<T: Tags> tonic::server::UnaryService<super::DeleteTagRequest>
+                    for DeleteTagSvc<T> {
                         type Response = ();
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::DeleteTagRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { <T as Tags>::delete_tag(&inner, request).await };
+                            let fut = async move {
+                                <T as Tags>::delete_tag(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -954,17 +1085,21 @@ pub mod tags_server {
                     };
                     Box::pin(fut)
                 }
-                _ => Box::pin(async move {
-                    Ok(http::Response::builder()
-                        .status(200)
-                        .header("grpc-status", tonic::Code::Unimplemented as i32)
-                        .header(
-                            http::header::CONTENT_TYPE,
-                            tonic::metadata::GRPC_CONTENT_TYPE,
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", tonic::Code::Unimplemented as i32)
+                                .header(
+                                    http::header::CONTENT_TYPE,
+                                    tonic::metadata::GRPC_CONTENT_TYPE,
+                                )
+                                .body(empty_body())
+                                .unwrap(),
                         )
-                        .body(empty_body())
-                        .unwrap())
-                }),
+                    })
+                }
             }
         }
     }

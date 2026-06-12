@@ -30,7 +30,7 @@ buildGoModule {
 
   modRoot = "tuissh";
 
-  vendorHash = "sha256-7OlvdycBY9hwiA/dEm9lTUd8FEPwbI6Yk323nNQGP30=";
+  vendorHash = "sha256-JfMVwIRGBK3NR0Ded1U0Z+1H+fLwqscFLE924wOJNUo=";
 
   ldflags = [
     "-s"

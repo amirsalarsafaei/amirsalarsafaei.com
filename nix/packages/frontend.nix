@@ -72,7 +72,7 @@ stdenv.mkDerivation {
 
   yarnOfflineCache = fetchYarnDeps {
     yarnLock = "${src}/frontend/yarn.lock";
-    hash = "sha256-XVMKv0s2CwKFfRaxiEYUAor6DLvtonNcGWVukpeStkc=";
+    hash = "sha256-1fOFxEmlumUiOImhcMXh5hs4r5tQiT94zlJ0beM7FiY=";
   };
 
   preBuild = ''

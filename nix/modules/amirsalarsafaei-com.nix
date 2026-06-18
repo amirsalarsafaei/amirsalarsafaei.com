@@ -11,9 +11,43 @@ let
   cfg = config.services.amirsalarsafaei-com;
   inherit (lib) types;
 
-  websitePackages = inputs.amirsalarsafaei-com.packages.${pkgs.system};
-  frontendPackage =
-    if cfg.frontend.env == "local" then websitePackages.frontendLocal else websitePackages.frontend;
+  websitePackages = inputs.self.packages.${pkgs.system};
+
+  # Upstream builds the frontend with nodejs_20, which is now EOL/insecure in
+  # nixpkgs. Override to nodejs_22 (LTS) for both the pure dependency tree and
+  # the on-server `next build`, so they share one ABI.
+  nodejs = pkgs.nodejs_22;
+
+  # The frontend is built ON THIS HOST against the live, already-deployed
+  # backend, so its SSG/ISR pages fetch real content (the backend can't run in
+  # the pure Nix sandbox, and a single nixos-rebuild builds everything before
+  # activating any service). frontendBuildTree carries the sources + pure
+  # node_modules; the amirsalarsafaei-com-frontend-build unit runs `next build`
+  # from a copy once the backend is healthy.
+  frontendBuildTree = websitePackages.frontendBuildTree.override {
+    nodejs_20 = nodejs;
+  };
+
+  frontendRoot = "/var/lib/amirsalarsafaei-com/frontend";
+  internalGrpcUrl = "http://${cfg.backend.host}:${toString cfg.backend.port}";
+
+  # Anything that should invalidate the built frontend: new sources/deps, a new
+  # backend (its data shapes the build), or changed public/internal URLs. Used
+  # as restartTriggers on both the build and server units so a new generation
+  # re-runs the build and then restarts the server.
+  frontendBuildInputs = [
+    frontendBuildTree
+    websitePackages.backend
+    cfg.frontend.grpcWebUrl
+    cfg.frontend.imageServerUrl
+    internalGrpcUrl
+  ];
+
+  # Cheap identity for "the frontend currently built for this config", so the
+  # build unit can skip rebuilding on an unrelated reboot/restart.
+  frontendReleaseKey = builtins.substring 0 12 (
+    builtins.hashString "sha256" (lib.concatMapStringsSep "\n" toString frontendBuildInputs)
+  );
 
   originList = lib.concatMapStringsSep ", " (origin: ''"${origin}"'') cfg.backend.allowedOrigins;
 
@@ -62,9 +96,6 @@ let
     SPOTIFY_REFRESH_TOKEN = cfg.spotify.refreshToken;
   };
 
-  sshEnvironment = {
-
-  };
   backendLauncher = pkgs.writeShellScript "amirsalarsafaei-com-backend" ''
     set -eu
 
@@ -105,14 +136,6 @@ in
       type = types.str;
       default = "amirsalarsafaei.com";
       description = "Public domain name for the website.";
-    };
-
-    packageSet = lib.mkOption {
-      type = types.attrs;
-      default = websitePackages;
-      defaultText = "inputs.amirsalarsafaei-com.packages.\${pkgs.system}";
-      readOnly = true;
-      description = "Package set exported by the amirsalarsafaei-com flake.";
     };
 
     authToken = lib.mkOption {
@@ -309,6 +332,51 @@ in
         description = "Public image server URL exposed to the frontend runtime.";
       };
     };
+
+    ssh = {
+      enable = lib.mkEnableOption "the SSH front-end (Wish + Bubble Tea TUI) for amirsalarsafaei.com";
+
+      host = lib.mkOption {
+        type = types.str;
+        default = "0.0.0.0";
+        description = "Bind address for the SSH front-end.";
+      };
+
+      port = lib.mkOption {
+        type = types.port;
+        default = 23234;
+        description = "Port the SSH front-end listens on.";
+      };
+
+      webAddr = lib.mkOption {
+        type = types.str;
+        default = ":2223";
+        description = ''
+          Bind address for the browser bridge (xterm.js WebSocket served by
+          tuissh). Empty disables it. Fronted over TLS by nginx at
+          ssh.amirsalarsafaei.com.
+        '';
+      };
+
+      hostKeyPath = lib.mkOption {
+        type = types.str;
+        default = "/var/lib/amirsalarsafaei-com/ssh/id_ed25519";
+        description = "Path to the SSH host key. Generated automatically if missing.";
+      };
+
+      grpcAddr = lib.mkOption {
+        type = types.str;
+        default = "${cfg.backend.host}:${toString cfg.backend.port}";
+        defaultText = "\${backend.host}:\${backend.port}";
+        description = "Backend gRPC address the SSH front-end consumes.";
+      };
+
+      grpcTLS = lib.mkOption {
+        type = types.bool;
+        default = false;
+        description = "Whether the backend gRPC endpoint uses TLS.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -348,7 +416,10 @@ in
 
     systemd.tmpfiles.rules = [
       "d ${cfg.backend.uploadDir} 0750 ${cfg.user} ${cfg.group} -"
-    ];
+      "d ${frontendRoot} 0750 ${cfg.user} ${cfg.group} -"
+      "d ${frontendRoot}/releases 0750 ${cfg.user} ${cfg.group} -"
+    ]
+    ++ lib.optional cfg.ssh.enable "d ${builtins.dirOf cfg.ssh.hostKeyPath} 0750 ${cfg.user} ${cfg.group} -";
 
     systemd.services.amirsalarsafaei-com-backend = {
       description = "amirsalarsafaei.com backend";
@@ -401,8 +472,159 @@ in
       };
     };
 
+    # Build the frontend on this host against the live backend, then atomically
+    # publish it at ${frontendRoot}/current. Runs after the backend is healthy
+    # (its ExecStartPost readiness gate) so SSG/ISR pages fetch real content.
+    systemd.services.amirsalarsafaei-com-frontend-build = {
+      description = "amirsalarsafaei.com frontend build (against live backend)";
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "network-online.target"
+        "amirsalarsafaei-com-backend.service"
+      ];
+      wants = [ "network-online.target" ];
+      requires = [ "amirsalarsafaei-com-backend.service" ];
+
+      # A new generation (new sources/deps/backend/URLs) re-runs the build.
+      restartTriggers = frontendBuildInputs;
+
+      path = [
+        nodejs
+        pkgs.coreutils
+        pkgs.findutils
+      ];
+
+      environment = {
+        NODE_ENV = "production";
+        NODE_OPTIONS = "--max_old_space_size=4096";
+        # Browser bundle gets the public URLs...
+        NEXT_PUBLIC_GRPC_WEB_URL = cfg.frontend.grpcWebUrl;
+        NEXT_PUBLIC_IMAGE_SERVER_WEB_URL = cfg.frontend.imageServerUrl;
+        # ...while build-time SSG/ISR fetches hit the backend directly.
+        GRPC_WEB_INTERNAL_URL = internalGrpcUrl;
+      };
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        TimeoutStartSec = "20min";
+        User = cfg.user;
+        Group = cfg.group;
+        StateDirectory = "amirsalarsafaei-com";
+        WorkingDirectory = "/var/lib/amirsalarsafaei-com";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectHome = true;
+        ProtectSystem = "strict";
+        ReadWritePaths = [ "/var/lib/amirsalarsafaei-com" ];
+      };
+
+      script = ''
+        set -euo pipefail
+
+        root="${frontendRoot}"
+        key="${frontendReleaseKey}"
+
+        # Skip if the published release already matches this config.
+        if [ -e "$root/current/.next/standalone/server.js" ] \
+          && [ "$(cat "$root/.last-key" 2>/dev/null || true)" = "$key" ]; then
+          echo "frontend already built for key $key; skipping"
+          exit 0
+        fi
+
+        work="$(mktemp -d "$root/build.XXXXXX")"
+        trap 'rm -rf "$work"' EXIT
+
+        cp -a ${frontendBuildTree}/. "$work/src"
+        chmod -R u+w "$work/src"
+
+        export HOME="$work/home"
+        mkdir -p "$HOME"
+
+        cd "$work/src/frontend"
+        # Real backend is up: do NOT skip backend calls during the build.
+        unset NEXT_BUILD_SKIP_BACKEND || true
+        node node_modules/next/dist/bin/next build
+
+        release="$root/releases/$(date -u +%Y%m%d%H%M%S)-$key"
+        mkdir -p "$release"
+        cp -a .next package.json "$release"/
+        [ -d public ] && cp -a public "$release"/ || true
+
+        # Standalone server needs static assets + public/ alongside it.
+        if [ -d "$release/.next/standalone" ] && [ -d "$release/.next/static" ]; then
+          mkdir -p "$release/.next/standalone/.next/static"
+          cp -a "$release/.next/static/." "$release/.next/standalone/.next/static/"
+        fi
+        if [ -d public ] && [ -d "$release/.next/standalone" ]; then
+          mkdir -p "$release/.next/standalone/public"
+          cp -a public/. "$release/.next/standalone/public/"
+        fi
+
+        # Publish atomically, then record the key.
+        ln -sfn "$release" "$root/current.tmp"
+        mv -Tf "$root/current.tmp" "$root/current"
+        echo "$key" > "$root/.last-key"
+
+        # Prune old releases, keeping the live one plus the two most recent.
+        cur="$(readlink -f "$root/current")"
+        n=0
+        for d in $(ls -1dt "$root"/releases/*/ 2>/dev/null || true); do
+          d="''${d%/}"
+          [ "$d" = "$cur" ] && continue
+          n=$((n + 1))
+          [ "$n" -gt 2 ] && rm -rf "$d"
+        done
+      '';
+    };
+
     systemd.services.amirsalarsafaei-com-frontend = {
       description = "amirsalarsafaei.com frontend";
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "network-online.target"
+        "amirsalarsafaei-com-backend.service"
+        "amirsalarsafaei-com-frontend-build.service"
+      ];
+      wants = [ "network-online.target" ];
+      # Bound to the build: a re-running build stops the server first, so it
+      # never serves a stale release while the new one is being built. Ordered
+      # after the build (above) so it only (re)starts once the build succeeds.
+      bindsTo = [ "amirsalarsafaei-com-frontend-build.service" ];
+      # Restart on a new generation so the freshly published release is served.
+      restartTriggers = frontendBuildInputs;
+
+      environment = {
+        PORT = toString cfg.frontend.port;
+        HOSTNAME = cfg.frontend.host;
+        NODE_ENV = "production";
+        NEXT_PUBLIC_GRPC_WEB_URL = cfg.frontend.grpcWebUrl;
+        NEXT_PUBLIC_IMAGE_SERVER_WEB_URL = cfg.frontend.imageServerUrl;
+        # Runtime ISR revalidation fetches hit the backend directly.
+        GRPC_WEB_INTERNAL_URL = internalGrpcUrl;
+      };
+
+      serviceConfig = {
+        Type = "simple";
+        WorkingDirectory = "${frontendRoot}/current";
+        ExecStartPre = "${pkgs.coreutils}/bin/test -f ${frontendRoot}/current/.next/standalone/server.js";
+        ExecStart = "${nodejs}/bin/node .next/standalone/server.js";
+        Restart = "on-failure";
+        RestartSec = "5s";
+        User = cfg.user;
+        Group = cfg.group;
+        StateDirectory = "amirsalarsafaei-com";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectHome = true;
+        ProtectSystem = "strict";
+        # ISR writes its cache under the release dir at runtime.
+        ReadWritePaths = [ "/var/lib/amirsalarsafaei-com" ];
+      };
+    };
+
+    systemd.services.amirsalarsafaei-com-ssh = lib.mkIf cfg.ssh.enable {
+      description = "amirsalarsafaei.com SSH front-end";
       wantedBy = [ "multi-user.target" ];
       after = [
         "network-online.target"
@@ -411,25 +633,31 @@ in
       wants = [ "network-online.target" ];
 
       environment = {
-        PORT = toString cfg.frontend.port;
-        HOSTNAME = cfg.frontend.host;
-        NODE_ENV = "production";
-        NEXT_PUBLIC_GRPC_WEB_URL = cfg.frontend.grpcWebUrl;
-        NEXT_PUBLIC_IMAGE_SERVER_WEB_URL = cfg.frontend.imageServerUrl;
+        SSH_HOST = cfg.ssh.host;
+        SSH_PORT = toString cfg.ssh.port;
+        SSH_HOST_KEY_PATH = cfg.ssh.hostKeyPath;
+        GRPC_ADDR = cfg.ssh.grpcAddr;
+        GRPC_TLS = lib.boolToString cfg.ssh.grpcTLS;
+        WEB_ADDR = cfg.ssh.webAddr;
       };
 
       serviceConfig = {
         Type = "simple";
-        WorkingDirectory = frontendPackage;
-        ExecStart = "${pkgs.nodejs_20}/bin/node .next/standalone/server.js";
+        ExecStart = "${websitePackages.tuissh}/bin/tuissh";
         Restart = "on-failure";
         RestartSec = "5s";
         User = cfg.user;
         Group = cfg.group;
+        StateDirectory = "amirsalarsafaei-com";
+        WorkingDirectory = "/var/lib/amirsalarsafaei-com";
+        # Allow binding to privileged ports (e.g. 22) as a non-root user.
+        AmbientCapabilities = lib.mkIf (cfg.ssh.port < 1024) [ "CAP_NET_BIND_SERVICE" ];
+        CapabilityBoundingSet = lib.mkIf (cfg.ssh.port < 1024) [ "CAP_NET_BIND_SERVICE" ];
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectHome = true;
         ProtectSystem = "strict";
+        ReadWritePaths = [ "/var/lib/amirsalarsafaei-com" ];
       };
     };
   };

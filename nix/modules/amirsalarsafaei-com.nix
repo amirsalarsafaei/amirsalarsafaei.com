@@ -482,7 +482,7 @@ in
       serviceConfig = {
         Type = "simple";
         WorkingDirectory = frontendPackage;
-        ExecStart = "${pkgs.nodejs_20}/bin/node .next/standalone/server.js";
+        ExecStart = "${pkgs.nodejs_24}/bin/node .next/standalone/server.js";
         Restart = "on-failure";
         RestartSec = "5s";
         User = cfg.user;

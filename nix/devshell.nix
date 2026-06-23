@@ -8,7 +8,7 @@ pkgs.mkShell {
 
   packages = [
     rustToolchain
-    pkgs.nodejs_20
+    pkgs.nodejs_24
     pkgs.yarn
     pkgs.protobuf
     pkgs.buf

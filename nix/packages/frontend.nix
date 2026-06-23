@@ -3,7 +3,7 @@
   stdenv,
   fetchYarnDeps,
   yarnConfigHook,
-  nodejs_20,
+  nodejs_24,
   pkg-config,
   python3,
   vips,
@@ -52,7 +52,7 @@ stdenv.mkDerivation {
   sourceRoot = "${src.name}/frontend";
 
   nativeBuildInputs = [
-    nodejs_20
+    nodejs_24
     yarnConfigHook
     pkg-config
     python3

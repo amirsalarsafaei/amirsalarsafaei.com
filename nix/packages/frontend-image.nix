@@ -1,7 +1,7 @@
 {
   dockerTools,
   lib,
-  nodejs_20,
+  nodejs_24,
   cacert,
   tzdata,
   bash,
@@ -10,7 +10,7 @@
 }:
 
 let
-  nodejs = nodejs_20;
+  nodejs = nodejs_24;
 in
 dockerTools.buildLayeredImage {
   name = "amirsalarsafaeicom-frontend";

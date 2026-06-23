@@ -34,7 +34,7 @@
       flake = {
         nixosModule = inputs.self.nixosModules.default;
         nixosModules = {
-          amirsalarsafaei-com = import ./nix/modules/amirsalarsafaei-com.nix { inherit inputs; };
+          amirsalarsafaei-com = import ./nix/modules/amirsalarsafaei-com.nix { inherit self; };
           default = inputs.self.nixosModules.amirsalarsafaei-com;
         };
       };

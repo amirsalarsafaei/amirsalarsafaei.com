@@ -1,4 +1,4 @@
-{ inputs }:
+{ self }:
 
 {
   config,
@@ -11,7 +11,7 @@ let
   cfg = config.services.amirsalarsafaei-com;
   inherit (lib) types;
 
-  websitePackages = inputs.amirsalarsafaei-com.packages.${pkgs.system};
+  websitePackages = self.packages.${pkgs.system};
   frontendPackage =
     if cfg.frontend.env == "local" then websitePackages.frontendLocal else websitePackages.frontend;
 

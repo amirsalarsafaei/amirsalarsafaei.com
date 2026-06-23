@@ -21,7 +21,6 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/rpc"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/termcaps"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/ui"
 	"github.com/charmbracelet/colorprofile"
 	"github.com/coder/websocket"
@@ -69,11 +68,19 @@ func wsHandler(client *rpc.Client) http.HandlerFunc {
 		defer pw.Close()
 		out := &wsWriter{ctx: ctx, conn: conn}
 
-		m := ui.New(ctx, client, cols, rows, termcaps.Caps{Term: "xterm-256color"})
+		m := ui.New(ctx, client, cols, rows)
 		prog := tea.NewProgram(m,
 			tea.WithContext(ctx),
 			tea.WithInput(pr),
 			tea.WithOutput(out),
+			// Without an explicit environment Bubble Tea falls back to the
+			// server process's os.Environ(), where TERM is unset. The renderer
+			// derives its capabilities from TERM, so an empty value leaves it
+			// with *no* capabilities — it loses absolute cursor positioning
+			// (CHA/HPA) and erase-char (ECH), and full-screen redraws shift and
+			// fail to clear. xterm.js is an xterm, so advertise that. (The SSH
+			// path works precisely because Wish sets TERM from the pty-req.)
+			tea.WithEnvironment([]string{"TERM=xterm-256color", "COLORTERM=truecolor"}),
 			// Browsers (xterm.js) are truecolor; force it so colours aren't
 			// stripped for a non-tty writer. This also makes Bubble Tea emit a
 			// ColorProfileMsg, lighting up the shader and half-block album art.

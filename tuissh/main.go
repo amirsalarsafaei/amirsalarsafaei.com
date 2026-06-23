@@ -25,7 +25,6 @@ import (
 	bm "charm.land/wish/v2/bubbletea"
 	"charm.land/wish/v2/logging"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/rpc"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/termcaps"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/ui"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/web"
 	"github.com/charmbracelet/log"
@@ -97,8 +96,7 @@ func teaHandler(client *rpc.Client) bm.Handler {
 			return nil, nil
 		}
 
-		caps := termcaps.Detect(pty.Term, s.Environ())
-		m := ui.New(s.Context(), client, pty.Window.Width, pty.Window.Height, caps)
+		m := ui.New(s.Context(), client, pty.Window.Width, pty.Window.Height)
 		return m, nil
 	}
 }

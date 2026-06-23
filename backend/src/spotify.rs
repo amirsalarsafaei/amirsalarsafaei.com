@@ -77,6 +77,27 @@ impl SpotifyServicer {
             spotify_client,
             latest: Arc::new(tx),
         };
+
+        // Dev/test affordance: without Spotify creds the real API only returns
+        // 400s, so album art can't be exercised. Setting
+        // SPOTIFY_FAKE_NOW_PLAYING=<cover-image-url> seeds a canned now-playing
+        // track pointing at that image, letting the TUI's album-art rendering be
+        // tested end to end. Unset in production — the real poller runs instead.
+        if let Some(url) = std::env::var("SPOTIFY_FAKE_NOW_PLAYING")
+            .ok()
+            .map(|u| u.trim().to_string())
+            .filter(|u| !u.is_empty())
+        {
+            let _ = servicer.latest.send(Some(TrackInfo {
+                artist_name: "Daft Punk".to_string(),
+                track_name: "Digital Love".to_string(),
+                album_art_url: url,
+                is_explicit: false,
+                is_playing: true,
+            }));
+            return servicer;
+        }
+
         servicer.start_token_refresh();
         servicer.start_poller();
         servicer

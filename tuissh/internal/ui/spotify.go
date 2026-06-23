@@ -115,7 +115,7 @@ func (m *Model) renderAlbumArt() {
 	maxCols := max(min(albumArtMaxCols, m.contentWidth()/3), 6)
 	b := m.albumArt.img.Bounds()
 	cols, rows := termimg.FitBox(b.Dx(), b.Dy(), maxCols, albumArtMaxRows)
-	if s, ok := termimg.Render(m.albumArt.img, cols, rows, m.caps.Pixel, m.trueColor); ok {
+	if s, ok := termimg.Render(m.albumArt.img, cols, rows, m.trueColor); ok {
 		m.albumArt.rendered = s
 	} else {
 		m.albumArt.rendered = ""

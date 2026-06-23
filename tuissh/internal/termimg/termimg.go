@@ -1,23 +1,28 @@
 // Package termimg fetches a remote image and renders it inside a terminal.
 //
-// Three rendering strategies are supported, picked by the caller from the
-// client's detected capabilities:
+// Rendering uses Unicode half-blocks ("▀"): each character cell encodes two
+// vertically-stacked pixels via its foreground (top pixel) and background
+// (bottom pixel) colours, doubling vertical resolution.
 //
-//   - Kitty graphics protocol  — crisp pixels (kitty, ghostty, konsole)
-//   - iTerm2 inline images      — crisp pixels (iTerm2, WezTerm)
-//   - Unicode half-blocks       — the universal fallback; every truecolor
-//     terminal can show it, since it's "just" coloured text. Each character
-//     cell ("▀") encodes two stacked pixels via its fg/bg colours.
+// Half-blocks are the only viable strategy here. The UI is a Bubble Tea v2
+// program, whose renderer (ultraviolet) composes the screen into a grid of
+// grapheme cells and DISCARDS embedded pixel-graphics escape sequences — the
+// Kitty graphics protocol and the iTerm2 inline-image protocol both get parsed
+// as zero-width "unknown" sequences during cell composition and dropped, so
+// they never reach the terminal. Half-blocks are "just" coloured text, so they
+// survive composition and render identically on any truecolor terminal,
+// through tmux/screen, and over the xterm.js web bridge.
+//
+// (Crisp pixel output would require the Kitty Unicode-placeholder scheme, whose
+// placeholder glyphs are real cells; that's a larger change and isn't done
+// here.)
 package termimg
 
 import (
-	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"image"
 	"image/color"
-	"image/png"
 	"io"
 	"net/http"
 	"strings"
@@ -28,7 +33,6 @@ import (
 	_ "image/png"
 
 	"charm.land/lipgloss/v2"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/termcaps"
 )
 
 // maxDownload caps how much of a remote image we'll read, so a hostile or
@@ -82,21 +86,15 @@ func FitBox(imgW, imgH, maxCols, maxRows int) (cols, rows int) {
 	return cols, rows
 }
 
-// Render turns an image into terminal output sized to cols × rows cells using
-// the best strategy for the given pixel protocol. trueColor reports whether the
-// half-block fallback is worth attempting (it needs at least decent colour).
-func Render(img image.Image, cols, rows int, pixel termcaps.Pixel, trueColor bool) (string, bool) {
-	switch pixel {
-	case termcaps.PixelKitty:
-		return renderKitty(img, cols, rows), true
-	case termcaps.PixelITerm:
-		return renderITerm(img, cols, rows), true
-	default:
-		if trueColor {
-			return renderHalfBlocks(img, cols, rows), true
-		}
+// Render draws the image as cols × rows cells of Unicode half-blocks. trueColor
+// reports whether the terminal has the colour depth to make it legible (decided
+// by the caller from the runtime colour profile); without it, ok is false and
+// the caller should skip the image.
+func Render(img image.Image, cols, rows int, trueColor bool) (string, bool) {
+	if !trueColor {
 		return "", false
 	}
+	return renderHalfBlocks(img, cols, rows), true
 }
 
 // renderHalfBlocks draws the image as cols × rows cells of "▀" where the upper
@@ -121,92 +119,55 @@ func renderHalfBlocks(img image.Image, cols, rows int) string {
 	return b.String()
 }
 
-// resize does a nearest-neighbour rescale to w × h, returning rows of RGBA so
-// the rest of the package never touches the source image's coordinate space.
+// resize rescales img to w × h, returning rows of RGBA so the rest of the
+// package never touches the source image's coordinate space. It area-averages
+// the source pixels covering each destination cell, which keeps a heavily
+// downscaled cover (e.g. 300×300 → 18×18) far cleaner than nearest-neighbour.
 func resize(img image.Image, w, h int) [][]color.RGBA {
 	bounds := img.Bounds()
 	sw, sh := bounds.Dx(), bounds.Dy()
 	out := make([][]color.RGBA, h)
+	if sw <= 0 || sh <= 0 || w <= 0 || h <= 0 {
+		for y := range out {
+			out[y] = make([]color.RGBA, max(w, 0))
+		}
+		return out
+	}
 	for y := range h {
 		row := make([]color.RGBA, w)
-		sy := bounds.Min.Y + y*sh/h
+		sy0 := bounds.Min.Y + y*sh/h
+		sy1 := bounds.Min.Y + (y+1)*sh/h
+		if sy1 <= sy0 {
+			sy1 = sy0 + 1
+		}
 		for x := range w {
-			sx := bounds.Min.X + x*sw/w
-			r, g, bl, a := img.At(sx, sy).RGBA()
-			row[x] = color.RGBA{uint8(r >> 8), uint8(g >> 8), uint8(bl >> 8), uint8(a >> 8)}
+			sx0 := bounds.Min.X + x*sw/w
+			sx1 := bounds.Min.X + (x+1)*sw/w
+			if sx1 <= sx0 {
+				sx1 = sx0 + 1
+			}
+			var rs, gs, bs, as, n uint64
+			for sy := sy0; sy < sy1; sy++ {
+				for sx := sx0; sx < sx1; sx++ {
+					r, g, bl, a := img.At(sx, sy).RGBA() // 16-bit channels
+					rs += uint64(r)
+					gs += uint64(g)
+					bs += uint64(bl)
+					as += uint64(a)
+					n++
+				}
+			}
+			if n == 0 {
+				n = 1
+			}
+			row[x] = color.RGBA{
+				uint8((rs / n) >> 8),
+				uint8((gs / n) >> 8),
+				uint8((bs / n) >> 8),
+				uint8((as / n) >> 8),
+			}
 		}
 		out[y] = row
 	}
 	return out
-}
-
-// renderKitty emits the Kitty graphics protocol escape that displays a PNG
-// scaled into cols × rows cells. C=1 keeps the cursor put so the caller can
-// reserve the box with blank cells and keep its layout intact.
-func renderKitty(img image.Image, cols, rows int) string {
-	data, err := pngBytes(img)
-	if err != nil {
-		return reserveBox(cols, rows)
-	}
-	enc := base64.StdEncoding.EncodeToString(data)
-
-	const chunk = 4096
-	var b strings.Builder
-	first := true
-	for len(enc) > 0 {
-		n := min(chunk, len(enc))
-		piece := enc[:n]
-		enc = enc[n:]
-		more := 0
-		if len(enc) > 0 {
-			more = 1
-		}
-		b.WriteString("\x1b_G")
-		if first {
-			// a=T transmit+display, f=100 PNG, c/r target cell size, C=1 no cursor move.
-			fmt.Fprintf(&b, "a=T,f=100,c=%d,r=%d,C=1,m=%d", cols, rows, more)
-			first = false
-		} else {
-			fmt.Fprintf(&b, "m=%d", more)
-		}
-		b.WriteByte(';')
-		b.WriteString(piece)
-		b.WriteString("\x1b\\")
-	}
-	// Reserve the cells so surrounding layout flows correctly; the image is
-	// drawn over these transparent (default-bg) cells.
-	b.WriteString(reserveBox(cols, rows))
-	return b.String()
-}
-
-// renderITerm emits the iTerm2 inline-image escape sized to cols × rows cells.
-func renderITerm(img image.Image, cols, rows int) string {
-	data, err := pngBytes(img)
-	if err != nil {
-		return reserveBox(cols, rows)
-	}
-	enc := base64.StdEncoding.EncodeToString(data)
-	return fmt.Sprintf(
-		"\x1b]1337;File=inline=1;width=%d;height=%d;preserveAspectRatio=1:%s\a",
-		cols, rows, enc,
-	)
-}
-
-// reserveBox is rows lines of cols spaces — the placeholder a pixel image is
-// painted over, and the graceful degradation if PNG encoding ever fails.
-func reserveBox(cols, rows int) string {
-	line := strings.Repeat(" ", cols)
-	lines := make([]string, rows)
-	for i := range lines {
-		lines[i] = line
-	}
-	return strings.Join(lines, "\n")
-}
-
-func pngBytes(img image.Image) ([]byte, error) {
-	var buf bytes.Buffer
-	if err := png.Encode(&buf, img); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
 }

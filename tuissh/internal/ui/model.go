@@ -11,7 +11,6 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/rpc"
-	"github.com/amirsalarsafaei/amirsalarsafaei.com/tuissh/internal/termcaps"
 	"github.com/charmbracelet/colorprofile"
 	"github.com/charmbracelet/glamour"
 )
@@ -35,7 +34,6 @@ type Model struct {
 	ctx    context.Context
 	client *rpc.Client
 	styles *Styles
-	caps   termcaps.Caps
 
 	width  int
 	height int
@@ -87,10 +85,10 @@ type Model struct {
 	profileErr    error
 }
 
-// New builds a root model for a session of the given size and capabilities.
-// ctx is the session context; the now-playing stream lives for its lifetime
-// and is torn down when the SSH session ends.
-func New(ctx context.Context, client *rpc.Client, width, height int, caps termcaps.Caps) Model {
+// New builds a root model for a session of the given size. ctx is the session
+// context; the now-playing stream lives for its lifetime and is torn down when
+// the SSH session ends.
+func New(ctx context.Context, client *rpc.Client, width, height int) Model {
 	styles := NewStyles()
 
 	sp := spinner.New(
@@ -102,7 +100,6 @@ func New(ctx context.Context, client *rpc.Client, width, height int, caps termca
 		ctx:      ctx,
 		client:   client,
 		styles:   styles,
-		caps:     caps,
 		width:    width,
 		height:   height,
 		view:     viewMenu,

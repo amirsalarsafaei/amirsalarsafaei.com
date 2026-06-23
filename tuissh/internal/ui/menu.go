@@ -39,7 +39,7 @@ func (m Model) enterMenu(v view) (tea.Model, tea.Cmd) {
 	switch v {
 	case viewAbout:
 		if m.profileLoaded {
-			m.showMarkdown(aboutMarkdown(m.profile))
+			m.showAbout()
 		}
 	case viewLinks:
 		if m.profileLoaded {

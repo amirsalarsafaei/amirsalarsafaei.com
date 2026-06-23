@@ -4,6 +4,7 @@ package ui
 
 import (
 	"context"
+	"image"
 	"time"
 
 	"charm.land/bubbles/v2/spinner"
@@ -83,6 +84,11 @@ type Model struct {
 	profile       profileInfo
 	profileLoaded bool
 	profileErr    error
+
+	// profile photo for the about page, fetched from profile.image_url and
+	// rendered as half-blocks (same approach as the album art).
+	profileImg         image.Image
+	profileImgRendered string
 }
 
 // New builds a root model for a session of the given size. ctx is the session
@@ -122,6 +128,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.resizeViewport()
 		m.renderAlbumArt()
+		m.renderProfileImage()
+		if m.view == viewAbout {
+			m.showAbout()
+		}
 		return m, nil
 
 	case tea.ColorProfileMsg:
@@ -131,6 +141,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Half-block rendering needs the colour profile, which we only learn
 		// now — re-render any art that loaded before this message arrived.
 		m.renderAlbumArt()
+		m.renderProfileImage()
+		if m.view == viewAbout {
+			m.showAbout()
+		}
 		return m, tea.Batch(m.maybeStartShader(), m.maybeLoadAlbumArt())
 
 	case tea.KeyPressMsg:
@@ -190,9 +204,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// If the user is already waiting on About/Links, fill the viewport now.
 		switch m.view {
 		case viewAbout:
-			m.showMarkdown(aboutMarkdown(m.profile))
+			m.showAbout()
 		case viewLinks:
 			m.showMarkdown(linksMarkdown(m.profile))
+		}
+		// Kick off the profile-photo fetch so the about page can show it.
+		return m, m.loadProfileImage()
+
+	case profileImageMsg:
+		if msg.err == nil && msg.img != nil {
+			m.profileImg = msg.img
+			m.renderProfileImage()
+			if m.view == viewAbout {
+				m.showAbout()
+			}
 		}
 		return m, nil
 
@@ -416,6 +441,19 @@ func (m Model) renderMarkdown(md string) string {
 func (m *Model) showMarkdown(md string) {
 	m.resizeViewport()
 	m.viewport.SetContent(m.renderMarkdown(md))
+	m.viewport.GotoTop()
+}
+
+// showAbout fills the viewport with the about page: the profile photo (as
+// half-blocks, once loaded) above the bio/skills/resume markdown — mirroring
+// the website, which shows the same backend-served image.
+func (m *Model) showAbout() {
+	m.resizeViewport()
+	content := m.renderMarkdown(aboutMarkdown(m.profile))
+	if m.profileImgRendered != "" {
+		content = m.profileImgRendered + "\n\n" + content
+	}
+	m.viewport.SetContent(content)
 	m.viewport.GotoTop()
 }
 

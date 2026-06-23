@@ -30,7 +30,14 @@ export interface GetProfileResponse {
   /** "Current focus" rendered as Markdown. */
   currentFocus: string;
   /** Structured CV, one ResumeSection per CV heading. */
-  resume?: Resume | undefined;
+  resume?:
+    | Resume
+    | undefined;
+  /**
+   * Absolute URL of the profile photo, shown in the "about me" of every client
+   * (rendered as half-blocks in the SSH terminal, an <img> on the website).
+   */
+  imageUrl: string;
 }
 
 /** A single skill/interest with a proficiency level. */
@@ -244,7 +251,7 @@ export const Link: MessageFns<Link> = {
 };
 
 function createBaseGetProfileResponse(): GetProfileResponse {
-  return { name: "", title: "", bio: "", links: [], skills: [], currentFocus: "", resume: undefined };
+  return { name: "", title: "", bio: "", links: [], skills: [], currentFocus: "", resume: undefined, imageUrl: "" };
 }
 
 export const GetProfileResponse: MessageFns<GetProfileResponse> = {
@@ -269,6 +276,9 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
     }
     if (message.resume !== undefined) {
       Resume.encode(message.resume, writer.uint32(58).fork()).join();
+    }
+    if (message.imageUrl !== "") {
+      writer.uint32(66).string(message.imageUrl);
     }
     return writer;
   },
@@ -336,6 +346,14 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
           message.resume = Resume.decode(reader, reader.uint32());
           continue;
         }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.imageUrl = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -358,6 +376,11 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
         ? globalThis.String(object.current_focus)
         : "",
       resume: isSet(object.resume) ? Resume.fromJSON(object.resume) : undefined,
+      imageUrl: isSet(object.imageUrl)
+        ? globalThis.String(object.imageUrl)
+        : isSet(object.image_url)
+        ? globalThis.String(object.image_url)
+        : "",
     };
   },
 
@@ -384,6 +407,9 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
     if (message.resume !== undefined) {
       obj.resume = Resume.toJSON(message.resume);
     }
+    if (message.imageUrl !== "") {
+      obj.imageUrl = message.imageUrl;
+    }
     return obj;
   },
 
@@ -401,6 +427,7 @@ export const GetProfileResponse: MessageFns<GetProfileResponse> = {
     message.resume = (object.resume !== undefined && object.resume !== null)
       ? Resume.fromPartial(object.resume)
       : undefined;
+    message.imageUrl = object.imageUrl ?? "";
     return message;
   },
 };

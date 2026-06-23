@@ -176,7 +176,10 @@ type GetProfileResponse struct {
 	// "Current focus" rendered as Markdown.
 	CurrentFocus string `protobuf:"bytes,6,opt,name=current_focus,json=currentFocus,proto3" json:"current_focus,omitempty"`
 	// Structured CV, one ResumeSection per CV heading.
-	Resume        *Resume `protobuf:"bytes,7,opt,name=resume,proto3" json:"resume,omitempty"`
+	Resume *Resume `protobuf:"bytes,7,opt,name=resume,proto3" json:"resume,omitempty"`
+	// Absolute URL of the profile photo, shown in the "about me" of every client
+	// (rendered as half-blocks in the SSH terminal, an <img> on the website).
+	ImageUrl      string `protobuf:"bytes,8,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -258,6 +261,13 @@ func (x *GetProfileResponse) GetResume() *Resume {
 		return x.Resume
 	}
 	return nil
+}
+
+func (x *GetProfileResponse) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
 }
 
 // A single skill/interest with a proficiency level.
@@ -442,7 +452,7 @@ const file_profile_profile_proto_rawDesc = "" +
 	"\x11GetProfileRequest\".\n" +
 	"\x04Link\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\x10\n" +
-	"\x03url\x18\x02 \x01(\tR\x03url\"\xeb\x01\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\"\x88\x02\n" +
 	"\x12GetProfileResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x10\n" +
@@ -450,7 +460,8 @@ const file_profile_profile_proto_rawDesc = "" +
 	"\x05links\x18\x04 \x03(\v2\r.profile.LinkR\x05links\x12&\n" +
 	"\x06skills\x18\x05 \x03(\v2\x0e.profile.SkillR\x06skills\x12#\n" +
 	"\rcurrent_focus\x18\x06 \x01(\tR\fcurrentFocus\x12'\n" +
-	"\x06resume\x18\a \x01(\v2\x0f.profile.ResumeR\x06resume\"\x9e\x01\n" +
+	"\x06resume\x18\a \x01(\v2\x0f.profile.ResumeR\x06resume\x12\x1b\n" +
+	"\timage_url\x18\b \x01(\tR\bimageUrl\"\x9e\x01\n" +
 	"\x05Skill\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12*\n" +
 	"\x05level\x18\x02 \x01(\x0e2\x14.profile.Skill.LevelR\x05level\"U\n" +

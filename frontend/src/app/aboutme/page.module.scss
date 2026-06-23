@@ -192,6 +192,15 @@
   }
 }
 
+.avatar {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(67, 217, 173, 0.4);
+  box-shadow: 0 0 20px rgba(67, 217, 173, 0.15);
+}
+
 .barFilled {
   color: #43d9ad;
 }

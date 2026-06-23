@@ -49,6 +49,18 @@ const RESUME_FULL_NAME: &str = "AmirSalar Safaei Ghaderi";
 const RESUME_EMAIL: &str = "amirsalarsafaeighaderi@gmail.com";
 const RESUME_GITHUB_URL: &str = "https://github.com/amirsalarsafaei";
 
+/// Profile photo URL shared by every client. Defaults to the backend's own
+/// image server (dev); override with $PROFILE_IMAGE_URL in production to point
+/// at the public upload host.
+const PROFILE_IMAGE_URL: &str = "http://localhost:3001/images/profile.jpg";
+
+fn profile_image_url() -> String {
+    std::env::var("PROFILE_IMAGE_URL")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or_else(|| PROFILE_IMAGE_URL.to_string())
+}
+
 #[derive(Default)]
 pub struct ProfileServicer {}
 
@@ -216,6 +228,7 @@ impl Profile for ProfileServicer {
                 link("LinkedIn", "https://linkedin.com/in/amir-salar-safaei"),
                 link("SSH", "ssh ssh.amirsalarsafaei.com"),
             ],
+            image_url: profile_image_url(),
         }))
     }
 }

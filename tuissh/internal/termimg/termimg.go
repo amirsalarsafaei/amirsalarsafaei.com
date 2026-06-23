@@ -86,12 +86,16 @@ func FitBox(imgW, imgH, maxCols, maxRows int) (cols, rows int) {
 	return cols, rows
 }
 
-// Render draws the image as cols × rows cells of Unicode half-blocks. trueColor
-// reports whether the terminal has the colour depth to make it legible (decided
-// by the caller from the runtime colour profile); without it, ok is false and
-// the caller should skip the image.
-func Render(img image.Image, cols, rows int, trueColor bool) (string, bool) {
-	if !trueColor {
+// Render draws the image as cols × rows cells of Unicode half-blocks. hasColor
+// reports whether the terminal can show colour at all (256-colour or truecolor,
+// from the runtime colour profile); without it, ok is false and the caller
+// should skip the image. Note we deliberately accept 256-colour, not just
+// truecolor: inside tmux/screen the real terminal is masked and the profile is
+// capped at ANSI256 (tmux ignores COLORTERM), but the bubbletea renderer
+// downsamples the cell colours to the active profile, so the picture still
+// shows — just with a smaller palette.
+func Render(img image.Image, cols, rows int, hasColor bool) (string, bool) {
+	if !hasColor {
 		return "", false
 	}
 	return renderHalfBlocks(img, cols, rows), true

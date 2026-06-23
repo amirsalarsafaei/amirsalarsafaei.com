@@ -1,4 +1,5 @@
 import nextDynamic from "next/dynamic";
+import Image from "next/image";
 import styles from "./page.module.scss";
 import { InlineCode } from "@/components/InlineCode/InlineCode";
 import { CodeBlock } from "@/components/CodeBlock/CodeBlock";
@@ -95,6 +96,9 @@ GPA: 17.9/20
     { label: "Telegram", url: "https://t.me/amirsalarsafaei" },
     { label: "LinkedIn", url: "https://linkedin.com/in/amir-salar-safaei" },
   ],
+  // Local public asset as the offline fallback; the backend serves the real
+  // URL when reachable (single source of truth shared with the SSH terminal).
+  imageUrl: "/amirsalar-photo.jpg",
 };
 
 async function getProfile() {
@@ -138,6 +142,25 @@ export default async function AboutMe() {
 ${profile.title}`}
             </pre>
           </div>
+
+          {profile.imageUrl && (
+            <>
+              <div className={styles.line}>
+                <span className={styles.prompt}>visitor@amirsalar:~$</span> open
+                avatar.png
+              </div>
+              <div className={styles.content}>
+                <Image
+                  src={profile.imageUrl}
+                  alt={profile.name}
+                  width={200}
+                  height={200}
+                  className={styles.avatar}
+                  priority
+                />
+              </div>
+            </>
+          )}
 
           <div className={styles.line}>
             <span className={styles.prompt}>visitor@amirsalar:~$</span> cat

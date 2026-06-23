@@ -27,6 +27,9 @@ message GetProfileResponse {
   string current_focus = 6;
   // Structured CV, one ResumeSection per CV heading.
   Resume resume = 7;
+  // Absolute URL of the profile photo, shown in the "about me" of every client
+  // (rendered as half-blocks in the SSH terminal, an <img> on the website).
+  string image_url = 8;
 }
 
 // A single skill/interest with a proficiency level.

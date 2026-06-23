@@ -23,108 +23,244 @@
 
 .controls-container {
   position: fixed;
-  bottom: 16px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100000000;
+  width: min(92vw, 380px);
+  font-family: $code-font;
 
   .controls-panel {
-    background-color: #1e1e1e;
-    color: #d4d4d4;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid #404040;
+    color: $blog-text-color;
+    background: rgba($card-bg, 0.82);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba($secondary-color, 0.22);
+    border-radius: 14px;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.45),
+      0 0 40px rgba($secondary-color, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    animation: controlsRise 0.4s ease both;
 
     &.minimized {
+      padding: 0;
+      gap: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      box-shadow: none;
+
+      .ssh-promo,
       .controls-instructions,
       .camera-controls {
         display: none;
       }
 
-      padding: 0;
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
+      .toggle-button {
+        position: static;
+      }
+    }
+  }
+
+  .toggle-button {
+    position: absolute;
+    top: -36px;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: $code-font;
+    font-size: 12px;
+    color: $secondary-color;
+    background: rgba($card-bg, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba($secondary-color, 0.22);
+    border-radius: 999px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $highlight-color;
+      border-color: rgba($highlight-color, 0.45);
+      box-shadow: 0 0 12px rgba($highlight-color, 0.18);
     }
 
-    .toggle-button {
-      position: absolute;
-      top: -24px;
-      right: 0;
-      background-color: #1e1e1e;
-      border: 1px solid #404040;
-      border-bottom: none;
-      border-radius: 4px 4px 0 0;
-      padding: 4px 8px;
+    svg {
+      width: 11px;
+      height: 11px;
+    }
+  }
+
+  // ── SSH promo ─────────────────────────────────────────────────────────────
+  .ssh-promo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: rgba($blog-text-color, 0.85);
+    }
+
+    &__icon {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      color: $highlight-color;
+    }
+
+    &__cmd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 9px 12px;
       cursor: pointer;
-      color: #d4d4d4;
-      transition: background-color 0.2s;
+      font-family: $code-font;
+      font-size: 13.5px;
+      color: $highlight-color;
+      background: rgba($secondary-color, 0.08);
+      border: 1px solid rgba($secondary-color, 0.3);
+      border-radius: 9px;
+      transition: all 0.2s ease;
 
       &:hover {
-        background-color: #2d2d2d;
+        background: rgba($secondary-color, 0.14);
+        border-color: rgba($highlight-color, 0.5);
+        box-shadow: 0 0 16px rgba($secondary-color, 0.15);
+      }
+
+      code {
+        flex: 1;
+        text-align: left;
+        font-family: $code-font;
+        background: none;
+      }
+    }
+
+    &__prompt {
+      color: $accent-color;
+      font-weight: 700;
+    }
+
+    &__copy {
+      display: inline-flex;
+      color: rgba($blog-text-color, 0.6);
+
+      svg {
+        width: 13px;
+        height: 13px;
+      }
+    }
+  }
+
+  // ── Instructions ────────────────────────────────────────────────────────
+  .controls-instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    text-align: center;
+    color: rgba($text-color, 0.85);
+
+    kbd {
+      font-family: $code-font;
+      font-size: 11px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba($secondary-color, 0.2);
+      color: $blog-text-color;
+    }
+
+    .mobile-note {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+  }
+
+  // ── Camera focus buttons ──────────────────────────────────────────────────
+  .camera-controls {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+
+    button {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 4px;
+      cursor: pointer;
+      color: $text-color;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba($secondary-color, 0.12);
+      border-radius: 9px;
+      transition: all 0.18s ease;
+
+      &:hover {
+        background: rgba($secondary-color, 0.1);
+        border-color: rgba($secondary-color, 0.35);
+        transform: translateY(-2px);
       }
 
       svg {
-        width: 12px;
-        height: 12px;
+        width: 17px;
+        height: 17px;
+      }
+
+      .cam-label {
+        font-family: $code-font;
+        font-size: 10px;
+        letter-spacing: 0.02em;
+        color: rgba($text-color, 0.75);
+      }
+
+      .screen-icon {
+        color: #569cd6;
+      }
+
+      .gopher-icon {
+        color: #00add8;
+      }
+
+      .music-icon {
+        color: #ce9178;
+      }
+
+      .github-icon {
+        color: #c586c0;
+      }
+
+      .tux-icon {
+        color: #e6e6e6;
       }
     }
+  }
+}
 
-    .controls-instructions {
-      margin-bottom: 12px;
-      font-size: 14px;
-      opacity: 0.75;
-      max-width: 300px;
-      text-align: center;
+@keyframes controlsRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-      .mobile-note {
-        font-size: 12px;
-      }
-    }
-
-    .camera-controls {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-
-      button {
-        padding: 8px 12px;
-        background-color: #2d2d2d;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: #3d3d3d;
-        }
-
-        svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        .screen-icon {
-          color: #569cd6;
-        }
-
-        .gopher-icon {
-          color: #00add8;
-        }
-
-        .music-icon {
-          color: #ce9178;
-        }
-
-        .github-icon {
-          color: #c586c0;
-        }
-
-        .tux-icon {
-          color: white;
-        }
-      }
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

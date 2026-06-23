@@ -1,6 +1,6 @@
 use salar_interface::profile::{
-    GetProfileRequest, GetProfileResponse, Link, Resume, ResumeSection, Skill,
-    profile_server::Profile, skill::Level,
+    profile_server::Profile, skill::Level, GetProfileRequest, GetProfileResponse, Link, Resume,
+    ResumeSection, Skill,
 };
 
 /// Single source of truth for the "about me" content shared by every client

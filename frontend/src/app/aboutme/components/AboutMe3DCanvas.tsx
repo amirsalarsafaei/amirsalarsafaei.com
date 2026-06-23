@@ -114,7 +114,8 @@ function CpuCore({
     }
     if (loadRef.current) {
       loadRef.current.scale.y = 0.08 + load * 0.95;
-      loadRef.current.position.y = position[1] - 0.45 + (0.08 + load * 0.95) / 2;
+      loadRef.current.position.y =
+        position[1] - 0.45 + (0.08 + load * 0.95) / 2;
     }
   });
 
@@ -190,7 +191,8 @@ function ConcurrentTasks({
       const from = cores[task.from].position;
       const to = cores[task.to].position;
       // ping-pong progress to show data passing between cores concurrently
-      const p = (Math.sin(clock.elapsedTime * task.speed + task.offset) + 1) / 2;
+      const p =
+        (Math.sin(clock.elapsedTime * task.speed + task.offset) + 1) / 2;
       mesh.position.x = from[0] + (to[0] - from[0]) * p;
       mesh.position.y = from[1] + (to[1] - from[1]) * p;
       mesh.position.z = -3.7 + Math.sin(p * Math.PI) * 0.6;

@@ -1,7 +1,7 @@
 use crate::db;
-use crate::toproto::{ToProto, list_to_proto};
+use crate::toproto::{list_to_proto, ToProto};
 
-use base64::{Engine, engine::general_purpose::URL_SAFE};
+use base64::{engine::general_purpose::URL_SAFE, Engine};
 use log;
 use prost::Message;
 use sqlx::PgPool;

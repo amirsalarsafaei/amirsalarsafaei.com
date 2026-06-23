@@ -2,8 +2,8 @@
 /// Generated client implementations.
 pub mod profile_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
     use tonic::codegen::http::Uri;
+    use tonic::codegen::*;
     #[derive(Debug, Clone)]
     pub struct ProfileClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -47,9 +47,8 @@ pub mod profile_client {
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
         {
             ProfileClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -87,23 +86,16 @@ pub mod profile_client {
         pub async fn get_profile(
             &mut self,
             request: impl tonic::IntoRequest<super::GetProfileRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetProfileResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::GetProfileResponse>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/profile.Profile/GetProfile",
-            );
+            let path = http::uri::PathAndQuery::from_static("/profile.Profile/GetProfile");
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("profile.Profile", "GetProfile"));
@@ -121,10 +113,7 @@ pub mod profile_server {
         async fn get_profile(
             &self,
             request: tonic::Request<super::GetProfileRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetProfileResponse>,
-            tonic::Status,
-        >;
+        ) -> std::result::Result<tonic::Response<super::GetProfileResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct ProfileServer<T: Profile> {
@@ -147,10 +136,7 @@ pub mod profile_server {
                 max_encoding_message_size: None,
             }
         }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> InterceptedService<Self, F>
+        pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
         where
             F: tonic::service::Interceptor,
         {
@@ -205,23 +191,16 @@ pub mod profile_server {
                 "/profile.Profile/GetProfile" => {
                     #[allow(non_camel_case_types)]
                     struct GetProfileSvc<T: Profile>(pub Arc<T>);
-                    impl<
-                        T: Profile,
-                    > tonic::server::UnaryService<super::GetProfileRequest>
-                    for GetProfileSvc<T> {
+                    impl<T: Profile> tonic::server::UnaryService<super::GetProfileRequest> for GetProfileSvc<T> {
                         type Response = super::GetProfileResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::GetProfileRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as Profile>::get_profile(&inner, request).await
-                            };
+                            let fut =
+                                async move { <T as Profile>::get_profile(&inner, request).await };
                             Box::pin(fut)
                         }
                     }
@@ -247,21 +226,17 @@ pub mod profile_server {
                     };
                     Box::pin(fut)
                 }
-                _ => {
-                    Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", tonic::Code::Unimplemented as i32)
-                                .header(
-                                    http::header::CONTENT_TYPE,
-                                    tonic::metadata::GRPC_CONTENT_TYPE,
-                                )
-                                .body(empty_body())
-                                .unwrap(),
+                _ => Box::pin(async move {
+                    Ok(http::Response::builder()
+                        .status(200)
+                        .header("grpc-status", tonic::Code::Unimplemented as i32)
+                        .header(
+                            http::header::CONTENT_TYPE,
+                            tonic::metadata::GRPC_CONTENT_TYPE,
                         )
-                    })
-                }
+                        .body(empty_body())
+                        .unwrap())
+                }),
             }
         }
     }

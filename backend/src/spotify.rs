@@ -1,23 +1,22 @@
 use chrono::Utc;
+use futures::Stream;
 use log::error;
-use rspotify::AuthCodeSpotify;
 use rspotify::clients::OAuthClient;
 use rspotify::model::TimeLimits;
 use rspotify::prelude::*;
-use futures::Stream;
+use rspotify::AuthCodeSpotify;
 use salar_interface::playground::{
-    GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse, spotify_server,
+    spotify_server, GetRecentlyPlayedSongRequest, GetRecentlyPlayedSongResponse,
 };
 use std::pin::Pin;
 use std::sync::Arc;
-use tokio::sync::{RwLock, watch};
-use tokio::time::{Duration, interval, sleep};
+use tokio::sync::{watch, RwLock};
+use tokio::time::{interval, sleep, Duration};
 use tonic::Code;
 use tonic::Status;
 
 /// Server-streaming response type for StreamRecentlyPlayedSong.
-type SongStream =
-    Pin<Box<dyn Stream<Item = Result<GetRecentlyPlayedSongResponse, Status>> + Send>>;
+type SongStream = Pin<Box<dyn Stream<Item = Result<GetRecentlyPlayedSongResponse, Status>> + Send>>;
 
 /// While a track is playing we poll on a short interval so track changes show
 /// up quickly. This is the upper bound while playing; we poll even sooner when

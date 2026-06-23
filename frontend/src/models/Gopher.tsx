@@ -1,34 +1,34 @@
 "use client";
 
-import { Mesh, MeshStandardMaterial } from 'three'
-import { useGLTF } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { Mesh, MeshStandardMaterial } from "three";
+import { useGLTF } from "@react-three/drei";
+import { GLTF } from "three-stdlib";
 
 export type GLTFResult = GLTF & {
   nodes: {
-    Object_4: Mesh
-    Object_14: Mesh
-    left_eye: Mesh
-    left_hand: Mesh
-    left_pupil: Mesh
-    nose_tip001: Mesh
-    right_eye: Mesh
-    right_hand001: Mesh
-    right_pupil: Mesh
-    Object_6: Mesh
-    Object_8: Mesh
-    Object_10: Mesh
-    Object_28: Mesh
-    Object_30: Mesh
-    Object_32: Mesh
-  }
+    Object_4: Mesh;
+    Object_14: Mesh;
+    left_eye: Mesh;
+    left_hand: Mesh;
+    left_pupil: Mesh;
+    nose_tip001: Mesh;
+    right_eye: Mesh;
+    right_hand001: Mesh;
+    right_pupil: Mesh;
+    Object_6: Mesh;
+    Object_8: Mesh;
+    Object_10: Mesh;
+    Object_28: Mesh;
+    Object_30: Mesh;
+    Object_32: Mesh;
+  };
   materials: {
-    ['Material.009']: MeshStandardMaterial
-    ['Material.012']: MeshStandardMaterial
-    ['Material.010']: MeshStandardMaterial
-    ['Material.011']: MeshStandardMaterial
-  }
-}
+    ["Material.009"]: MeshStandardMaterial;
+    ["Material.012"]: MeshStandardMaterial;
+    ["Material.010"]: MeshStandardMaterial;
+    ["Material.011"]: MeshStandardMaterial;
+  };
+};
 
 export default function Model(props: any) {
   const { nodes, materials } = useGLTF("/gopher.glb", true) as GLTFResult;

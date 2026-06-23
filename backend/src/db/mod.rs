@@ -1,8 +1,8 @@
 pub mod blogs;
 pub mod tags;
 
-use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
+use sqlx::PgPool;
 
 use crate::config::DatabaseConfig;
 

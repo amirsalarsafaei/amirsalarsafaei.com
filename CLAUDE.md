@@ -26,7 +26,7 @@ Docker Compose. CI publishes images to GHCR.
   config at the repo root (`devbox.json`) provisions Rust (via rustup), Node
   20, Yarn, buf, sqlx-cli, protobuf, postgres client, openssl, treefmt,
   prettier. Devbox is the only supported dev/deploy toolchain.
-- **`nix/` + `flake.nix` (legacy, do not extend)** — these exist *only* so an
+- **`nix/` + `flake.nix` (legacy, do not extend)** — these exist _only_ so an
   external dotfiles repo can consume this repo as a flake input and build the
   frontend/backend from source. This is a **known bad pattern**: it couples
   the two repos through a push + `flake.lock` bump + rebuild round trip and

@@ -35,7 +35,6 @@
         nixosModule = inputs.self.nixosModules.default;
         nixosModules = {
           amirsalarsafaei-com = import ./nix/modules/amirsalarsafaei-com.nix { inherit inputs; };
-          ssh-service = import ./nix/modules/ssh-service.nix { inherit inputs; };
           default = inputs.self.nixosModules.amirsalarsafaei-com;
         };
       };

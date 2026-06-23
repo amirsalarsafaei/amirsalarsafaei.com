@@ -18,19 +18,20 @@ import { grpc } from "@improbable-eng/grpc-web";
 
 // Dynamically import NodeHttpTransport only on server-side
 const getNodeHttpTransport = () => {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { NodeHttpTransport } = require('@improbable-eng/grpc-web-node-http-transport');
+      const {
+        NodeHttpTransport,
+      } = require("@improbable-eng/grpc-web-node-http-transport");
       return NodeHttpTransport;
     } catch (error) {
-      console.warn('NodeHttpTransport not available:', error);
+      console.warn("NodeHttpTransport not available:", error);
       return null;
     }
   }
   return null;
 };
-
 
 // Resolve the gRPC-web endpoint. On the server (SSR, build-time SSG/ISR, and
 // generateStaticParams/generateMetadata) prefer GRPC_WEB_INTERNAL_URL so we can
@@ -71,8 +72,11 @@ export function createGrpcClients(): GrpcClients {
   }
 
   const transport = new GrpcWebImpl(getGrpcWebUrl(), {
-    debug: process.env.NODE_ENV === 'development',
-    transport: typeof window === 'undefined' && NodeHttpTransport ? NodeHttpTransport() : undefined
+    debug: process.env.NODE_ENV === "development",
+    transport:
+      typeof window === "undefined" && NodeHttpTransport
+        ? NodeHttpTransport()
+        : undefined,
   });
 
   clientInstance = {

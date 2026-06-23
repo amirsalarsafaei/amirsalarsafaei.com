@@ -22,14 +22,24 @@ interface CameraControlsUIProps {
 const SSH_COMMAND = "ssh ssh.amirsalarsafaei.com";
 
 const VIEWS: { id: string; label: string; icon: React.ReactNode }[] = [
-  { id: "screen", label: "Screen", icon: <FaDesktop className="screen-icon" /> },
-  { id: "gopher", label: "Gopher", icon: <GopherIcon className="gopher-icon" /> },
+  {
+    id: "screen",
+    label: "Screen",
+    icon: <FaDesktop className="screen-icon" />,
+  },
+  {
+    id: "gopher",
+    label: "Gopher",
+    icon: <GopherIcon className="gopher-icon" />,
+  },
   { id: "music", label: "Music", icon: <FaMusic className="music-icon" /> },
   { id: "wall", label: "GitHub", icon: <FaGithub className="github-icon" /> },
   { id: "tux", label: "Tux", icon: <FaLinux className="tux-icon" /> },
 ];
 
-const CameraControlsUI: React.FC<CameraControlsUIProps> = ({ onViewChange }) => {
+const CameraControlsUI: React.FC<CameraControlsUIProps> = ({
+  onViewChange,
+}) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [copied, setCopied] = useState(false);
 
@@ -41,7 +51,9 @@ const CameraControlsUI: React.FC<CameraControlsUIProps> = ({ onViewChange }) => 
 
   return (
     <div className="controls-container">
-      <div className={`controls-panel ${isExpanded ? "expanded" : "minimized"}`}>
+      <div
+        className={`controls-panel ${isExpanded ? "expanded" : "minimized"}`}
+      >
         <button
           className="toggle-button"
           onClick={() => setIsExpanded(!isExpanded)}

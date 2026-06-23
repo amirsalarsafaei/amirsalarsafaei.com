@@ -63,7 +63,14 @@ let
   };
 
   sshEnvironment = {
-
+    SSH_HOST = cfg.ssh.host;
+    SSH_PORT = toString cfg.ssh.port;
+    SSH_HOST_KEY_PATH = cfg.ssh.hostKeyPath;
+    # tuissh talks to the same backend the website does, over plain gRPC on the
+    # loopback interface.
+    GRPC_ADDR = "${cfg.backend.host}:${toString cfg.backend.port}";
+    GRPC_TLS = lib.boolToString cfg.ssh.grpcTls;
+    WEB_ADDR = cfg.ssh.webAddr;
   };
   backendLauncher = pkgs.writeShellScript "amirsalarsafaei-com-backend" ''
     set -eu
@@ -309,6 +316,60 @@ in
         description = "Public image server URL exposed to the frontend runtime.";
       };
     };
+
+    ssh = {
+      enable = lib.mkEnableOption "the SSH terminal front-end (tuissh)";
+
+      package = lib.mkOption {
+        type = types.package;
+        default = websitePackages.tuissh;
+        defaultText = "inputs.amirsalarsafaei-com.packages.\${pkgs.system}.tuissh";
+        description = "tuissh package to run.";
+      };
+
+      host = lib.mkOption {
+        type = types.str;
+        default = "0.0.0.0";
+        description = "Address the SSH server binds to.";
+      };
+
+      port = lib.mkOption {
+        type = types.port;
+        default = 23234;
+        description = "Port the SSH server listens on.";
+      };
+
+      hostKeyPath = lib.mkOption {
+        type = types.str;
+        default = "/var/lib/amirsalarsafaei-com-ssh/ssh_host_ed25519_key";
+        description = ''
+          Path to the SSH host private key. tuissh generates one here on first
+          start if it is missing, so this must live under a directory the
+          service can write to (the default is inside its StateDirectory).
+        '';
+      };
+
+      webAddr = lib.mkOption {
+        type = types.str;
+        default = ":2223";
+        description = ''
+          Listen address for the browser bridge (xterm.js over WebSocket).
+          Set to an empty string to disable the bridge.
+        '';
+      };
+
+      grpcTls = lib.mkOption {
+        type = types.bool;
+        default = false;
+        description = "Whether the connection to the backend gRPC API uses TLS.";
+      };
+
+      openFirewall = lib.mkOption {
+        type = types.bool;
+        default = true;
+        description = "Open the SSH port in the firewall (the SSH front-end is meant to be reachable publicly).";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -430,6 +491,43 @@ in
         PrivateTmp = true;
         ProtectHome = true;
         ProtectSystem = "strict";
+      };
+    };
+
+    networking.firewall.allowedTCPPorts = lib.mkIf (cfg.ssh.enable && cfg.ssh.openFirewall) [
+      cfg.ssh.port
+    ];
+
+    systemd.services.amirsalarsafaei-com-ssh = lib.mkIf cfg.ssh.enable {
+      description = "amirsalarsafaei.com SSH terminal (tuissh)";
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "network-online.target"
+        "amirsalarsafaei-com-backend.service"
+      ];
+      wants = [ "network-online.target" ];
+
+      environment = sshEnvironment;
+
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = lib.getExe cfg.ssh.package;
+        Restart = "on-failure";
+        RestartSec = "5s";
+        User = cfg.user;
+        Group = cfg.group;
+        # tuissh writes/generates its SSH host key under this state directory.
+        StateDirectory = "amirsalarsafaei-com-ssh";
+        StateDirectoryMode = "0750";
+        WorkingDirectory = "/var/lib/amirsalarsafaei-com-ssh";
+        # Allow binding the privileged SSH port (e.g. 22) as a non-root user.
+        AmbientCapabilities = lib.optional (cfg.ssh.port < 1024) "CAP_NET_BIND_SERVICE";
+        CapabilityBoundingSet = lib.optional (cfg.ssh.port < 1024) "CAP_NET_BIND_SERVICE";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectHome = true;
+        ProtectSystem = "strict";
+        ReadWritePaths = [ "/var/lib/amirsalarsafaei-com-ssh" ];
       };
     };
   };

@@ -160,7 +160,7 @@ export class TerminalController {
     this.folder = this.fileSystem.root;
     new File("cv", FileType.File, this.fileSystem.root, cv);
     this.runCommand(
-      `cowsay "Available commands are:\nls, cd, pwd, cowsay, mkdir, cat.\nCreated using creativity by:\n AmirSalar Safaei Ghaderi\ne.g.: 'cat cv'\nUse shift/ctrl and drag to move around"`,
+      `cowsay "Commands: ls, cd, pwd, cowsay, mkdir, cat, ssh.\nTry 'cat cv' for my resume.\nPsst - this whole site runs over SSH too:\n  ssh ssh.amirsalarsafaei.com  (try 'ssh' here!)\nShift/Ctrl + drag to look around"`,
     );
   }
 
@@ -210,6 +210,8 @@ export class TerminalController {
       result = this.cowsay(args[1] ?? "");
     } else if (args[0] === "cat") {
       result = this.cat(args[1] ?? "");
+    } else if (args[0] === "ssh") {
+      result = this.ssh(args.slice(1));
     } else {
       result = {
         stderr: "command `" + args[0] + "` not found",
@@ -356,6 +358,27 @@ export class TerminalController {
   cowsay(text: string): CommandResult {
     return {
       stdout: say({ text: text }),
+    };
+  }
+
+  // ssh promotes the real thing: this 3D laptop is a toy shell, but the actual
+  // site is served as a full TUI over SSH. Any reachable-looking target prints
+  // the invite; an unrelated host gets a playful "can't resolve" nudge.
+  ssh(args: string[]): CommandResult {
+    const host = "ssh.amirsalarsafaei.com";
+    const target = (args[0] ?? "").replace(/^.*@/, "");
+    if (target && !target.includes("amirsalarsafaei.com")) {
+      return {
+        stderr: `ssh: could not resolve hostname ${target}\nthis is a 3D toy shell — try: ssh ${host}`,
+      };
+    }
+    return {
+      stdout:
+        "This laptop is just for show. The real site runs as a full\n" +
+        "terminal UI over SSH — blogs, about-me, and now-playing with\n" +
+        "album art, right in your terminal:\n\n" +
+        `    $ ssh ${host}\n\n` +
+        "Open a real terminal and run it — works from anywhere.",
     };
   }
 

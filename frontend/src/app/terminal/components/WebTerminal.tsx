@@ -13,8 +13,7 @@ import "@xterm/xterm/css/xterm.css";
 // (e.g. ws://localhost:2223/ws).
 function wsUrl(cols: number, rows: number): string {
   const base =
-    process.env.NEXT_PUBLIC_TUISSH_WS_URL ||
-    "wss://ssh.amirsalarsafaei.com/ws";
+    process.env.NEXT_PUBLIC_TUISSH_WS_URL || "wss://ssh.amirsalarsafaei.com/ws";
   const sep = base.includes("?") ? "&" : "?";
   return `${base}${sep}cols=${cols}&rows=${rows}`;
 }

@@ -33,12 +33,9 @@ const LEVEL_LABEL: Record<string, string> = {
 // truth) and revalidated hourly via ISR.
 export const revalidate = 3600;
 
-const ThreeDCanvas = nextDynamic(
-  () => import("./components/AboutMe3DCanvas"),
-  {
-    ssr: false,
-  },
-);
+const ThreeDCanvas = nextDynamic(() => import("./components/AboutMe3DCanvas"), {
+  ssr: false,
+});
 
 // Fallback used if the backend is unreachable (and at offline `next build`
 // time, since the production Nix build sets NEXT_BUILD_SKIP_BACKEND=1 and ISR

@@ -1,21 +1,21 @@
 "use client";
 
-import { Mesh, MeshStandardMaterial } from 'three'
-import { useGLTF } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { Mesh, MeshStandardMaterial } from "three";
+import { useGLTF } from "@react-three/drei";
+import { GLTF } from "three-stdlib";
 
 type GLTFResult = GLTF & {
   nodes: {
-    ['Tux-printable_0']: Mesh
-    ['Tux-printable_1']: Mesh
-    ['Tux-printable_2']: Mesh
-  }
+    ["Tux-printable_0"]: Mesh;
+    ["Tux-printable_1"]: Mesh;
+    ["Tux-printable_2"]: Mesh;
+  };
   materials: {
-    black: MeshStandardMaterial
-    white: MeshStandardMaterial
-    orange: MeshStandardMaterial
-  }
-}
+    black: MeshStandardMaterial;
+    white: MeshStandardMaterial;
+    orange: MeshStandardMaterial;
+  };
+};
 
 export default function Model(props: any) {
   const { nodes, materials } = useGLTF(

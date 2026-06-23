@@ -8,35 +8,35 @@ Source: https://sketchfab.com/3d-models/ferris-the-crab-ea4b18d686dd409baa1e0ea6
 Title: Ferris the crab
 */
 
-import { Mesh, SkinnedMesh, Bone, MeshStandardMaterial } from 'three'
-import React from 'react'
-import { useGraph } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
-import { GLTF, SkeletonUtils } from 'three-stdlib'
+import { Mesh, SkinnedMesh, Bone, MeshStandardMaterial } from "three";
+import React from "react";
+import { useGraph } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+import { GLTF, SkeletonUtils } from "three-stdlib";
 
 type GLTFResult = GLTF & {
   nodes: {
-    Object_45: Mesh
-    Object_4: Mesh
-    Object_49: Mesh
-    Object_10: SkinnedMesh
-    Object_12: SkinnedMesh
-    Object_14: SkinnedMesh
-    Object_15: SkinnedMesh
-    Object_17: SkinnedMesh
-    Object_19: SkinnedMesh
-    Object_21: SkinnedMesh
-    GLTF_created_0_rootJoint: Bone
-  }
+    Object_45: Mesh;
+    Object_4: Mesh;
+    Object_49: Mesh;
+    Object_10: SkinnedMesh;
+    Object_12: SkinnedMesh;
+    Object_14: SkinnedMesh;
+    Object_15: SkinnedMesh;
+    Object_17: SkinnedMesh;
+    Object_19: SkinnedMesh;
+    Object_21: SkinnedMesh;
+    GLTF_created_0_rootJoint: Bone;
+  };
   materials: {
-    ['Material.001']: MeshStandardMaterial
-    flagLGBT: MeshStandardMaterial
-    material_0: MeshStandardMaterial
-    Body: MeshStandardMaterial
-    Material: MeshStandardMaterial
-    Eyes: MeshStandardMaterial
-  }
-}
+    ["Material.001"]: MeshStandardMaterial;
+    flagLGBT: MeshStandardMaterial;
+    material_0: MeshStandardMaterial;
+    Body: MeshStandardMaterial;
+    Material: MeshStandardMaterial;
+    Eyes: MeshStandardMaterial;
+  };
+};
 
 export default function Model(props: JSX.IntrinsicElements["group"]) {
   const { scene } = useGLTF("/ferris_the_crab-transformed.glb");

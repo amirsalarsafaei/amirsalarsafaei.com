@@ -2,8 +2,8 @@ use crate::db;
 use crate::toproto::{self, ToProto};
 use log;
 use salar_interface::blogs::{
-    CreateTagRequest, DeleteTagRequest, ListTagsRequest, ListTagsResponse, SetBlogTagsRequest,
-    SetBlogTagsResponse, Tag, tags_server::Tags,
+    tags_server::Tags, CreateTagRequest, DeleteTagRequest, ListTagsRequest, ListTagsResponse,
+    SetBlogTagsRequest, SetBlogTagsResponse, Tag,
 };
 use sqlx::PgPool;
 use uuid::Uuid;

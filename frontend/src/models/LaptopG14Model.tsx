@@ -1,24 +1,24 @@
-import { Mesh, MeshStandardMaterial } from 'three'
-import React from 'react'
-import { useGLTF } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { Mesh, MeshStandardMaterial } from "three";
+import React from "react";
+import { useGLTF } from "@react-three/drei";
+import { GLTF } from "three-stdlib";
 
 type GLTFResult = GLTF & {
   nodes: {
-    Object_2: Mesh
-    Object_3: Mesh
-    Object_5: Mesh
-    Object_6: Mesh
-    Object_7: Mesh
-  }
+    Object_2: Mesh;
+    Object_3: Mesh;
+    Object_5: Mesh;
+    Object_6: Mesh;
+    Object_7: Mesh;
+  };
   materials: {
-    ['Body_BAKED.002']: MeshStandardMaterial
-    ['Internals_BAKED.002']: MeshStandardMaterial
-    ['Keys_BAKED.002']: MeshStandardMaterial
-    ['Material.001']: MeshStandardMaterial
-    ['Top_Lid.002_BAKED.002']: MeshStandardMaterial
-  }
-}
+    ["Body_BAKED.002"]: MeshStandardMaterial;
+    ["Internals_BAKED.002"]: MeshStandardMaterial;
+    ["Keys_BAKED.002"]: MeshStandardMaterial;
+    ["Material.001"]: MeshStandardMaterial;
+    ["Top_Lid.002_BAKED.002"]: MeshStandardMaterial;
+  };
+};
 
 export default function Model(props: JSX.IntrinsicElements["group"]) {
   const { nodes, materials } = useGLTF(

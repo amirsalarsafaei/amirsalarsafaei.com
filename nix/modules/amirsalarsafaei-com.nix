@@ -13,10 +13,9 @@ let
 
   websitePackages = self.packages.${pkgs.system};
 
-  # Upstream builds the frontend with nodejs_20, which is now EOL/insecure in
-  # nixpkgs. Override to nodejs_22 (LTS) for both the pure dependency tree and
+  # Build the frontend with a pinned Node.js package for both the pure dependency tree and
   # the on-server `next build`, so they share one ABI.
-  nodejs = pkgs.nodejs_22;
+  nodejs = pkgs.nodejs_24;
 
   # The frontend is built ON THIS HOST against the live, already-deployed
   # backend, so its SSG/ISR pages fetch real content (the backend can't run in
@@ -25,7 +24,7 @@ let
   # node_modules; the amirsalarsafaei-com-frontend-build unit runs `next build`
   # from a copy once the backend is healthy.
   frontendBuildTree = websitePackages.frontendBuildTree.override {
-    nodejs_20 = nodejs;
+    nodejs_24 = nodejs;
   };
 
   frontendRoot = "/var/lib/amirsalarsafaei-com/frontend";

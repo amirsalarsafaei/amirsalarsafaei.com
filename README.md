@@ -102,6 +102,25 @@ just up
 CI builds and publishes images to `ghcr.io/<owner>/amirsalarsafaei-com/{backend,frontend}`
 on every push to `main` — see [`.github/workflows/build-publish.yml`](./.github/workflows/build-publish.yml).
 
+### Nix binary cache
+
+The NixOS deployment in `../dotfiles/nixos` consumes this repository as a flake
+input. GitHub Actions also builds the heavy Nix outputs and pushes them to
+Cachix so the VM can substitute them instead of rebuilding the Rust backend and
+other packages locally.
+
+One-time setup:
+
+```bash
+cachix create amirsalarsafaei-com
+cachix authtoken
+```
+
+Add the token as the GitHub Actions secret `CACHIX_AUTH_TOKEN`, then enable the
+commented `amirsalarsafaei-com.cachix.org` substituter and public key in
+`../dotfiles/nixos/flake.nix`. The workflow is
+`.github/workflows/nix-cache.yml`.
+
 ## License
 
 MIT — see [LICENSE](./LICENSE).

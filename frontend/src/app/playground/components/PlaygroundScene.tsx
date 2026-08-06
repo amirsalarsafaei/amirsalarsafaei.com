@@ -1,19 +1,26 @@
 "use client";
 
 import LaptopG14Model from "@/models/LaptopG14Model";
-import DivoomSpeakerModel from "@/models/DivoomSpeakerModel";
 import Tux from "@/models/Tux";
 import AnimatedGopherModel from "@/models/AnimatedGopher";
 import FerrisCrab from "@/models/FerrisCrab";
 
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useEffect, useState, useCallback } from "react";
+import * as THREE from "three";
+
+// Room bounds — must match OuterEnclosure dims in RoomStructure.tsx.
+const ROOM_HALF_W = 70;
+const ROOM_HALF_D = 70;
+const ROOM_HEIGHT = 42;
+const CAM_PAD = 6;
 import Loading from "./Loading";
 
 import "./PlaygroundScene.scss";
 import Screen from "./Screen";
 import MusicPlayer from "./MusicPlayer";
 import RoomEnvironment from "./RoomEnvironment";
+import RoomStructure from "./RoomStructure";
 import GithubWall from "./GithubWall";
 
 import { OrbitControls, Grid, ContactShadows } from "@react-three/drei";
@@ -40,10 +47,42 @@ const useIsMobile = () => {
   return isMobile;
 };
 
+const clamp = (v: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, v));
+
 const Controls = ({ currentView }: { currentView: string }) => {
   const controlsRef = useRef<any>(null);
   const { camera } = useThree();
   const isMobile = useIsMobile();
+
+  // Keep camera + target inside the room after every OrbitControls update.
+  useFrame(() => {
+    if (!controlsRef.current) return;
+    camera.position.x = clamp(
+      camera.position.x,
+      -ROOM_HALF_W + CAM_PAD,
+      ROOM_HALF_W - CAM_PAD,
+    );
+    camera.position.z = clamp(
+      camera.position.z,
+      -ROOM_HALF_D + CAM_PAD,
+      ROOM_HALF_D - CAM_PAD,
+    );
+    camera.position.y = clamp(camera.position.y, 1, ROOM_HEIGHT - CAM_PAD);
+
+    const target = controlsRef.current.target as THREE.Vector3;
+    target.x = clamp(
+      target.x,
+      -ROOM_HALF_W + CAM_PAD,
+      ROOM_HALF_W - CAM_PAD,
+    );
+    target.z = clamp(
+      target.z,
+      -ROOM_HALF_D + CAM_PAD,
+      ROOM_HALF_D - CAM_PAD,
+    );
+    target.y = clamp(target.y, 1, ROOM_HEIGHT - CAM_PAD);
+  });
 
   const updateCameraPosition = useCallback(
     (position: [number, number, number], target: [number, number, number]) => {
@@ -71,7 +110,7 @@ const Controls = ({ currentView }: { currentView: string }) => {
         updateCameraPosition([2, 10.81, 14.24], [-2.84, 9.44, 5.96]);
         break;
       case "music":
-        updateCameraPosition([1.85, 4.86, 17.7], [9.98, 4.3, 2.01]);
+        updateCameraPosition([8.4, 6.2, 15.8], [16.8, 3.5, -1.2]);
         break;
       case "wall":
         updateCameraPosition([-39.61, 22.23, 5.33], [-10.3, 22.15, -13.67]);
@@ -127,8 +166,10 @@ export default function Playground() {
         }}
       >
         <Suspense fallback={<Loading />}>
+          <fog attach="fog" args={["#020408", 25, 110]} />
           <ambientLight color={"#ffffff"} intensity={0.4} />
           <RoomEnvironment />
+          <RoomStructure />
 
           <pointLight
             position={[-15, 12, 15]}

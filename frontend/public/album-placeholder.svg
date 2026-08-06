@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Offline Frequencies album art</title>
+  <desc id="desc">Retro green terminal waves and a compact disc used as placeholder album art.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071008"/>
+      <stop offset="0.55" stop-color="#0b2515"/>
+      <stop offset="1" stop-color="#06100d"/>
+    </linearGradient>
+    <radialGradient id="disc" cx="42%" cy="38%" r="68%">
+      <stop offset="0" stop-color="#d9ffe1"/>
+      <stop offset="0.16" stop-color="#31ff72"/>
+      <stop offset="0.5" stop-color="#08772f"/>
+      <stop offset="0.78" stop-color="#00d9cf"/>
+      <stop offset="1" stop-color="#062918"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#3dff74" stroke-opacity=".09"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" rx="28" fill="url(#background)"/>
+  <rect width="512" height="512" rx="28" fill="url(#grid)"/>
+  <path d="M0 330c44-51 79 45 122-6s75 49 120-2 76 44 121-8 83 38 149-21" fill="none" stroke="#00ff5a" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M0 365c50-23 77 20 127-7s76 23 126-4 78 25 127-5 79 13 132-10" fill="none" stroke="#00e5d4" stroke-opacity=".62" stroke-width="3"/>
+  <circle cx="335" cy="190" r="112" fill="#001d0d" stroke="#32ff70" stroke-width="5" filter="url(#glow)"/>
+  <circle cx="335" cy="190" r="92" fill="url(#disc)"/>
+  <circle cx="335" cy="190" r="31" fill="#071008" stroke="#b9ffcb" stroke-width="4"/>
+  <path d="M302 139a75 75 0 0 1 91 15" fill="none" stroke="#e6ffec" stroke-opacity=".72" stroke-width="7" stroke-linecap="round"/>
+  <text x="48" y="78" fill="#b8ffc9" font-family="monospace" font-size="22" letter-spacing="4">LOCALHOST RADIO</text>
+  <text x="48" y="126" fill="#00ff5a" font-family="monospace" font-size="42" font-weight="700">OFFLINE</text>
+  <text x="48" y="169" fill="#00ff5a" font-family="monospace" font-size="42" font-weight="700">FREQUENCIES</text>
+  <text x="48" y="452" fill="#75ff9d" font-family="monospace" font-size="17" letter-spacing="2">$ PLAYING FROM CACHE_</text>
+</svg>

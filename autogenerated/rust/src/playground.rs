@@ -14,6 +14,10 @@ pub struct GetRecentlyPlayedSongResponse {
     pub playing: bool,
     #[prost(string, tag = "4")]
     pub album_art_url: ::prost::alloc::string::String,
+    #[prost(int64, tag = "5")]
+    pub progress_ms: i64,
+    #[prost(int64, tag = "6")]
+    pub duration_ms: i64,
 }
 /// Encoded file descriptor set for the `playground` package
 pub const FILE_DESCRIPTOR_SET: &[u8] = &[

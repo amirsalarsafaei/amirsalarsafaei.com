@@ -46,6 +46,8 @@ struct TrackInfo {
     artist_name: String,
     track_name: String,
     album_art_url: String,
+    progress_ms: i64,
+    duration_ms: i64,
     is_explicit: bool,
     is_playing: bool,
 }
@@ -57,6 +59,8 @@ impl TrackInfo {
             track: self.track_name.clone(),
             album_art_url: self.album_art_url.clone(),
             playing: self.is_playing,
+            progress_ms: self.progress_ms,
+            duration_ms: self.duration_ms,
         }
     }
 }
@@ -91,6 +95,8 @@ impl SpotifyServicer {
                 artist_name: "Daft Punk".to_string(),
                 track_name: "Digital Love".to_string(),
                 album_art_url: url,
+                progress_ms: 42_000,
+                duration_ms: 238_000,
                 is_explicit: false,
                 is_playing: true,
             }));
@@ -171,11 +177,14 @@ impl SpotifyServicer {
         };
 
         let is_explicit = track.explicit;
+        let duration_ms = track.duration.num_milliseconds();
 
         TrackInfo {
             album_art_url,
             artist_name,
             track_name,
+            progress_ms: 0,
+            duration_ms,
             is_explicit,
             is_playing: false,
         }
@@ -204,10 +213,17 @@ impl SpotifyServicer {
                         if secs > 0 {
                             remaining = Some(Duration::from_secs(secs as u64));
                         }
+                        let progress_ms = progress.num_milliseconds();
+                        let duration_ms = full_track.duration.num_milliseconds();
+                        let mut t = Self::extract_track_info(&full_track);
+                        t.progress_ms = progress_ms.clamp(0, duration_ms);
+                        t.is_playing = true;
+                        Some(t)
+                    } else {
+                        let mut t = Self::extract_track_info(&full_track);
+                        t.is_playing = true;
+                        Some(t)
                     }
-                    let mut t = Self::extract_track_info(&full_track);
-                    t.is_playing = true;
-                    Some(t)
                 }
                 _ => None,
             },
@@ -240,6 +256,7 @@ impl SpotifyServicer {
         if track.as_ref().is_none_or(|t| t.is_explicit) {
             track = prev.map(|mut t| {
                 t.is_playing = false;
+                t.progress_ms = 0;
                 t
             });
         }

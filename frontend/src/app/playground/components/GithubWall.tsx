@@ -66,6 +66,8 @@ const mockData: Repository[] = [
   },
 ];
 
+const HOLD_DURATION_MS = 3000;
+
 const RepoCard = ({
   repo,
   position,
@@ -76,7 +78,11 @@ const RepoCard = ({
   const cardWidth = 14;
   const cardHeight = 6;
   const [hovered, setHovered] = useState(false);
+  const [holdProgress, setHoldProgress] = useState(0);
   const meshRef = useRef<THREE.Mesh>(null);
+  const holdStartRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const openedRef = useRef(false);
 
   const material = useMemo(
     () =>
@@ -90,22 +96,65 @@ const RepoCard = ({
     [],
   );
 
-  useFrame((state) => {
+  useFrame(() => {
     if (meshRef.current) {
-      if (hovered) {
-        meshRef.current.scale.lerp(new THREE.Vector3(1.05, 1.05, 1.05), 0.1);
-        material.emissive.setHex(0x114411);
-      } else {
-        meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
-        material.emissive.setHex(0x000000);
-      }
+      const targetScale = hovered ? 1.05 : 1;
+      meshRef.current.scale.lerp(
+        new THREE.Vector3(targetScale, targetScale, targetScale),
+        0.1,
+      );
+      // Emissive intensifies as user holds
+      const hex = holdProgress > 0
+        ? Math.floor(0x11 + holdProgress * 0x44)
+        : hovered
+          ? 0x11
+          : 0x00;
+      material.emissive.setRGB(0, hex / 255, (hex / 255) * 0.4);
     }
   });
 
-  const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation();
-    window.open(`https://github.com/${repo.author}/${repo.name}`, "_blank");
+  const cancelHold = () => {
+    holdStartRef.current = null;
+    openedRef.current = false;
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    setHoldProgress(0);
   };
+
+  const tick = () => {
+    if (holdStartRef.current === null) return;
+    const elapsed = performance.now() - holdStartRef.current;
+    const progress = Math.min(1, elapsed / HOLD_DURATION_MS);
+    setHoldProgress(progress);
+    if (progress >= 1) {
+      if (!openedRef.current) {
+        openedRef.current = true;
+        window.open(
+          `https://github.com/${repo.author}/${repo.name}`,
+          "_blank",
+        );
+      }
+      cancelHold();
+      return;
+    }
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  const startHold = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    if (holdStartRef.current !== null) return;
+    holdStartRef.current = performance.now();
+    openedRef.current = false;
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
 
   return (
     <group position={position}>
@@ -125,8 +174,13 @@ const RepoCard = ({
           e.stopPropagation();
           setHovered(false);
           document.body.style.cursor = "default";
+          cancelHold();
         }}
-        onClick={handleClick}
+        onPointerDown={startHold}
+        onPointerUp={(e) => {
+          e.stopPropagation();
+          cancelHold();
+        }}
       >
         <Text
           position={[-cardWidth / 2 + 0.4, cardHeight / 2 - 0.6, 0.11]}

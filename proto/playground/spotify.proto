@@ -19,4 +19,6 @@ message GetRecentlyPlayedSongResponse {
   string artist = 2;
   bool playing = 3;
   string album_art_url = 4;
+  int64 progress_ms = 5;
+  int64 duration_ms = 6;
 }

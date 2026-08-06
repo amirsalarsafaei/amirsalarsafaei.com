@@ -1,0 +1,247 @@
+@use "@/styles/variables" as *;
+
+.snake-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: snakeFade 0.18s ease-out;
+  font-family: $code-font;
+  color: $blog-text-color;
+}
+
+.snake-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(540px, 100%);
+  background: rgba($card-bg, 0.96);
+  border: 1px solid rgba($secondary-color, 0.35);
+  border-radius: 14px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba($secondary-color, 0.12);
+  overflow: hidden;
+}
+
+.snake-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba($secondary-color, 0.15);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.snake-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: $highlight-color;
+
+  .snake-prompt {
+    color: $accent-color;
+  }
+}
+
+.snake-scores {
+  display: flex;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 13px;
+  color: rgba($blog-text-color, 0.75);
+
+  b {
+    margin-left: 4px;
+    color: $highlight-color;
+    font-weight: 700;
+  }
+
+  .best b {
+    color: #ffb000;
+  }
+}
+
+.snake-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  cursor: pointer;
+  color: rgba($blog-text-color, 0.7);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba($secondary-color, 0.2);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: $highlight-color;
+    border-color: rgba($highlight-color, 0.55);
+  }
+}
+
+.snake-stage {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  margin: 18px auto 8px;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #0a0f0a;
+    border: 1px solid rgba($secondary-color, 0.25);
+    border-radius: 8px;
+    image-rendering: pixelated;
+  }
+}
+
+.snake-splash {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(10, 15, 10, 0.82);
+  border-radius: 8px;
+
+  &__title {
+    font-family: $code-font;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: $highlight-color;
+    text-shadow: 0 0 18px rgba($highlight-color, 0.5);
+  }
+
+  &__stat {
+    font-size: 13px;
+    color: rgba($blog-text-color, 0.8);
+
+    b {
+      color: $highlight-color;
+    }
+  }
+
+  &__cta {
+    padding: 10px 22px;
+    cursor: pointer;
+    font-family: $code-font;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: $primary-bg;
+    background: $highlight-color;
+    border: none;
+    border-radius: 999px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba($highlight-color, 0.35);
+    }
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: rgba($blog-text-color, 0.55);
+    letter-spacing: 0.08em;
+  }
+}
+
+.snake-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 16px 18px;
+}
+
+.snake-status {
+  text-align: center;
+  font-size: 12px;
+  color: rgba($blog-text-color, 0.55);
+  letter-spacing: 0.06em;
+}
+
+.snake-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 4px;
+  justify-content: center;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    color: $highlight-color;
+    background: rgba($secondary-color, 0.1);
+    border: 1px solid rgba($secondary-color, 0.28);
+    border-radius: 8px;
+    transition: transform 0.08s ease, background 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:hover,
+    &:active {
+      background: rgba($highlight-color, 0.2);
+      transform: translateY(1px);
+    }
+
+    &--up {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    &--left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    &--right {
+      grid-column: 3;
+      grid-row: 2;
+    }
+    &--down {
+      grid-column: 2;
+      grid-row: 3;
+    }
+  }
+}
+
+@media (min-width: 720px) {
+  .snake-dpad {
+    display: none;
+  }
+
+  .snake-footer {
+    padding-bottom: 14px;
+  }
+}
+
+@keyframes snakeFade {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

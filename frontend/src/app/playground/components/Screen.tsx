@@ -11,10 +11,11 @@ export default function Screen() {
     <Html
       scale={0.5}
       rotation={[-0.34, 0, 0]}
-      position={[0, 5.85, -7.3]}
+      position={[0, 5.72, -7.16]}
       transform
-      occlude="blending"
-      pointerEvents="none"
+      occlude
+      zIndexRange={[10, 0]}
+      pointerEvents="auto"
       onPointerOver={(e) => {
         e.stopPropagation();
         setFocused(true);

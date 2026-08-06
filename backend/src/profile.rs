@@ -49,10 +49,10 @@ const RESUME_FULL_NAME: &str = "AmirSalar Safaei Ghaderi";
 const RESUME_EMAIL: &str = "amirsalarsafaeighaderi@gmail.com";
 const RESUME_GITHUB_URL: &str = "https://github.com/amirsalarsafaei";
 
-/// Profile photo URL shared by every client. Defaults to the backend's own
-/// image server (dev); override with $PROFILE_IMAGE_URL in production to point
-/// at the public upload host.
-const PROFILE_IMAGE_URL: &str = "http://localhost:3001/images/profile.jpg";
+/// Profile photo URL shared by every client. Defaults to the local public
+/// asset; override with $PROFILE_IMAGE_URL in production to point at the
+/// public upload host (e.g. http://amirsalarsafaei.com/images/<uuid>.jpg).
+const PROFILE_IMAGE_URL: &str = "/amirsalar-photo.jpg";
 
 fn profile_image_url() -> String {
     std::env::var("PROFILE_IMAGE_URL")

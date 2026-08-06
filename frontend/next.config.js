@@ -15,9 +15,17 @@ if (!generatedTsPath) {
   );
 }
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+// Bundle analyzer is only needed for local development builds.
+// Skip it in CI/dev containers where devDependencies aren't installed.
+let withBundleAnalyzer = (c) => c;
+try {
+  const bundleAnalyzer = require('@next/bundle-analyzer');
+  withBundleAnalyzer = bundleAnalyzer({
+    enabled: process.env.ANALYZE === 'true',
+  });
+} catch {
+  // @next/bundle-analyzer not installed — skip
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

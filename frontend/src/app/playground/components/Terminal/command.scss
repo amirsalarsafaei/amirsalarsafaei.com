@@ -23,7 +23,7 @@ $terminal-time-size: 0.8rem;
 .tmux {
   background-color: $terminal-bg;
   color: $terminal-text;
-  font-family: "Menlo", "Monaco", "Courier New", monospace;
+  font-family: "Laptop Terminal", monospace;
 
   .pane {
     padding: $terminal-padding;
@@ -36,12 +36,22 @@ $terminal-time-size: 0.8rem;
       padding: $terminal-padding;
 
       .cmd-input {
+        display: block;
+        min-width: 0;
+        height: 1.35em;
+        padding: 0;
+        margin: 0;
         background: none;
         outline: none;
         border: none;
+        border-radius: 0;
         color: $terminal-input-text;
         width: 100%;
         font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: 1.35;
+        appearance: none;
 
         caret-color: transparent;
 
@@ -53,16 +63,17 @@ $terminal-time-size: 0.8rem;
       .cmd-input-wrapper {
         position: relative;
         flex-grow: 1;
+        min-width: 0;
 
         &::after {
           content: "";
           position: absolute;
-          top: 2px;
+          top: 0.075em;
           height: 1.2em;
-          width: 0.6em;
+          width: 0.61em;
           background-color: $terminal-input-text;
           animation: blink 1s step-end infinite;
-          left: calc(var(--cursor-position) * 0.6em);
+          left: calc(var(--cursor-position) * 0.601em);
         }
       }
 
@@ -86,7 +97,7 @@ $terminal-time-size: 0.8rem;
 
 .cmdout {
   white-space: pre;
-  line-height: 1.4;
+  line-height: 1.35;
   padding: $terminal-padding 0;
 }
 
@@ -129,7 +140,7 @@ $terminal-time-size: 0.8rem;
   flex-grow: 1;
   overflow-wrap: break-word;
   word-break: break-word;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .command {

@@ -21,6 +21,8 @@ export interface GetRecentlyPlayedSongResponse {
   artist: string;
   playing: boolean;
   albumArtUrl: string;
+  progressMs: string;
+  durationMs: string;
 }
 
 function createBaseGetRecentlyPlayedSongRequest(): GetRecentlyPlayedSongRequest {
@@ -67,7 +69,7 @@ export const GetRecentlyPlayedSongRequest: MessageFns<GetRecentlyPlayedSongReque
 };
 
 function createBaseGetRecentlyPlayedSongResponse(): GetRecentlyPlayedSongResponse {
-  return { track: "", artist: "", playing: false, albumArtUrl: "" };
+  return { track: "", artist: "", playing: false, albumArtUrl: "", progressMs: "0", durationMs: "0" };
 }
 
 export const GetRecentlyPlayedSongResponse: MessageFns<GetRecentlyPlayedSongResponse> = {
@@ -83,6 +85,12 @@ export const GetRecentlyPlayedSongResponse: MessageFns<GetRecentlyPlayedSongResp
     }
     if (message.albumArtUrl !== "") {
       writer.uint32(34).string(message.albumArtUrl);
+    }
+    if (message.progressMs !== "0") {
+      writer.uint32(40).int64(message.progressMs);
+    }
+    if (message.durationMs !== "0") {
+      writer.uint32(48).int64(message.durationMs);
     }
     return writer;
   },
@@ -126,6 +134,22 @@ export const GetRecentlyPlayedSongResponse: MessageFns<GetRecentlyPlayedSongResp
           message.albumArtUrl = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.progressMs = reader.int64().toString();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.durationMs = reader.int64().toString();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -145,6 +169,16 @@ export const GetRecentlyPlayedSongResponse: MessageFns<GetRecentlyPlayedSongResp
         : isSet(object.album_art_url)
         ? globalThis.String(object.album_art_url)
         : "",
+      progressMs: isSet(object.progressMs)
+        ? globalThis.String(object.progressMs)
+        : isSet(object.progress_ms)
+        ? globalThis.String(object.progress_ms)
+        : "0",
+      durationMs: isSet(object.durationMs)
+        ? globalThis.String(object.durationMs)
+        : isSet(object.duration_ms)
+        ? globalThis.String(object.duration_ms)
+        : "0",
     };
   },
 
@@ -162,6 +196,12 @@ export const GetRecentlyPlayedSongResponse: MessageFns<GetRecentlyPlayedSongResp
     if (message.albumArtUrl !== "") {
       obj.albumArtUrl = message.albumArtUrl;
     }
+    if (message.progressMs !== "0") {
+      obj.progressMs = message.progressMs;
+    }
+    if (message.durationMs !== "0") {
+      obj.durationMs = message.durationMs;
+    }
     return obj;
   },
 
@@ -176,6 +216,8 @@ export const GetRecentlyPlayedSongResponse: MessageFns<GetRecentlyPlayedSongResp
     message.artist = object.artist ?? "";
     message.playing = object.playing ?? false;
     message.albumArtUrl = object.albumArtUrl ?? "";
+    message.progressMs = object.progressMs ?? "0";
+    message.durationMs = object.durationMs ?? "0";
     return message;
   },
 };

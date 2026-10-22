@@ -37,7 +37,7 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "rxjs": "^7.8.2",
-    "sharp": "^0.35.0",
+    "sharp": "^0.35.5",
     "terser-webpack-plugin": "^5.3.11",
     "three": "^0.171.0",
     "ts-proto": "^2.6.0"

@@ -33,8 +33,15 @@ const nextConfig = {
   // what the Docker image and the NixOS service run in production.
   output: "standalone",
 
+  // Keep the standalone layout stable even when a parent directory contains
+  // lockfiles (Next 15 otherwise infers the repo root and nests the output
+  // under .next/standalone/frontend/).
+  outputFileTracingRoot: __dirname,
+
   reactStrictMode: true,
-  swcMinify: true,
+
+  // Kept out of the server bundle; it is loaded by the markdown highlighter.
+  serverExternalPackages: ['prismjs'],
 
   // Optimize bundle size
   experimental: {
@@ -50,17 +57,6 @@ const nextConfig = {
       'rehype-raw',
       'mermaid'
     ],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-    // Enable modern bundling optimizations
-    esmExternals: true,
-    serverComponentsExternalPackages: ['prismjs'],
     webVitalsAttribution: ['CLS', 'LCP'],
   },
 

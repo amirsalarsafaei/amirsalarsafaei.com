@@ -6,15 +6,26 @@ $scrollbar-track-color: rgba(0, 0, 0, 0.1);
 $scrollbar-thumb-color: rgba(255, 255, 255, 0.3);
 $scrollbar-thumb-radius: 4px;
 
+$bar-bg: #21252b;
+$bar-fg: #abb2bf;
+$bar-dim: #5c6370;
+$bar-accent: #61afef;
+$bar-green: #98c379;
+$bar-border: #3b4048;
+
 .tmux {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   overflow: hidden;
 
   .pane {
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     width: 100%;
     overflow: hidden;
+    padding: 0.2rem;
 
     .commands {
       display: flex;
@@ -48,7 +59,74 @@ $scrollbar-thumb-radius: 4px;
       line-height: 1.35;
       overflow-wrap: break-word;
       word-break: break-word;
-      white-space: pre-wrap;
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// tmux chrome
+// ---------------------------------------------------------------------------
+
+.tmux-bar {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 0.9rem;
+  height: 30px;
+  padding: 0 0.6rem;
+  background: $bar-bg;
+  color: $bar-dim;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+
+  &--top {
+    border-bottom: 1px solid $bar-border;
+  }
+
+  &--bottom {
+    border-top: 1px solid $bar-border;
+  }
+
+  .tmux-session {
+    color: $bar-green;
+    font-weight: 700;
+  }
+
+  .tmux-tab {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: $bar-dim;
+
+    &--active {
+      background: $bar-accent;
+      color: #ffffff;
+      font-weight: 700;
+    }
+  }
+
+  .tmux-spacer {
+    flex: 1;
+  }
+
+  .tmux-badge {
+    padding: 1px 7px;
+    border: 1px solid rgba(97, 175, 239, 0.4);
+    border-radius: 999px;
+    color: $bar-accent;
+    font-size: 12px;
+  }
+
+  .tmux-status-session {
+    color: #e5c07b;
+    font-weight: 700;
+  }
+
+  .tmux-status-item {
+    color: $bar-fg;
+    font-variant-numeric: tabular-nums;
   }
 }

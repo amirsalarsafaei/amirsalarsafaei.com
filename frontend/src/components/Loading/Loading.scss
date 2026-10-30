@@ -4,65 +4,54 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
+  padding: $spacing-lg;
 
   .terminal {
-    background: $terminal-bg;
-    border-radius: $border-radius;
     width: 100%;
-    max-width: 800px;
+    max-width: 560px;
+    background: $terminal-bg;
+    border: 1px solid $terminal-border;
+    border-radius: 10px;
+    box-shadow: $shadow-lg;
     font-family: $code-font;
 
     .terminal-body {
-      padding: 1rem;
+      padding: clamp(1.25rem, 3vw, 2rem);
       color: $terminal-text;
 
       .spinner-container {
         display: flex;
         justify-content: center;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
 
         .binary-spinner {
-          width: 40px;
-          height: 40px;
-          border: 3px solid transparent;
-          border-top-color: $terminal-primary;
-          border-right-color: $terminal-primary;
+          width: 38px;
+          height: 38px;
+          border: 2px solid transparent;
+          border-top-color: $accent-color;
+          border-right-color: rgba($accent-color, 0.4);
           border-radius: 50%;
-          animation: spin 1s linear infinite;
+          animation: spin 0.9s linear infinite;
           position: relative;
-
-          &::after {
-            content: "";
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            right: 3px;
-            bottom: 3px;
-            border: 3px solid transparent;
-            border-top-color: $terminal-secondary;
-            border-radius: 50%;
-            animation: spin 0.5s linear infinite reverse;
-          }
         }
       }
 
       .main-message {
         text-align: center;
-        color: $terminal-white;
-        font-size: $font-size-xl;
-        margin-bottom: 1rem;
-        font-family: $content-font;
+        color: $text-bright;
+        font-size: $font-size-lg;
+        margin-bottom: 0.5rem;
+        font-family: $code-font;
+        word-break: break-word;
       }
 
       .state-message {
         text-align: center;
-        color: $terminal-primary;
-        font-size: $font-size-lg;
+        color: $terminal-muted;
+        font-size: $font-size-sm;
         min-height: 1.5em;
-        opacity: 0.8;
-        transition: color $transition-speed ease;
       }
     }
   }

@@ -1,7 +1,27 @@
+@use "@/styles/variables" as *;
+
 .toolbar {
   width: 100%;
+  max-width: $container-max-width;
+  margin: 0 auto;
   display: flex;
-  justify-content: flex-end;
-  padding: 1rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-base;
+  padding: $spacing-md clamp(1rem, 3vw, 1.5rem) 0;
   box-sizing: border-box;
+}
+
+.title {
+  margin: 0;
+  color: $text-bright;
+  font-family: $code-font;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+
+  &::before {
+    content: "~/";
+    color: $secondary-color;
+    opacity: 0.7;
+  }
 }

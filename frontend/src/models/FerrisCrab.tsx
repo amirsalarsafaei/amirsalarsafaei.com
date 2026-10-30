@@ -10,7 +10,7 @@ Title: Ferris the crab
 
 import { Mesh, SkinnedMesh, Bone, MeshStandardMaterial } from "three";
 import React from "react";
-import { useGraph } from "@react-three/fiber";
+import { useGraph, type ThreeElements } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { GLTF, SkeletonUtils } from "three-stdlib";
 
@@ -38,10 +38,10 @@ type GLTFResult = GLTF & {
   };
 };
 
-export default function Model(props: JSX.IntrinsicElements["group"]) {
+export default function Model(props: ThreeElements["group"]) {
   const { scene } = useGLTF("/ferris_the_crab-transformed.glb");
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
-  const { nodes, materials } = useGraph(clone) as GLTFResult;
+  const { nodes, materials } = useGraph(clone) as unknown as GLTFResult;
   return (
     <group {...props} dispose={null}>
       <primitive object={nodes.GLTF_created_0_rootJoint} />

@@ -60,105 +60,90 @@
   }
 }
 
-.editorHeader {
+.titleInput {
+  flex: 1 1 320px;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+}
+
+// Title + action buttons share the first row; tags get their own full-width
+// row underneath, so the toolbar stays readable at every width.
+.tagsSection {
+  order: 3;
+  flex: 1 1 100%;
   display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  background: $blog-code-bg;
-  border-radius: 8px;
   align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm $spacing-base;
+  padding-top: $spacing-sm;
+  border-top: 1px solid rgba($secondary-color, 0.12);
+}
 
-  input {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
+.tagsHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
 
-  .tagsSection {
-    margin: 1rem 0;
-    background: $blog-code-bg;
-    padding: 1rem;
-    border-radius: $blog-border-radius;
-  }
-
-  .tagsHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-
-    h3 {
-      margin: 0;
-      font-size: 1rem;
-      color: $highlight-color;
-      font-family: $code-font;
-    }
-  }
-
-  .tagsContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .tagWrapper {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .deleteTagButton {
-    position: absolute;
-    right: -6px;
-    top: -6px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: rgba($blog-text-color, 0.9);
-    color: $blog-code-bg;
-    border: 2px solid $blog-code-bg;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 0;
-    opacity: 0;
-    transition: all 0.2s ease;
+  h3 {
+    margin: 0;
+    color: $secondary-color;
     font-family: $code-font;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.03em;
+    text-transform: lowercase;
 
-    &:hover {
-      background: $blog-text-color;
-      transform: scale(1.1);
+    &::before {
+      content: "# ";
+      opacity: 0.6;
     }
   }
+}
 
-  .tagWrapper:hover .deleteTagButton {
+.tagsContainer {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tagWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.deleteTagButton {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid $card-bg;
+  border-radius: 50%;
+  background: $blog-code-color;
+  color: $primary-bg;
+  font-family: $code-font;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.45;
+  transition:
+    opacity $transition-speed $transition-timing,
+    transform $transition-speed $transition-timing;
+
+  &:hover {
     opacity: 1;
+    transform: scale(1.12);
   }
+}
 
-  .titleInput {
-    flex: 2;
-  }
-
-  .tagsInput {
-    flex: 1;
-  }
-
-  .saveButton {
-    padding: 0.5rem 1rem;
-    background: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-
-    &:hover {
-      background: #0051a2;
-    }
-  }
+.tagWrapper:hover .deleteTagButton {
+  opacity: 1;
 }
 
 .editorPane {
@@ -217,17 +202,22 @@
 
 .upsertHeader {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 1rem;
-  background: var(--blog-code-bg);
+  gap: 0.75rem 1rem;
+  padding: $spacing-base;
+  background: $card-bg;
+  border: 1px solid rgba($secondary-color, 0.12);
   border-radius: 8px;
 }
 
 .headerButtons {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
   align-items: center;
+  gap: $spacing-sm;
+  order: 2;
+  margin-left: auto;
 }
 
 .blogImageContainer {

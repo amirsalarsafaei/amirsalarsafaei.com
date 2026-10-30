@@ -1,0 +1,11 @@
+Model Information:
+* title:	Network Server Rack
+* source:	https://sketchfab.com/3d-models/3b15fb8779274844b54e63a40194d450
+* author:	ngdkh (https://sketchfab.com/ngdkh)
+
+Model License:
+* license type:	CC Attribution (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Network Server Rack" (https://sketchfab.com/3d-models/3b15fb8779274844b54e63a40194d450) by ngdkh licensed under CC Attribution (http://creativecommons.org/licenses/by/4.0/)

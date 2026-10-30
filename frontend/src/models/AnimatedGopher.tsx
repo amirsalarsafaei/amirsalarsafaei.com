@@ -14,7 +14,10 @@ interface AnimatedGopherProps {
 
 export default function AnimatedGopherModel(props: AnimatedGopherProps) {
   const modelRef = useRef<Group>(null);
-  const { nodes, materials } = useGLTF("/gopher.glb", true) as GLTFResult;
+  const { nodes, materials } = useGLTF(
+    "/gopher.glb",
+    true,
+  ) as unknown as GLTFResult;
 
   useFrame((state) => {
     if (modelRef.current) {

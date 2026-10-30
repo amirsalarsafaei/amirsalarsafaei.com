@@ -1,0 +1,18 @@
+// Silkscreen (SIL OFL 1.1) — see /fonts/Silkscreen-OFL.txt.
+// The music player's LCD is drawn into a canvas, so the face needs to be
+// registered as a CSS font as well as loaded by three's Text primitives.
+@font-face {
+  font-family: "Bitwave Pixel";
+  src: url("/fonts/Silkscreen-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Bitwave Pixel";
+  src: url("/fonts/Silkscreen-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+}

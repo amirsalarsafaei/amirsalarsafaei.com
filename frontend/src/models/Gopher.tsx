@@ -31,7 +31,10 @@ export type GLTFResult = GLTF & {
 };
 
 export default function Model(props: any) {
-  const { nodes, materials } = useGLTF("/gopher.glb", true) as GLTFResult;
+  const { nodes, materials } = useGLTF(
+    "/gopher.glb",
+    true,
+  ) as unknown as GLTFResult;
   return (
     <group {...props} dispose={null}>
       <mesh

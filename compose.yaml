@@ -69,10 +69,17 @@ services:
         NPM_REGISTRY: ${NPM_REGISTRY:-}
         NPM_REGISTRY_TOKEN: ${NPM_REGISTRY_TOKEN:-}
     ports:
-      - "3000:3000"
+      # 3000 is commonly taken (grafana on many dev machines). Override with
+      # FRONTEND_PORT=3000 if the host port is free.
+      - "${FRONTEND_PORT:-3002}:3000"
     environment:
+      # Browser calls the published host port; server-side rendering/ISR runs
+      # inside this container and must use the compose service name.
       NEXT_PUBLIC_GRPC_WEB_URL: ${NEXT_PUBLIC_GRPC_WEB_URL:-http://localhost:8000}
+      GRPC_WEB_INTERNAL_URL: ${GRPC_WEB_INTERNAL_URL:-http://backend:8000}
       NEXT_PUBLIC_IMAGE_SERVER_WEB_URL: ${NEXT_PUBLIC_IMAGE_SERVER_WEB_URL:-http://localhost:3001}
+      # Used by /api/revalidate so publishing invalidates the ISR cache.
+      AUTH_TOKEN: ${AUTH_TOKEN:-dev-token}
     depends_on:
       backend:
         condition: service_healthy

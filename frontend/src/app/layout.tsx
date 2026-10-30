@@ -1,14 +1,50 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 
 import "@/styles/global.scss"; // Global styles first
 import "@/styles/_base.scss"; // Global styles first
-import styles from "./page.module.scss";
 import QueryProvider from "@/providers/QueryProvider";
 import { GrpcProvider } from "@/providers/GrpcProvider";
 import Navbar from "@/components/Navbar/Navbar";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { getSiteUrl } from "@/utils/seo";
+
+// The repo already ships JetBrains Mono under public/fonts; load it properly
+// instead of hoping the visitor has it installed. Exposed as --font-mono /
+// --font-jetbrains so Sass and the xterm surface can consume the same face.
+const jetbrainsMono = localFont({
+  src: [
+    {
+      path: "../../public/fonts/JetBrainsMono-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/JetBrainsMono-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/JetBrainsMono-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/JetBrainsMono-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-jetbrains",
+  display: "swap",
+  preload: true,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+});
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Amirsalar Safaei | Software Engineer",
     template: "%s | Amirsalar Safaei",
@@ -33,16 +69,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://amirsalarsafaei.com",
+    url: siteUrl,
     title: "Amirsalar Safaei | Software Engineer",
     description:
       "Building high-performance systems and software with Rust, Go, and modern web technologies",
     siteName: "Amirsalar Safaei Portfolio",
     images: [
       {
-        url: "/icon.png",
-        width: 1200,
-        height: 630,
+        url: "/blog-1.png",
+        width: 1024,
+        height: 576,
         alt: "Amirsalar Safaei Portfolio",
       },
     ],
@@ -52,7 +88,7 @@ export const metadata: Metadata = {
     title: "Amirsalar Safaei | Software Engineer",
     description:
       "Building high-performance systems and software with Rust, Go, and modern web technologies",
-    images: ["/icon.png"],
+    images: ["/blog-1.png"],
   },
   robots: {
     index: true,
@@ -73,18 +109,24 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#080b0a",
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
       <body>
         <QueryProvider>
           <GrpcProvider>
             <Navbar />
-            <div className={styles.pageContent}>{children}</div>
+            <div className="pageContent">{children}</div>
           </GrpcProvider>
         </QueryProvider>
       </body>

@@ -1,50 +1,71 @@
-// Colors
-$primary-bg: #0a0c0b; // Nearly black with hint of green
-$card-bg: #0f1412; // Very dark green-black
-$primary-color: #141917; // Dark green-tinted black
-$secondary-color: #2bbc8a; // Muted matrix green
-$text-color: #98a3a0; // Muted green-gray for main text
-$highlight-color: #4ae168; // Softer green for highlights
-$hover-color: #1c2721; // Dark hover state
-$border-radius: 5px;
-$accent-color: #36b37e; // Professional green accent
-$content-font: "Inter", sans-serif;
-$primary-bg: #0a0c0b; // Nearly black with hint of green
+// ============================================
+// DESIGN TOKENS
+// One dark, terminal-flavoured palette shared by
+// every page (site chrome, blogs, terminal UI, 3D HUD).
+// ============================================
 
-// Blog specific colors
-$blog-heading-color: $secondary-color;
-$blog-text-color: #dfe4ea;
-$blog-code-bg: $hover-color;
-$blog-code-color: #ff7675;
-$blog-border-color: $primary-color;
+// Core surfaces
+$primary-bg: #080b0a; // page background — near-black with a green cast
+$card-bg: #0d1311; // cards, panels
+$primary-color: #121a17; // raised surfaces / inputs
+$hover-color: #182420; // hover surface
+$border-color: #1b2622; // hairline borders
+
+// Accent ramp (dim → bright)
+$secondary-color: #2bbc8a; // muted accent: borders, secondary text
+$accent-color: #43d9ad; // primary accent: links, buttons, keywords
+$highlight-color: #5ef2c2; // bright accent: hover, focus, cursors
+
+// Text
+$text-color: #8d9b97; // muted body copy
+$text-bright: #d6deeb; // primary body copy
+
+// Radii / motion
+$border-radius: 6px;
+$transition-speed: 0.2s;
+$transition-timing: cubic-bezier(0.22, 1, 0.36, 1);
+
+// Typography
+$font-mono:
+  var(--font-jetbrains), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+  Consolas, monospace;
+$code-font: $font-mono;
+$content-font: $font-mono;
+
+// Terminal surfaces (shared by about page, loading states, error screens)
+$terminal-bg: #071018;
+$terminal-chrome: #0a141d;
+$terminal-border: #14303a;
+$terminal-text: #a2b3c6;
+$terminal-muted: #607b96;
+$terminal-primary: $accent-color;
+$terminal-secondary: $highlight-color;
+$terminal-white: $text-bright;
+$terminal-violet: #7f5af0;
+$terminal-amber: #ffcc66;
+$terminal-red: #ff7675;
+
+// Blog palette
+$blog-heading-color: $accent-color;
+$blog-text-color: $text-bright;
+$blog-code-bg: #101a17;
+$blog-code-color: #ff8a80;
+$blog-border-color: $border-color;
 $blog-tag-bg: $card-bg;
-$blog-meta-color: #a4b0be;
+$blog-meta-color: #7d8c88;
 $blog-blockquote-border: $secondary-color;
-$blog-link-color: $secondary-color;
-$card-bg: #0f1412; // Very dark green-black
+$blog-link-color: $accent-color;
+
 // Blog layout
 $blog-max-width: 900px;
 $blog-container-padding: 2rem;
-$blog-border-radius: 5px;
+$blog-border-radius: 8px;
 
-$terminal-bg: $primary-bg;
-$terminal-text: $secondary-color;
-$terminal-primary: $highlight-color;
-$terminal-secondary: $accent-color;
-$terminal-white: $blog-text-color;
-
-$content-font: "Inter", sans-serif;
 // Layout
 $navbar-height: 4rem;
 $mobile-breakpoint: 768px;
 
-// Typography
-$code-font: "Fira Code", monospace;
-
-// Animation
-$transition-speed: 0.3s;
-
-// Font Sizes
+// Font sizes
 $font-size-xs: 0.75rem; // 12px
 $font-size-sm: 0.875rem; // 14px
 $font-size-base: 1rem; // 16px
@@ -54,12 +75,12 @@ $font-size-xl: 1.5rem; // 24px
 $font-size-2xl: 1.875rem; // 30px
 $font-size-3xl: 2.25rem; // 36px
 
-// Line Heights
+// Line heights
 $line-height-tight: 1.25;
-$line-height-base: 1.5;
+$line-height-base: 1.6;
 $line-height-loose: 1.75;
 
-// Font Weights
+// Font weights
 $font-weight-light: 300;
 $font-weight-normal: 400;
 $font-weight-medium: 500;
@@ -83,27 +104,18 @@ $z-index-modal: 1050;
 $z-index-popover: 1060;
 $z-index-tooltip: 1070;
 
-$transition-speed: 0.3s;
-$transition-timing: ease;
-
-// Shadows
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-base:
-  0 1px 3px 0 rgba(0, 0, 0, 0.1),
-  0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-md:
-  0 4px 6px -1px rgba(0, 0, 0, 0.1),
-  0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg:
-  0 10px 15px -3px rgba(0, 0, 0, 0.1),
-  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+// Shadows — tuned for a dark surface
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+$shadow-base: 0 2px 8px rgba(0, 0, 0, 0.35);
+$shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+$shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.45);
 
 // Container
 $container-padding-mobile: 1rem;
 $container-padding-tablet: 2rem;
 $container-padding-desktop: 4rem;
 $container-max-width: 1200px;
-$container-padding-medium: 3em;
+$container-padding-medium: 3rem;
 
 // Grid
 $grid-columns: 12;
@@ -116,7 +128,7 @@ $grid-breakpoints: (
   xl: 1200px,
 );
 
-// Media Queries
+// Media queries
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;

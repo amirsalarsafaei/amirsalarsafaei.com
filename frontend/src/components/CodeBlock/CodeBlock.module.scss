@@ -1,12 +1,16 @@
+@use "@/styles/variables" as *;
+
 .codeBlock {
-  background-color: var(--code-bg);
-  padding: 1rem;
-  border-radius: 8px;
+  margin: $spacing-base 0;
+  padding: $spacing-base;
   overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  line-height: 1.5;
-  margin: 1rem 0;
+  background: $blog-code-bg;
+  border: 1px solid rgba($secondary-color, 0.12);
+  border-radius: $border-radius;
+  color: $blog-text-color;
+  font-family: $code-font;
+  font-size: $font-size-sm;
+  line-height: 1.6;
 
   code {
     display: block;

@@ -1,0 +1,89 @@
+@use "@/styles/variables" as *;
+
+%canvas-slot {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 24rem;
+  align-self: stretch;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid rgba($accent-color, 0.18);
+  background:
+    radial-gradient(
+      circle at 25% 20%,
+      rgba($accent-color, 0.18),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 75% 80%,
+      rgba($terminal-violet, 0.16),
+      transparent 35%
+    ),
+    linear-gradient(135deg, #011627 0%, #0a0a1f 100%);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 0 45px rgba($accent-color, 0.08);
+  overflow: hidden;
+
+  @media (max-width: 1200px) {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    height: 30rem;
+  }
+}
+
+.loading {
+  @extend %canvas-slot;
+  color: $text-color;
+  font-family: $code-font;
+  font-size: $font-size-sm;
+}
+
+.fallback {
+  @extend %canvas-slot;
+  color: $text-color;
+  font-family: $code-font;
+
+  .prompt {
+    color: $highlight-color;
+    font-size: $font-size-sm;
+  }
+
+  h2 {
+    margin: 0.25rem 0 0.35rem;
+    color: $text-bright;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+  }
+
+  p {
+    max-width: 34ch;
+    margin: 0;
+    color: $terminal-muted;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+  }
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgba($accent-color, 0.2);
+  border-top-color: $accent-color;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

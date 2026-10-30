@@ -1,6 +1,6 @@
 "use client";
 
-import { Html, useProgress } from "@react-three/drei";
+import { useProgress } from "@react-three/drei";
 
 function getLoadingMessage(progress: number) {
   if (progress < 20) return "init";
@@ -10,14 +10,20 @@ function getLoadingMessage(progress: number) {
   return "ready";
 }
 
+// Rendered as a DOM overlay outside <Canvas>, not with drei's <Html>. <Html>
+// creates its own React root and unmounts it synchronously in a layout-effect
+// cleanup, which React 19 rejects when it happens during a render — e.g. when
+// this component is a Suspense fallback that unmounts as the scene resolves.
 function Loading() {
-  const { progress } = useProgress();
+  const { active, progress } = useProgress();
+
+  if (!active) return null;
 
   return (
-    <Html center>
+    <div className="scene-loader">
       <div
         style={{
-          width: "400px",
+          width: "min(400px, calc(100vw - 32px))",
           backgroundColor: "#1e1e1e",
           borderRadius: "4px",
           padding: "10px",
@@ -101,7 +107,7 @@ function Loading() {
           </div>
         </div>
       </div>
-    </Html>
+    </div>
   );
 }
 

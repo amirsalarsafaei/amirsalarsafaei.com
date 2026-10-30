@@ -1,7 +1,92 @@
 @use "@/styles/variables" as *;
-.formContainer {
-  padding: $container-padding-medium;
+
+.page {
+  min-height: calc(100dvh - #{$navbar-height});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.card {
+  width: min(100%, 480px);
+  overflow: hidden;
+  background: $terminal-bg;
+  border: 1px solid $terminal-border;
+  border-radius: 10px;
+  box-shadow: $shadow-lg;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background: $terminal-chrome;
+  border-bottom: 1px solid $terminal-border;
+  color: $terminal-muted;
+  font-family: $code-font;
+  font-size: 0.8rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $accent-color;
+  box-shadow: 0 0 12px rgba($accent-color, 0.6);
+}
+
+.cardBody {
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.prompt {
+  margin: 0 0 0.35rem;
+  color: $terminal-text;
+  font-family: $code-font;
+  font-size: 0.9rem;
+}
+
+.dollar {
+  color: $accent-color;
+  margin-right: 0.2rem;
+}
+
+.status {
+  margin: 0 0 1.5rem;
+  color: $terminal-muted;
+  font-family: $code-font;
+  font-size: 0.9rem;
+}
+
+.ok {
+  color: $highlight-color;
+}
+
+.muted {
+  color: $text-color;
+}
+
+.field {
   display: flex;
   flex-direction: column;
-  align-items: center;
+}
+
+.error {
+  margin: $spacing-xs 0 0;
+  color: $blog-code-color;
+  font-size: $font-size-xs;
+}
+
+.success {
+  margin: $spacing-xs 0 0;
+  color: $secondary-color;
+  font-size: $font-size-xs;
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
 }

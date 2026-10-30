@@ -1,17 +1,23 @@
 @use "@/styles/variables" as *;
 
 .markdown {
-  line-height: 1.8;
-
   color: $blog-text-color;
-  font-size: 1rem; // 18px
+  font-family: $code-font;
+  font-size: $font-size-base;
+  line-height: 1.8;
+  overflow-wrap: break-word;
 
-  p {
-    margin: 0.75rem 0;
+  @media (max-width: $mobile-breakpoint) {
+    font-size: 0.95rem;
+    line-height: 1.75;
   }
 
-  @media (max-width: 768px) {
-    font-size: 0.9rem; // 16px
+  p {
+    margin: 0.85rem 0;
+  }
+
+  > :first-child {
+    margin-top: 0;
   }
 
   h1,
@@ -20,38 +26,40 @@
   h4,
   h5,
   h6 {
-    color: $blog-heading-color;
-    margin: 2.5rem 0 1.25rem;
-
+    color: $text-bright;
     line-height: 1.3;
+    scroll-margin-top: calc(#{$navbar-height} + 1rem);
   }
 
   h1 {
-    font-size: 2.25rem;
-    border-bottom: 2px solid $highlight-color;
+    margin: 2.5rem 0 1.25rem;
     padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba($accent-color, 0.3);
+    font-size: 2.1rem;
 
-    @media (max-width: 768px) {
-      font-size: 1.875rem;
+    @media (max-width: $mobile-breakpoint) {
+      font-size: 1.8rem;
     }
   }
 
   h2 {
-    font-size: 1.875rem;
-    border-bottom: 2px solid $highlight-color;
-    padding-bottom: 0.5rem;
     position: relative;
+    margin: 2.25rem 0 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba($secondary-color, 0.18);
+    font-size: 1.65rem;
 
     &::before {
       content: "##";
       position: absolute;
-      left: -1.5em;
-      color: rgba($highlight-color, 0.4);
+      left: -1.65em;
+      color: rgba($accent-color, 0.4);
+      font-size: 0.8em;
       font-family: $code-font;
     }
 
-    @media (max-width: 768px) {
-      font-size: 1.625rem;
+    @media (max-width: $mobile-breakpoint) {
+      font-size: 1.45rem;
 
       &::before {
         display: none;
@@ -60,108 +68,85 @@
   }
 
   h3 {
-    font-size: 1.5rem;
+    margin: 1.75rem 0 0.75rem;
     color: $highlight-color;
-    background: rgba($highlight-color, 0.1);
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
+    font-size: 1.3rem;
 
-    @media (max-width: 768px) {
-      font-size: 1.375rem;
+    &::before {
+      content: "### ";
+      color: rgba($accent-color, 0.4);
+      font-size: 0.8em;
+    }
+
+    @media (max-width: $mobile-breakpoint) {
+      font-size: 1.2rem;
     }
   }
 
   h4 {
-    font-size: 1.25rem;
-    color: $highlight-color;
-    position: relative;
-    padding-left: 1rem;
+    margin: 1.5rem 0 0.6rem;
+    color: $accent-color;
+    font-size: 1.1rem;
 
     &::before {
-      content: ">";
-      position: absolute;
-      left: 0;
-      color: rgba($highlight-color, 0.6);
-      font-family: $code-font;
-    }
-
-    @media (max-width: 768px) {
-      font-size: 1.125rem;
+      content: "> ";
+      color: rgba($accent-color, 0.6);
     }
   }
 
   h5,
   h6 {
-    font-size: 1.125rem;
-    color: $highlight-color;
+    margin: 1.25rem 0 0.5rem;
+    color: $secondary-color;
+    font-size: 1rem;
     font-style: italic;
-
-    @media (max-width: 768px) {
-      font-size: 1rem;
-    }
   }
 
   code {
+    padding: 0.16em 0.38em;
+    border-radius: 4px;
     background: $blog-code-bg;
     color: $blog-code-color;
-    padding: 0.2em 0.4em;
-    border-radius: $blog-border-radius;
     font-family: $code-font;
-    font-size: 1.25em;
-
-    @media (max-width: 768px) {
-      font-size: 1.15em;
-      padding: 0.15em 0.3em;
-    }
+    font-size: 0.9em;
   }
 
   .inlineCode {
-    background: rgba($highlight-color, 0.1);
+    background: rgba($accent-color, 0.08);
     color: $highlight-color;
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    font-family: $code-font;
-    font-size: 0.9em;
-    border: 1px solid rgba($highlight-color, 0.2);
-    transition: background 0.2s ease;
+    border: 1px solid rgba($accent-color, 0.18);
+    transition: background-color $transition-speed $transition-timing;
 
     &:hover {
-      background: rgba($highlight-color, 0.15);
+      background: rgba($accent-color, 0.13);
     }
   }
 
   pre {
-    background: $blog-code-bg;
+    margin: 1rem 0;
     padding: 0.75rem;
     border-radius: $blog-border-radius;
+    background: $blog-code-bg;
     overflow-x: auto;
-    margin: 1rem 0;
 
     code {
-      background: none;
       padding: 0;
+      background: none;
       color: $blog-text-color;
     }
   }
 
   blockquote {
-    border-left: 4px solid $blog-blockquote-border;
     margin: 1.5rem 0;
     padding: 1rem 1.25rem;
-    font-size: 1.1rem;
-
-    @media (max-width: 768px) {
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      margin: 1.25rem 0;
-    }
-
-    background: $blog-code-bg;
+    border-left: 3px solid $blog-blockquote-border;
     border-radius: 0 $blog-border-radius $blog-border-radius 0;
-    font-style: italic;
+    background: rgba($accent-color, 0.05);
+    color: rgba($blog-text-color, 0.9);
+    font-size: 1.02rem;
 
     p {
-      margin: 0.5rem 0;
+      margin: 0.4rem 0;
     }
 
     > p:first-child {
@@ -173,105 +158,147 @@
     }
 
     code {
-      background: rgba($highlight-color, 0.1);
+      background: rgba($accent-color, 0.1);
+    }
+
+    @media (max-width: $mobile-breakpoint) {
+      margin: 1.25rem 0;
+      padding: 0.8rem 1rem;
+      font-size: 1rem;
     }
   }
 
   a {
     color: $blog-link-color;
     text-decoration: none;
-    transition: color $transition-speed;
+    border-bottom: 1px solid rgba($accent-color, 0.25);
+    transition:
+      color $transition-speed $transition-timing,
+      border-color $transition-speed $transition-timing;
 
     &:hover {
-      text-decoration: underline;
       color: $highlight-color;
+      border-bottom-color: rgba($highlight-color, 0.6);
     }
   }
 
   table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1rem 0;
     display: block;
+    width: 100%;
+    margin: 1.25rem 0;
+    border-collapse: collapse;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    font-size: 0.92rem;
   }
 
   th,
   td {
-    border: 1px solid $blog-border-color;
-    padding: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid rgba($secondary-color, 0.15);
+    text-align: left;
   }
 
   th {
-    background: $blog-code-bg;
+    background: rgba($accent-color, 0.07);
+    color: $text-bright;
+    font-weight: $font-weight-semibold;
+  }
+
+  tr:nth-child(even) td {
+    background: rgba($primary-color, 0.35);
   }
 
   ul,
   ol {
-    padding-left: 2rem;
+    padding-left: 1.75rem;
   }
 
   li {
-    margin: 0.5rem 0;
+    margin: 0.4rem 0;
+
+    &::marker {
+      color: $secondary-color;
+    }
   }
 
   img {
-    max-width: 100%;
-    border-radius: $blog-border-radius;
     display: block;
+    max-width: 100%;
     margin: 2rem auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba($secondary-color, 0.15);
+    border-radius: $blog-border-radius;
+    box-shadow: $shadow-md;
   }
 
   hr {
+    height: 1px;
+    margin: 2.5rem 0;
     border: none;
-    border-top: 2px solid $blog-border-color;
-    margin: 2rem 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba($accent-color, 0.25),
+      transparent
+    );
   }
 
   .codeBlockContainer {
     margin: 1.5rem 0;
-    border-radius: $blog-border-radius;
     overflow: hidden;
-    background: #1e1e1e;
+    border: 1px solid rgba($secondary-color, 0.14);
+    border-radius: $blog-border-radius;
+    background: #101514;
   }
 
   .codeBlockHeader {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1rem;
-    background: #2d2d2d;
-    border-bottom: 1px solid #3d3d3d;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0.8rem;
+    background: #151d1b;
+    border-bottom: 1px solid rgba($secondary-color, 0.12);
   }
 
   .codeLanguage {
-    color: #9cdcfe;
-    font-size: 0.85rem;
+    color: $text-color;
     font-family: $code-font;
-    text-transform: uppercase;
+    font-size: $font-size-xs;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
 
-    @media (max-width: 768px) {
-      font-size: 0.75rem;
+    &::before {
+      content: "language=";
+      opacity: 0.55;
     }
   }
 
   .copyButton {
+    padding: 0.2rem 0.55rem;
     background: transparent;
-    border: 1px solid #4d4d4d;
-    color: #9cdcfe;
-    padding: 0.25rem 0.75rem;
+    border: 1px solid rgba($secondary-color, 0.2);
     border-radius: 4px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    color: $text-color;
     font-family: $code-font;
+    font-size: $font-size-xs;
+    cursor: pointer;
+    transition:
+      color $transition-speed $transition-timing,
+      border-color $transition-speed $transition-timing,
+      background-color $transition-speed $transition-timing;
 
     &:hover {
-      background: #3d3d3d;
-      border-color: #6d6d6d;
+      color: $highlight-color;
+      border-color: rgba($accent-color, 0.5);
+      background: rgba($accent-color, 0.08);
     }
+  }
+
+  // Syntax-highlighted blocks render inside a div (PreTag="div").
+  .codeBlockContainer > div:last-child {
+    margin: 0 !important;
+    border-radius: 0 !important;
   }
 
   pre {
@@ -280,45 +307,64 @@
     background: none !important;
   }
 
-  .mermaid {
-    padding: 1rem;
-    border-radius: $blog-border-radius;
+  :global(.mermaid) {
     margin: 1.5rem 0;
+    padding: 1rem;
+    overflow-x: auto;
     text-align: center;
+    background: rgba($primary-color, 0.45);
+    border: 1px solid rgba($secondary-color, 0.12);
+    border-radius: $blog-border-radius;
 
     svg {
       max-width: 100%;
+      height: auto;
     }
   }
 
   .loadingCode {
     padding: 1rem;
-    text-align: center;
-    color: #9cdcfe;
-    background: #1e1e1e;
+    background: #101514;
+    color: $terminal-muted;
     font-family: $code-font;
-    font-size: 0.9rem;
-    border-radius: 0 0 4px 4px;
-    
+    font-size: $font-size-sm;
+
     &::after {
-      content: '...';
+      content: "...";
       animation: loadingDots 1.5s infinite;
     }
   }
 
-  .spotifyError {
-    padding: 1rem;
-    background: rgba(255, 0, 0, 0.1);
-    border: 1px solid rgba(255, 0, 0, 0.3);
+  .spotifyEmbed {
+    margin: 1.5rem 0;
+    border: 1px solid rgba($secondary-color, 0.14);
     border-radius: $blog-border-radius;
-    color: #ff6b6b;
-    text-align: center;
+    overflow: hidden;
+  }
+
+  .spotifyError {
     margin: 1rem 0;
+    padding: 1rem;
+    background: rgba($blog-code-color, 0.08);
+    border: 1px solid rgba($blog-code-color, 0.25);
+    border-radius: $blog-border-radius;
+    color: $blog-code-color;
+    text-align: center;
   }
 }
 
 @keyframes loadingDots {
-  0%, 20% { opacity: 0; }
-  50% { opacity: 1; }
-  80%, 100% { opacity: 0; }
+  0%,
+  20% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  80%,
+  100% {
+    opacity: 0;
+  }
 }

@@ -1,28 +1,141 @@
 @use "prism-theme";
 @use "variables" as *;
-html,
-body {
-  height: 100%;
+
+// ============================================
+// CSS CUSTOM PROPERTIES
+// Components written against `var(--token)` (admin editor, markdown,
+// page-level overrides) all resolve through this block. Values mirror the
+// Sass tokens so there is exactly one source of truth.
+// ============================================
+:root {
+  color-scheme: dark;
+
+  --primary-bg: #{$primary-bg};
+  --card-bg: #{$card-bg};
+  --primary-color: #{$primary-color};
+  --primary-color-dark: #0f1614;
+  --secondary-color: #{$secondary-color};
+  --accent-color: #{$accent-color};
+  --highlight-color: #{$highlight-color};
+  --hover-color: #{$hover-color};
+  --text-color: #{$text-color};
+  --border-color: #{$border-color};
+
+  --blog-bg: #{$primary-bg};
+  --blog-text-color: #{$blog-text-color};
+  --blog-code-bg: #{$blog-code-bg};
+  --blog-code-color: #{$blog-code-color};
+  --blog-border-color: #{$blog-border-color};
+
+  --error-color: #{$blog-code-color};
+  --success-color: #35c98b;
+  --success-color-dark: #249c6b;
+
+  --code-bg: #{$blog-code-bg};
+  --font-mono: #{$font-mono};
+  --code-font: #{$code-font};
+
+  --navbar-height: #{$navbar-height};
+  --terminal-bg: #{$terminal-bg};
 }
 
-* {
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 body {
+  min-height: 100%;
+  height: 100dvh;
   margin: 0;
-  font-family: "JetBrains Mono", monospace;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: $font-mono;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  font-weight: $font-weight-normal;
   background: $primary-bg;
   color: $text-color;
 
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+// The scrollable content area below the navbar. `min-height: 0` lets the grid
+// row actually shrink so children can scroll instead of overflowing the body.
+.pageContent {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+::selection {
+  background: rgba($accent-color, 0.3);
+  color: #ffffff;
+}
+
+// Keyboard focus should always be visible; pointer focus stays quiet.
+:focus-visible {
+  outline: 2px solid rgba($highlight-color, 0.75);
+  outline-offset: 2px;
+}
+
+// Thin, palette-matched scrollbars.
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba($secondary-color, 0.35) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba($secondary-color, 0.28);
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+
+  &:hover {
+    background: rgba($secondary-color, 0.45);
+    background-clip: content-box;
+  }
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+// Respect users who ask for less motion.
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

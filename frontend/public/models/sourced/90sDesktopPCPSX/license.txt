@@ -1,0 +1,11 @@
+Model Information:
+* title:	90s Desktop PC - PSX
+* source:	https://sketchfab.com/3d-models/9638c26c48c44c52897d654cc12afb7e
+* author:	visualdiscette (https://sketchfab.com/visualdiscette)
+
+Model License:
+* license type:	CC Attribution (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "90s Desktop PC - PSX" (https://sketchfab.com/3d-models/9638c26c48c44c52897d654cc12afb7e) by visualdiscette licensed under CC Attribution (http://creativecommons.org/licenses/by/4.0/)

@@ -1,9 +1,4 @@
-import nextDynamic from "next/dynamic";
-
-// xterm.js touches the DOM, so render the terminal only on the client.
-const WebTerminal = nextDynamic(() => import("./components/WebTerminal"), {
-  ssr: false,
-});
+import TerminalClient from "./TerminalClient";
 
 export const metadata = {
   title: "terminal · amirsalar",
@@ -12,5 +7,5 @@ export const metadata = {
 };
 
 export default function TerminalPage() {
-  return <WebTerminal />;
+  return <TerminalClient />;
 }

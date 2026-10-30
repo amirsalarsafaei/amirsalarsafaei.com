@@ -21,7 +21,7 @@ export default function Model(props: any) {
   const { nodes, materials } = useGLTF(
     "/linux-transformed.glb",
     true,
-  ) as GLTFResult;
+  ) as unknown as GLTFResult;
   return (
     <group {...props} dispose={null}>
       <mesh

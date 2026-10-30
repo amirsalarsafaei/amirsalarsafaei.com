@@ -1,0 +1,11 @@
+Model Information:
+* title:	Office Chair Modern
+* source:	https://sketchfab.com/3d-models/675f34f7304e4d92812a41e9750539aa
+* author:	thethieme (https://sketchfab.com/thethieme)
+
+Model License:
+* license type:	CC Attribution (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Office Chair Modern" (https://sketchfab.com/3d-models/675f34f7304e4d92812a41e9750539aa) by thethieme licensed under CC Attribution (http://creativecommons.org/licenses/by/4.0/)

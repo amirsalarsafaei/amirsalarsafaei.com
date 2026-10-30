@@ -1,388 +1,160 @@
-import { CommandProps } from "./Command";
-import { say } from "cowsay";
-import cv from "./CV";
+import { Shell } from "./shell";
+import { CompletionResult, complete } from "./completion";
+import { C } from "./commands";
 
-interface PathHandler {
-  getFile(path: string): File | undefined;
-}
-
-enum FileType {
-  File,
-  Dir,
-}
-
-class File implements PathHandler {
-  name: string;
-  type: FileType;
-  modes: [number, number, number];
-  ownerID?: number;
-  groupID?: number;
-  createdAt: Date;
-  modifiedAt: Date;
-  accessedAt: Date;
-  content: string;
-  constructor(
-    name: string,
-    type: FileType,
-    parent?: File,
-    content: string = "",
-  ) {
-    this.name = name;
-    this.type = type;
-    this.modes = [7, 7, 7];
-    this.createdAt = this.modifiedAt = this.accessedAt = new Date();
-    if (this.type === FileType.Dir) {
-      this.children = [];
-    }
-    if (parent == null) {
-      this.parent = this;
-    } else {
-      this.parent = parent;
-      this.parent.children!!.push(this);
-    }
-    this.content = content;
-  }
-  children?: File[];
-  parent: File;
-
-  getChild(name: string): File | undefined {
-    return this.children?.find((f) => f.name === name);
-  }
-
-  getFile(path: string): File | undefined {
-    let firstPart = path,
-      secondPart = null;
-
-    if (path.includes("/")) {
-      firstPart = path.substring(0, path.indexOf("/"));
-      secondPart = path.substring(path.indexOf("/"));
-    }
-
-    const foundFile = this.getChild(firstPart);
-    if (foundFile != null) {
-      if (secondPart == null) {
-        return foundFile;
-      }
-      return foundFile.getFile(secondPart);
-    }
-
-    if (firstPart.startsWith(".")) {
-      let cnt = 0;
-      while (cnt < firstPart.length && firstPart.charAt(cnt) === ".") {
-        cnt++;
-      }
-      if (cnt !== firstPart.length) {
-        return undefined;
-      }
-
-      let cur: File = this;
-      for (let i = 1; i < cnt; i++) {
-        cur = cur.parent;
-      }
-
-      if (secondPart == null) {
-        return cur;
-      }
-      return cur.getFile(secondPart);
-    }
-    return undefined;
-  }
-
-  getLsName(): string {
-    if (this.type === FileType.File) {
-      return this.name;
-    }
-    return `${this.name}/`;
-  }
-
-  getPath(): string {
-    if (this.parent === this) {
-      return "/";
-    }
-    return this.parent.getPath() + this.getLsName();
-  }
-}
-
-class FileSystem implements PathHandler {
-  root: File;
-  constructor() {
-    this.root = new File("", FileType.Dir);
-  }
-
-  getFile(path: string): File | undefined {
-    let i = 0;
-    while (i < path.length && path.charAt(i) === "/") {
-      i++;
-    }
-    if (i == path.length) {
-      return this.root;
-    }
-
-    return this.root.getFile(path.substring(i));
-  }
-}
-
-type CommandResult = {
-  stdout?: string;
-  stderr?: string;
-};
-
-class CommandController implements CommandProps {
+export interface CommandRecord {
   id: string;
   command: string;
   stdout?: string;
   stderr?: string;
-  sentAt: Date;
+  /** Prompt path at the time the command ran. */
   path: string;
-  constructor(
-    id: string,
-    command: string,
-    path: string,
-    stderr?: string,
-    stdout?: string,
-  ) {
-    this.id = id;
-    this.path = path;
-    this.command = command;
-    this.stdout = stdout;
-    this.stderr = stderr;
-    this.sentAt = new Date();
-  }
+  sentAt: Date;
+  code?: number;
+  /** System banner rows have no prompt and no timestamp. */
+  system?: boolean;
+}
+
+const WELCOME_ART = [
+  "  █████╗ ███╗   ███╗██╗██████╗ ",
+  " ██╔══██╗████╗ ████║██║██╔══██╗",
+  " ███████║██╔████╔██║██║██████╔╝",
+  " ██╔══██║██║╚██╔╝██║██║██╔══██╗",
+  " ██║  ██║██║ ╚═╝ ██║██║██║  ██║",
+  " ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═╝",
+];
+
+function welcome(): string {
+  const dim = C.gray;
+  const cyan = C.cyan;
+  const bold = C.bold;
+  const green = C.green;
+  const yellow = C.yellow;
+  const reset = C.reset;
+
+  const art = WELCOME_ART.map((line, index) => {
+    const color = [cyan, cyan, green, green, yellow, yellow][index] ?? cyan;
+    return color + line + reset;
+  }).join("\n");
+
+  return (
+    `${art}\n` +
+    `${dim}  amirsalar's laptop · a POSIX-ish shell in a 3D room${reset}\n\n` +
+    `  ${bold}${green}help${reset}          list every command\n` +
+    `  ${bold}${green}ls -la${reset}        look around (~ is on a real little filesystem)\n` +
+    `  ${bold}${green}cat README.md${reset} how this works\n` +
+    `  ${bold}${green}neofetch${reset}      system vanity\n\n` +
+    `  ${dim}Tab completes · ↑/↓ history · Ctrl+R search · Ctrl+L clear${reset}\n` +
+    `  ${dim}The real site is a full TUI over SSH:${reset} ${bold}ssh ssh.amirsalarsafaei.com${reset}\n`
+  );
 }
 
 export class TerminalController {
-  history: CommandController[];
-  private fileSystem: FileSystem;
-  private folder: File;
+  shell: Shell;
+  history: CommandRecord[] = [];
+  private counter = 0;
+
   constructor() {
-    this.history = [];
-    this.fileSystem = new FileSystem();
-    this.folder = this.fileSystem.root;
-    new File("cv", FileType.File, this.fileSystem.root, cv);
-    this.runCommand(
-      `cowsay "Commands: ls, cd, pwd, cowsay, mkdir, cat, ssh.\nTry 'cat cv' for my resume.\nPsst - this whole site runs over SSH too:\n  ssh ssh.amirsalarsafaei.com  (try 'ssh' here!)\nShift/Ctrl + drag to look around"`,
-    );
+    this.shell = new Shell();
+    this.addSystem(welcome());
   }
 
-  private splitCommandRespectingQuotes(command: string): string[] {
-    const args: string[] = [];
-    let currentArg = "";
-    let inQuotes = false;
+  private nextId(): string {
+    this.counter++;
+    return `cmd-${this.counter}`;
+  }
 
-    for (let i = 0; i < command.length; i++) {
-      if (command[i] === '"' && (i === 0 || command[i - 1] !== "\\")) {
-        inQuotes = !inQuotes;
-      } else if (command[i] === " " && !inQuotes) {
-        if (currentArg) {
-          args.push(currentArg);
-          currentArg = "";
-        }
-      } else {
-        currentArg += command[i];
-      }
-    }
-
-    if (currentArg) {
-      args.push(currentArg);
-    }
-
-    return args;
+  private addSystem(stdout: string): void {
+    this.history.push({
+      id: this.nextId(),
+      command: "",
+      path: "",
+      sentAt: new Date(),
+      stdout,
+      system: true,
+    });
   }
 
   getCurrentPath(): string {
-    return this.folder.getPath();
+    return this.shell.getPromptPath();
   }
 
-  runCommand(command: string) {
-    command = command.trim();
-    let args = this.splitCommandRespectingQuotes(command);
-    const path = this.folder.getPath();
-    let result: CommandResult = {};
-    if (args[0] === "cd") {
-      result = this.cd(args[1] ?? "");
-    } else if (args[0] === "pwd") {
-      result = this.pwd();
-    } else if (args[0] === "mkdir") {
-      result = this.mkdir(args[1] ?? "");
-    } else if (args[0] === "ls") {
-      result = this.ls(args[1] ?? "");
-    } else if (args[0] === "cowsay") {
-      result = this.cowsay(args[1] ?? "");
-    } else if (args[0] === "cat") {
-      result = this.cat(args[1] ?? "");
-    } else if (args[0] === "ssh") {
-      result = this.ssh(args.slice(1));
-    } else {
-      result = {
-        stderr: "command `" + args[0] + "` not found",
-      };
+  getPrompt(): { user: string; host: string; path: string } {
+    return {
+      user: this.shell.env.USER ?? "amirsalar",
+      host: this.shell.env.HOSTNAME ?? "laptop",
+      path: this.shell.getPromptPath(),
+    };
+  }
+
+  runCommand(command: string): void {
+    const trimmed = command.trim();
+    if (trimmed === "") return;
+    const promptPath = this.shell.getPromptPath();
+    const result = this.shell.execute(command);
+
+    if (result.clear) {
+      this.history = [];
+      return;
     }
 
     this.history = [
       ...this.history,
-      new CommandController(
-        String(this.history.length),
+      {
+        id: this.nextId(),
         command,
-        path,
-        result.stderr,
-        result.stdout,
-      ),
+        path: promptPath,
+        sentAt: new Date(),
+        stdout: result.stdout,
+        stderr: result.stderr,
+        code: result.code,
+      },
     ];
   }
 
-  cd(path: string): CommandResult {
-    if (path === "") {
-      this.folder = this.fileSystem.root;
-      return {};
-    }
-
-    const destFolder = this.getFile(path);
-
-    if (destFolder == null) {
-      return {
-        stderr: "no such file or directory: " + path,
-      };
-    }
-    if (destFolder.type !== FileType.Dir) {
-      return {
-        stderr: "not a directory: " + path,
-      };
-    }
-    this.folder = destFolder;
-    return {};
+  /** Record a Ctrl+C on the current line, the way an interactive shell does. */
+  interrupt(command: string): void {
+    this.history = [
+      ...this.history,
+      {
+        id: this.nextId(),
+        command,
+        path: this.getCurrentPath(),
+        sentAt: new Date(),
+        stdout: `${C.gray}^C${C.reset}`,
+        code: 130,
+      },
+    ];
   }
 
-  private getFile(path: string): File | undefined {
-    if (path.startsWith("/")) {
-      return this.fileSystem.getFile(path);
-    } else {
-      return this.folder.getFile(path);
-    }
-  }
-
-  pwd(): CommandResult {
-    let cur = this.folder;
-    let parents = [cur];
-    while (cur.parent !== cur) {
-      cur = cur.parent;
-      parents.push(cur);
-    }
-
-    const path = parents.reduce((prevPath, curPar) => {
-      return "/" + curPar.name + prevPath;
-    }, "");
-
-    return {
-      stdout: path.substring(1),
-    };
-  }
-
-  mkdir(path: string): CommandResult {
-    let folder: File | undefined = this.folder;
-    let name = path;
-    if (path.includes("/")) {
-      name = path.substring(path.lastIndexOf("/"));
-      folder = this.getFile(path.substring(0, path.lastIndexOf("/")));
-      if (folder == null) {
-        return {
-          stderr: `cannot create directory \`${path}\`: No such file or directory`,
-        };
-      }
-    }
-
-    if (name.length === 0) {
-      return {
-        stderr: `cannot create directory \`${path}\`: Name cannot be empty`,
-      };
-    }
-    if (folder.getChild(name) != null) {
-      return {
-        stderr: `cannot create directory \`${path}\`: File exists`,
-      };
-    }
-    new File(name, FileType.Dir, this.folder);
-    return {};
-  }
-
-  ls(path: string): CommandResult {
-    if (path === "") {
-      path = ".";
-    }
-    const folder = this.getFile(path);
-    if (folder == null) {
-      return {
-        stderr: `cannot access '${path}': No such file or directory`,
-      };
-    }
-    let files = [];
-    if (folder.type === FileType.File) {
-      files.push(folder);
-    } else {
-      files = folder.children!!;
-    }
-    return {
-      stdout: files.reduce((prevOut, curFile) => {
-        if (prevOut !== "") {
-          return `${prevOut}\n${curFile.getLsName()}`;
-        }
-        return curFile.getLsName();
-      }, ""),
-    };
-  }
-
-  cat(path: string): CommandResult {
-    if (path === "") {
-      return {
-        stderr: `path cannot be empty`,
-      };
-    }
-
-    const file = this.getFile(path);
-    if (file == null) {
-      return {
-        stderr: `cannot access '${path}': No such file or directory`,
-      };
-    }
-
-    if (file.type == FileType.Dir) {
-      return {
-        stderr: `${file.name}: is a directory`,
-      };
-    }
-
-    return {
-      stdout: file.content,
-    };
-  }
-
-  cowsay(text: string): CommandResult {
-    return {
-      stdout: say({ text: text }),
-    };
-  }
-
-  // ssh promotes the real thing: this 3D laptop is a toy shell, but the actual
-  // site is served as a full TUI over SSH. Any reachable-looking target prints
-  // the invite; an unrelated host gets a playful "can't resolve" nudge.
-  ssh(args: string[]): CommandResult {
-    const host = "ssh.amirsalarsafaei.com";
-    const target = (args[0] ?? "").replace(/^.*@/, "");
-    if (target && !target.includes("amirsalarsafaei.com")) {
-      return {
-        stderr: `ssh: could not resolve hostname ${target}\nthis is a 3D toy shell — try: ssh ${host}`,
-      };
-    }
-    return {
-      stdout:
-        "This laptop is just for show. The real site runs as a full\n" +
-        "terminal UI over SSH — blogs, about-me, and now-playing with\n" +
-        "album art, right in your terminal:\n\n" +
-        `    $ ssh ${host}\n\n` +
-        "Open a real terminal and run it — works from anywhere.",
-    };
-  }
-
-  getCommands(): CommandController[] {
+  getCommands(): CommandRecord[] {
     return this.history;
+  }
+
+  getSuggestions(line: string, caret: number): CompletionResult {
+    return complete(this.shell, line, caret);
+  }
+
+  getHistory(): string[] {
+    return this.shell.history;
+  }
+
+  getExitCode(): number {
+    return this.shell.lastCode;
+  }
+
+  isExited(): boolean {
+    return this.shell.exited;
+  }
+
+  clear(): void {
+    this.history = [];
+  }
+
+  reset(): void {
+    this.shell = new Shell();
+    this.history = [];
+    this.counter = 0;
+    this.addSystem(welcome());
   }
 }

@@ -2,10 +2,15 @@ import { Html } from "@react-three/drei";
 
 import "./screen.scss";
 import Tmux from "./Terminal/Tmux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { onLaptopFocus } from "./laptopInput";
 
-export default function Screen() {
+export default function Screen({ powered = true }: { powered?: boolean }) {
   const [focused, setFocused] = useState<boolean>(true);
+
+  // A click on a 3D key should bring the terminal back into focus so the
+  // injected character lands in the prompt.
+  useEffect(() => onLaptopFocus(() => setFocused(true)), []);
 
   return (
     <Html
@@ -15,7 +20,7 @@ export default function Screen() {
       transform
       occlude
       zIndexRange={[10, 0]}
-      pointerEvents="auto"
+      pointerEvents={powered ? "auto" : "none"}
       onPointerOver={(e) => {
         e.stopPropagation();
         setFocused(true);
@@ -29,10 +34,14 @@ export default function Screen() {
         setFocused(true);
       }}
     >
-      <div className="screen-block" draggable={false}>
-        <div className="wrapper" draggable={false}>
-          <Tmux focused={focused} />
+      <div
+        className={`screen-block${powered ? "" : " screen-block--off"}`}
+        draggable={false}
+      >
+        <div className="wrapper" draggable={false} aria-hidden={!powered}>
+          <Tmux focused={focused && powered} />
         </div>
+        <div className="screen-off" aria-hidden />
       </div>
     </Html>
   );

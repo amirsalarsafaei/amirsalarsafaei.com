@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import "./Loading.scss";
 
 interface LoadingProps {
-  message: string;
+  message?: string;
 }
 
 const loadingStates = [
@@ -16,7 +16,7 @@ const loadingStates = [
   "Serializing binary data...",
 ];
 
-export default function Loading({ message }: LoadingProps) {
+export default function Loading({ message = "Loading" }: LoadingProps) {
   const [currentState, setCurrentState] = useState(0);
 
   useEffect(() => {
@@ -28,10 +28,10 @@ export default function Loading({ message }: LoadingProps) {
   }, []);
 
   return (
-    <div className="tech-spinner">
+    <div className="tech-spinner" role="status" aria-live="polite">
       <div className="terminal">
         <div className="terminal-body">
-          <div className="spinner-container">
+          <div className="spinner-container" aria-hidden>
             <div className="binary-spinner"></div>
           </div>
           <div className="main-message">{message}</div>

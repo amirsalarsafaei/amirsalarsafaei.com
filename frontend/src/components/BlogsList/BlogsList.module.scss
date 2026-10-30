@@ -1,69 +1,76 @@
-// Variables
 @use "@/styles/variables" as *;
 
 .blogsContainer {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  width: 100%;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 1.5rem) 4rem;
 }
 
 .blogsGrid {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 1rem 0;
-  max-width: 800px; // Comfortable reading width
+  gap: 1.5rem;
+  max-width: 840px;
   margin: 0 auto;
+  padding: 0.5rem 0;
+}
 
-  * {
-    text-decoration: none;
-    color: inherit;
+.blogCardLink {
+  display: block;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid rgba($highlight-color, 0.8);
+    outline-offset: 3px;
   }
 }
 
 .blogCard {
-  background: $card-bg;
-  border-radius: 8px;
-
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  border: 1px solid rgba($secondary-color, 0.1);
   position: relative;
   overflow: hidden;
+  background: $card-bg;
+  border: 1px solid rgba($secondary-color, 0.12);
+  border-radius: 10px;
+  transition:
+    transform $transition-speed $transition-timing,
+    border-color $transition-speed $transition-timing,
+    box-shadow $transition-speed $transition-timing;
 
-  width: 100%;
-
+  // A thin accent rail that lights up on hover.
   &::before {
-    content: "fn";
+    content: "";
     position: absolute;
-    top: -20px;
-    left: -10px;
-    font-size: 100px;
-    color: rgba($secondary-color, 0.03);
-    font-family: $code-font;
-    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      $accent-color,
+      rgba($accent-color, 0)
+    );
+    opacity: 0;
+    transition: opacity $transition-speed $transition-timing;
+    z-index: 3;
   }
 
-  &::after {
-    content: "impl";
-    position: absolute;
-    bottom: -30px;
-    right: -10px;
-    font-size: 80px;
-    color: rgba($secondary-color, 0.02);
-    font-family: $code-font;
-    z-index: 1;
-    transform: rotate(-10deg);
-  }
+  .blogCardLink:hover &,
+  .blogCardLink:focus-visible & {
+    transform: translateY(-3px);
+    border-color: rgba($accent-color, 0.35);
+    box-shadow:
+      0 18px 40px rgba(0, 0, 0, 0.35),
+      0 0 30px rgba($accent-color, 0.05);
 
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    border-color: rgba($secondary-color, 0.3);
+    &::before {
+      opacity: 1;
+    }
 
     .imageOverlay {
-      opacity: 0.95;
+      opacity: 1;
     }
 
     .codeLine,
@@ -72,207 +79,231 @@
       opacity: 1;
     }
 
-    .blogImage img {
-      transform: scale(1.05);
+    .blogCardImage {
+      transform: scale(1.03);
     }
-  }
-}
 
-.blogContent {
-  padding: 2rem;
-  min-height: 160px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 2;
-
-  &::before {
-    content: "struct";
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-family: $code-font;
-    font-size: 0.8rem;
-    color: rgba($secondary-color, 0.15);
-  }
-
-  &::after {
-    content: "package main";
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    font-family: $code-font;
-    font-size: 0.8rem;
-    color: rgba($secondary-color, 0.15);
+    .blogTitle {
+      color: $highlight-color;
+    }
   }
 }
 
 .blogImage {
   position: relative;
   width: 100%;
-  height: 250px;
+  height: clamp(180px, 30vw, 250px);
   overflow: hidden;
+  background: $primary-color;
+  border-bottom: 1px solid rgba($secondary-color, 0.1);
 
   .blogCardImage {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s $transition-timing;
   }
+}
 
-  &:hover {
-    .blogCardImage {
-      transform: scale(1.05);
-    }
+// Fallback art for posts without a cover image.
+.imagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(rgba($accent-color, 0.05) 1px, transparent 1px) 0 0 / 24px
+      24px,
+    linear-gradient(90deg, rgba($accent-color, 0.05) 1px, transparent 1px) 0 0 /
+      24px 24px,
+    radial-gradient(
+      circle at 30% 20%,
+      rgba($accent-color, 0.12),
+      transparent 55%
+    ),
+    linear-gradient(135deg, $card-bg, $primary-bg);
+
+  span {
+    color: rgba($accent-color, 0.55);
+    font-family: $code-font;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 24px rgba($accent-color, 0.35);
   }
 }
 
 .imageOverlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    135deg,
-    rgba($accent-color, 0.97) 0%,
-    rgba($accent-color, 0.92) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  inset: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  z-index: 2;
+  gap: 0.35rem;
+  background: linear-gradient(
+    135deg,
+    rgba($accent-color, 0.9),
+    rgba($terminal-violet, 0.82)
+  );
+  opacity: 0;
+  transition: opacity $transition-speed $transition-timing;
 }
 
 .codeLine,
 .codeTag {
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
   font-family: $code-font;
-  font-size: 1.5rem;
-  transform: translateY(10px);
+  font-size: 1.35rem;
+  transform: translateY(8px);
   opacity: 0;
-  transition: all 0.3s ease;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition:
+    transform $transition-speed $transition-timing,
+    opacity $transition-speed $transition-timing;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .codeTag {
-  color: #ffffff;
-  font-weight: bold;
-  transition-delay: 0.1s;
+  font-weight: $font-weight-bold;
+  transition-delay: 0.06s;
+}
+
+.blogContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.3rem 1.5rem 1.2rem;
 }
 
 .blogTitle {
-  color: $accent-color;
+  margin: 0;
+  color: $text-bright;
   font-family: $code-font;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+  font-weight: $font-weight-semibold;
   line-height: 1.4;
+  transition: color $transition-speed $transition-timing;
+
+  // Markdown-heading cue without needing an extra element.
+  &::before {
+    content: "# ";
+    color: $secondary-color;
+    opacity: 0.7;
+  }
+
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  padding-left: 2rem;
-
-  &::before {
-    content: "// ";
-    color: rgba($secondary-color, 0.5);
-    position: absolute;
-    left: 0px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -0.5rem;
-    left: 1.5rem;
-    width: 50px;
-    height: 2px;
-    background: linear-gradient(90deg, $accent-color, transparent);
-  }
-
-  &:hover {
-    &::after {
-      width: 100px;
-      transition: width 0.3s ease;
-    }
-  }
-}
-
-.blogExcerpt {
-  color: $text-color;
-  font-family: $content-font;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  opacity: 0.9;
 }
 
 .blogMeta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-top: 1rem;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
   border-top: 1px solid rgba($secondary-color, 0.1);
   font-family: $code-font;
-  font-size: 0.85rem;
-  margin-top: auto; // Push to bottom of card
+  font-size: $font-size-xs;
+}
+
+.blogDate {
+  color: $text-color;
+  opacity: 0.8;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .blogTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-
-  :global(.chip) {
-    transform: scale(0.9);
-    transform-origin: left;
-  }
+  justify-content: flex-end;
+  gap: 0.35rem;
 }
 
-.blogDate {
-  color: rgba($text-color, 0.6);
-  font-size: 0.8rem;
+.sentinel {
+  height: 1px;
 }
 
 .blogsLoading {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   padding: 2rem;
   color: $text-color;
+  font-size: $font-size-sm;
 
-  .loading-spinner {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba($secondary-color, 0.3);
-    border-radius: 50%;
-    border-top-color: $secondary-color;
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 1rem;
+  p {
+    margin: 0;
   }
 }
 
-.blogsError {
-  text-align: center;
-  padding: 3rem;
-  color: $text-color;
-  background: rgba($card-bg, 0.5);
-  border-radius: 8px;
-  margin: 2rem 0;
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgba($accent-color, 0.2);
+  border-top-color: $accent-color;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
 
-  h2 {
-    color: #ff6b6b;
-    margin-bottom: 1rem;
-    font-family: $code-font;
-  }
+.feedEnd {
+  margin: 1.75rem 0 0;
+  text-align: center;
+  color: rgba($text-color, 0.55);
+  font-family: $code-font;
+  font-size: $font-size-xs;
+  letter-spacing: 0.04em;
+}
+
+.stateCard {
+  max-width: 560px;
+  margin: clamp(2rem, 10vh, 6rem) auto;
+  padding: 1.5rem;
+  background: $terminal-bg;
+  border: 1px solid $terminal-border;
+  border-radius: 10px;
+  box-shadow: $shadow-lg;
+  color: $terminal-text;
 
   p {
-    opacity: 0.8;
+    margin: 0.9rem 0 1.15rem;
+    color: $terminal-muted;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+  }
+}
+
+.statePrompt {
+  margin: 0;
+  color: $highlight-color;
+  font-family: $code-font;
+  font-size: $font-size-sm;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+.stateAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba($accent-color, 0.08);
+  border: 1px solid rgba($accent-color, 0.35);
+  border-radius: $border-radius;
+  color: $highlight-color;
+  font-family: $code-font;
+  font-size: $font-size-sm;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color $transition-speed $transition-timing,
+    border-color $transition-speed $transition-timing;
+
+  &:hover {
+    background: rgba($accent-color, 0.16);
+    border-color: rgba($accent-color, 0.6);
   }
 }
 
@@ -282,61 +313,26 @@
   }
 }
 
-// Responsive adjustments
-@media (max-width: 768px) {
+@media (max-width: $mobile-breakpoint) {
   .blogsContainer {
-    padding: 0 1rem;
+    padding: 0.75rem 1rem 3rem;
   }
 
   .blogsGrid {
-    padding: 0.5rem;
-    gap: 1.5rem;
+    gap: 1.15rem;
   }
 
   .blogContent {
-    padding: 1.25rem;
-  }
-
-  .blogImage {
-    height: 180px;
-  }
-
-  .blogTitle {
-    font-size: 1.3rem;
-    padding-left: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .blogExcerpt {
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
+    padding: 1.05rem 1.15rem 1rem;
   }
 
   .blogMeta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .blogTags {
-    width: 100%;
-    margin-top: 0;
-  }
-
-  .codeLine,
-  .codeTag {
-    font-size: 1.25rem;
-  }
-
-  .blogCard {
-    &::before {
-      font-size: 80px;
-      top: -15px;
-    }
-
-    &::after {
-      font-size: 60px;
-      bottom: -20px;
-    }
+    justify-content: flex-start;
   }
 }

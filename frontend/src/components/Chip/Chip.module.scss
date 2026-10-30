@@ -3,30 +3,33 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.35rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid rgba($highlight-color, 0.3);
-  background: rgba($highlight-color, 0.05);
-  color: $blog-text-color;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font-size: $font-size-xs;
+  line-height: 1.5;
+  white-space: nowrap;
+  border: 1px solid rgba($accent-color, 0.22);
+  background: rgba($accent-color, 0.06);
+  color: rgba($text-bright, 0.85);
   font-family: $code-font;
+  transition:
+    background-color $transition-speed $transition-timing,
+    border-color $transition-speed $transition-timing,
+    color $transition-speed $transition-timing;
+}
+
+.interactive {
+  cursor: pointer;
 
   &:hover {
-    background: rgba($highlight-color, 0.1);
-    border-color: rgba($highlight-color, 0.4);
-  }
-
-  &.selected {
-    background: rgba($highlight-color, 0.2);
-    border-color: rgba($highlight-color, 0.5);
+    background: rgba($accent-color, 0.12);
+    border-color: rgba($accent-color, 0.45);
     color: $highlight-color;
-
-    &:hover {
-      background: rgba($highlight-color, 0.25);
-      border-color: rgba($highlight-color, 0.6);
-    }
   }
+}
+
+.selected {
+  background: rgba($accent-color, 0.16);
+  border-color: rgba($accent-color, 0.55);
+  color: $highlight-color;
 }

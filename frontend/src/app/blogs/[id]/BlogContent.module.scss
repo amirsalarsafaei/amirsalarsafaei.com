@@ -1,100 +1,95 @@
 @use "@/styles/variables" as *;
 
-.messageContainer {
-  text-align: center;
-  padding: 4rem 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.message {
-  font-size: 2rem;
-  color: $accent-color;
-  margin-bottom: 1rem;
-  font-family: $code-font;
-}
-
-.subMessage {
-  color: rgba($secondary-color, 0.8);
-  line-height: 1.6;
-}
-
 .blogContainer {
-  max-width: $blog-max-width;
+  max-width: 840px;
   margin: 0 auto;
-  padding: $blog-container-padding;
+  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) 4rem;
   font-family: $code-font;
+}
 
-  @media (max-width: 768px) {
-    padding: 1rem;
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: $spacing-md;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba($secondary-color, 0.2);
+  border-radius: 999px;
+  color: $text-color;
+  font-family: $code-font;
+  font-size: $font-size-xs;
+  text-decoration: none;
+  transition:
+    color $transition-speed $transition-timing,
+    border-color $transition-speed $transition-timing,
+    background-color $transition-speed $transition-timing;
+
+  &:hover {
+    color: $highlight-color;
+    background: rgba($accent-color, 0.07);
+    border-color: rgba($accent-color, 0.4);
   }
 }
 
 .blogHeader {
-  margin-bottom: 2rem;
-  border-bottom: 2px solid $blog-border-color;
-  padding-bottom: 1rem;
-  text-align: center;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid rgba($secondary-color, 0.14);
 }
 
 .blogTitle {
-  font-size: 2.5rem;
-  color: $blog-heading-color;
-  margin-bottom: 1rem;
-  line-height: 1.2;
+  margin: 0 0 0.85rem;
+  color: $text-bright;
+  font-size: clamp(1.85rem, 4.5vw, 2.5rem);
+  font-weight: $font-weight-semibold;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 
-  @media (max-width: 768px) {
-    font-size: 2rem;
+  &::before {
+    content: "# ";
+    color: $secondary-color;
+    opacity: 0.65;
   }
 }
 
 .blogMeta {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
   color: $blog-meta-color;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  justify-content: center;
+  font-size: $font-size-sm;
+  font-variant-numeric: tabular-nums;
+}
+
+.metaDivider {
+  color: rgba($text-color, 0.5);
 }
 
 .tagContainer {
   display: flex;
-  gap: 0.5rem;
   flex-wrap: wrap;
-  justify-content: center;
-}
-
-.tag {
-  background: $blog-tag-bg;
-  color: $secondary-color;
-  padding: 0.25rem 0.75rem;
-  border-radius: 15px;
-  font-size: 0.85rem;
-  transition: background-color $transition-speed;
-
-  &:hover {
-    background: $hover-color;
-  }
+  gap: 0.4rem;
+  margin-top: $spacing-base;
 }
 
 .blogImage {
-  width: 100%;
-  margin-top: 2rem;
-  border-radius: 8px;
-  overflow: hidden;
   position: relative;
+  width: 100%;
+  margin-top: $spacing-lg;
+  border: 1px solid rgba($secondary-color, 0.15);
+  border-radius: $blog-border-radius;
+  overflow: hidden;
+  background: $card-bg;
 
   &::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: linear-gradient(
       180deg,
-      rgba($blog-heading-color, 0.05) 0%,
-      transparent 100%
+      rgba($accent-color, 0.06),
+      transparent 40%
     );
     pointer-events: none;
   }
@@ -104,24 +99,59 @@
   width: 100%;
   height: auto;
   object-fit: cover;
-  border-radius: 8px;
-  transition: transform $transition-speed;
-
-  &:hover {
-    transform: scale(1.02);
-  }
+  display: block;
 }
 
-@media (max-width: 768px) {
+.blogFooter {
+  margin-top: $spacing-xl;
+  padding-top: $spacing-md;
+  border-top: 1px solid rgba($secondary-color, 0.14);
+}
+
+// Empty / not-found state
+.messageContainer {
+  max-width: 560px;
+  margin: clamp(3rem, 12vh, 8rem) auto;
+  padding: 1.5rem;
+  background: $terminal-bg;
+  border: 1px solid $terminal-border;
+  border-radius: 10px;
+  box-shadow: $shadow-lg;
+  text-align: left;
+}
+
+.prompt {
+  margin-bottom: 1rem;
+  color: $highlight-color;
+  font-family: $code-font;
+  font-size: $font-size-sm;
+}
+
+.message {
+  margin-bottom: 0.5rem;
+  color: $text-bright;
+  font-family: $code-font;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+}
+
+.subMessage {
+  margin: 0 0 1.25rem;
+  color: $terminal-muted;
+  font-size: $font-size-sm;
+  line-height: 1.6;
+}
+
+@media (max-width: $mobile-breakpoint) {
   .blogContainer {
-    padding: 1rem;
+    padding-bottom: 3rem;
   }
 
   .blogTitle {
-    font-size: 2rem;
+    font-size: clamp(1.6rem, 7vw, 2rem);
   }
 
   .blogImage {
-    height: 300px;
+    margin-top: $spacing-md;
   }
 }

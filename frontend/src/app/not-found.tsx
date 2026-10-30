@@ -1,29 +1,14 @@
-"use client";
-
-import { say } from "cowsay";
+import StatusScreen from "@/components/StatusScreen/StatusScreen";
 
 export default function NotFound() {
   return (
-    <>
-      <div
-        style={{
-          height: "100dvh",
-          width: "100dvw",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            whiteSpace: "pre",
-            overflow: "hidden",
-            fontFamily: "monospace",
-          }}
-        >
-          {say({ text: "404: The cows couldn't\nfind this page!" })}
-        </div>
-      </div>
-    </>
+    <StatusScreen
+      code="404"
+      title="not_found"
+      message="The cows couldn't find this page."
+      detail="The URL may be wrong, or the page may have moved."
+      actionLabel="Back home"
+      actionHref="/"
+    />
   );
 }

@@ -4,10 +4,12 @@ services:
       context: .
       dockerfile: ./frontend/Dockerfile.dev
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3002}:3000"
     environment:
       NEXT_PUBLIC_GRPC_WEB_URL: ${NEXT_PUBLIC_GRPC_WEB_URL:-http://localhost:8000}
+      GRPC_WEB_INTERNAL_URL: ${GRPC_WEB_INTERNAL_URL:-http://backend:8000}
       NEXT_PUBLIC_IMAGE_SERVER_WEB_URL: ${NEXT_PUBLIC_IMAGE_SERVER_WEB_URL:-http://localhost:3001}
+      AUTH_TOKEN: ${AUTH_TOKEN:-dev-token}
       NODE_ENV: development
       WATCHPACK_POLLING: "true"
       CHOKIDAR_USEPOLLING: "true"

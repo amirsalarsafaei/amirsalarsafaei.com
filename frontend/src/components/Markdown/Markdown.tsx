@@ -1,4 +1,12 @@
-import { useState, useEffect, useRef, lazy, Suspense } from "react";
+import {
+  ReactNode,
+  ComponentType,
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -8,13 +16,13 @@ const DynamicSyntaxHighlighter = lazy(() =>
   import("react-syntax-highlighter").then((module) => ({
     default: module.PrismAsync as any,
   })),
-);
+) as ComponentType<any>;
 
 const DynamicSpotify = lazy(() =>
   import("react-spotify-embed").then((module) => ({
     default: module.Spotify,
   })),
-);
+) as ComponentType<any>;
 
 let vscDarkPlusStyle: any = null;
 const loadVscDarkPlusStyle = async () => {
@@ -47,15 +55,88 @@ interface MarkdownProps {
   content: string;
 }
 
+interface CodeBlockProps {
+  language: string;
+  style: any;
+  children: ReactNode;
+}
+
+/**
+ * Fenced code block with a copy affordance. Defined at module scope so the
+ * copied state survives parent re-renders (an inline component with hooks gets
+ * remounted on every render).
+ */
+function CodeBlock({ language, style, children }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    };
+  }, []);
+
+  const handleCopy = () => {
+    copy(String(children));
+    setCopied(true);
+
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className={styles.codeBlockContainer}>
+      <div className={styles.codeBlockHeader}>
+        <span className={styles.codeLanguage}>{language || "text"}</span>
+        <button
+          onClick={handleCopy}
+          className={styles.copyButton}
+          aria-label={copied ? "Copied!" : "Copy code"}
+          type="button"
+        >
+          {copied ? "✓ copied" : "copy"}
+        </button>
+      </div>
+
+      {style ? (
+        <Suspense
+          fallback={<div className={styles.loadingCode}>loading highlighter</div>}
+        >
+          <DynamicSyntaxHighlighter
+            style={style}
+            language={language || "text"}
+            PreTag="div"
+            customStyle={{
+              margin: 0,
+              borderRadius: "0 0 6px 6px",
+              background: "#101514",
+            }}
+            showLineNumbers={true}
+            wrapLines={true}
+          >
+            {String(children).replace(/\n$/, "")}
+          </DynamicSyntaxHighlighter>
+        </Suspense>
+      ) : (
+        <div className={styles.loadingCode}>loading highlighter</div>
+      )}
+    </div>
+  );
+}
+
 export default function Markdown({ content }: MarkdownProps) {
   const mermaidInitialized = useRef(false);
   const [syntaxStyle, setSyntaxStyle] = useState<any>(null);
 
   useEffect(() => {
+    loadVscDarkPlusStyle().then(setSyntaxStyle);
+  }, []);
+
+  useEffect(() => {
     const initializeMermaid = async () => {
       if (!mermaidInitialized.current) {
         try {
-          const mermaidInstance = await loadMermaid();
+          await loadMermaid();
           mermaidInitialized.current = true;
         } catch (error) {
           console.error("Failed to load mermaid:", error);
@@ -68,92 +149,14 @@ export default function Markdown({ content }: MarkdownProps) {
   useEffect(() => {
     const renderMermaid = async () => {
       try {
-        const mermaidInstance = await loadMermaid();
-        await mermaidInstance.run({
-          querySelector: ".mermaid",
-        });
+        const mermaid = await loadMermaid();
+        await mermaid.run({ querySelector: ".mermaid" });
       } catch (error) {
         console.error("Mermaid rendering error:", error);
       }
     };
     renderMermaid();
   }, [content]);
-
-  const CodeBlock = ({ match, children, copied, setCopied, ...props }: any) => {
-    const [style, setStyle] = useState<any>(null);
-
-    useEffect(() => {
-      loadVscDarkPlusStyle().then(setStyle);
-    }, []);
-
-    const handleCopy = () => {
-      copy(String(children));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
-
-    if (!style) {
-      return (
-        <div className={styles.codeBlockContainer}>
-          <div className={styles.codeBlockHeader}>
-            {match?.[1] && (
-              <span className={styles.codeLanguage}>{match[1]}</span>
-            )}
-            <button
-              onClick={handleCopy}
-              className={styles.copyButton}
-              aria-label={copied ? "Copied!" : "Copy code"}
-            >
-              {copied ? "✓ Copied!" : "Copy"}
-            </button>
-          </div>
-          <div className={styles.loadingCode}>
-            Loading syntax highlighter...
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className={styles.codeBlockContainer}>
-        <div className={styles.codeBlockHeader}>
-          {match?.[1] && (
-            <span className={styles.codeLanguage}>{match[1]}</span>
-          )}
-          <button
-            onClick={handleCopy}
-            className={styles.copyButton}
-            aria-label={copied ? "Copied!" : "Copy code"}
-          >
-            {copied ? "✓ Copied!" : "Copy"}
-          </button>
-        </div>
-        <Suspense
-          fallback={
-            <div className={styles.loadingCode}>
-              Loading syntax highlighter...
-            </div>
-          }
-        >
-          <DynamicSyntaxHighlighter
-            {...props}
-            style={style}
-            language={match?.[1] || "text"}
-            PreTag="div"
-            customStyle={{
-              margin: 0,
-              borderRadius: "0 0 4px 4px",
-              background: "#1e1e1e",
-            }}
-            showLineNumbers={true}
-            wrapLines={true}
-          >
-            {String(children).replace(/\n$/, "")}
-          </DynamicSyntaxHighlighter>
-        </Suspense>
-      </div>
-    );
-  };
 
   return (
     <ReactMarkdown
@@ -163,9 +166,9 @@ export default function Markdown({ content }: MarkdownProps) {
       components={{
         code({ node, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
-          const [copied, setCopied] = useState(false);
+          const language = match?.[1];
 
-          if (!match) {
+          if (!language) {
             return (
               <code className={styles.inlineCode} {...props}>
                 {children}
@@ -173,7 +176,7 @@ export default function Markdown({ content }: MarkdownProps) {
             );
           }
 
-          if (match?.[1].startsWith("spotify")) {
+          if (language.startsWith("spotify")) {
             const spotifyUrl = String(children).trim();
             const isValidSpotifyUrl =
               /^https:\/\/open\.spotify\.com\/(track|album|playlist|artist)\/[a-zA-Z0-9]+/.test(
@@ -182,7 +185,7 @@ export default function Markdown({ content }: MarkdownProps) {
 
             if (isValidSpotifyUrl) {
               return (
-                <div style={{ overflow: "hidden" }}>
+                <div className={styles.spotifyEmbed}>
                   <Suspense fallback={<div>Loading Spotify embed...</div>}>
                     <DynamicSpotify
                       link={spotifyUrl}
@@ -193,16 +196,16 @@ export default function Markdown({ content }: MarkdownProps) {
                   </Suspense>
                 </div>
               );
-            } else {
-              return (
-                <div className={styles.spotifyError}>
-                  Invalid Spotify URL. Please use a valid Spotify share link.
-                </div>
-              );
             }
+
+            return (
+              <div className={styles.spotifyError}>
+                Invalid Spotify URL. Please use a valid Spotify share link.
+              </div>
+            );
           }
 
-          if (match?.[1] === "mermaid") {
+          if (language === "mermaid") {
             return (
               <div className="mermaid">
                 {String(children).replace(/\n$/, "")}
@@ -211,12 +214,7 @@ export default function Markdown({ content }: MarkdownProps) {
           }
 
           return (
-            <CodeBlock
-              match={match}
-              copied={copied}
-              setCopied={setCopied}
-              {...props}
-            >
+            <CodeBlock language={language} style={syntaxStyle}>
               {children}
             </CodeBlock>
           );

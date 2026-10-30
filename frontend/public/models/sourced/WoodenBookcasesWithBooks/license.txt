@@ -1,0 +1,11 @@
+Model Information:
+* title:	Wooden Bookcases with Books
+* source:	https://sketchfab.com/3d-models/d0618ac16b2a4a87b9b6c7d5e6765626
+* author:	mtcollings (https://sketchfab.com/mtcollings)
+
+Model License:
+* license type:	CC Attribution (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Wooden Bookcases with Books" (https://sketchfab.com/3d-models/d0618ac16b2a4a87b9b6c7d5e6765626) by mtcollings licensed under CC Attribution (http://creativecommons.org/licenses/by/4.0/)
